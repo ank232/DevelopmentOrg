@@ -6,6 +6,7 @@ global class RestAccountWrapper
     {
          public string First_Name;
          public string Industry;
+         public string ExternalID;
         // public string Description;
     }
 }

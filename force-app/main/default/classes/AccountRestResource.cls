@@ -43,22 +43,49 @@ global with sharing class AccountRestResource
           for (RestAccountWrapper.AccountDetails Eachaccount : accDetails) {
             ResAccsToAdd.add(
              new Account(Name=Eachaccount.First_Name,Industry= Eachaccount.Industry, 
+             Account_External_ID__c = Eachaccount.ExternalID,
                 Description ='Added by Rest Service'));
           }
           InsertRestAccounts.insertAccs(ResAccsToAdd);
           return ResAccsToAdd.size();
   } 
+  private static integer UpdateAccounts(Blob RequestBody)
+  {
+    String BlobtoJson = RequestBody.toString();
+    RestAccountWrapper RestAccs = (RestAccountWrapper)JSON.deserialize(BlobtoJson,RestAccountWrapper.class );
+    List<RestAccountWrapper.AccountDetails> accDetails = RestAccs.Accounts;
+          system.debug('Response==='+ accDetails);
+          List<Account> ResAccsToAdd = new List<Account>();
+          for (RestAccountWrapper.AccountDetails Eachaccount : accDetails) {
+            ResAccsToAdd.add(
+             new Account(Name=Eachaccount.First_Name,Industry= Eachaccount.Industry, 
+             Account_External_ID__c = Eachaccount.ExternalID,
+                Description ='Updated by Rest Service'));
+          }
+          InsertRestAccounts.UpdateAccs(ResAccsToAdd);
+          return ResAccsToAdd.size();
+  }
                  /*============= Rest Resources   ==================*/ 
+   @HttpPut
+   global static string UpdateAccountsFromPostMan()
+   {
+    RestRequest req = RestContext.request;
+    RestResponse res = Restcontext.response;
+    Integer TotalAccsUpdated = UpdateAccounts(req.requestBody);
+    return 'Total'+ TotalAccsUpdated +'Updated';
+   }
+
    @HttpPost
-   global static  Integer  CreateAccountFromPostman()
+   global static  string  CreateAccountFromPostman()
    {
     RestRequest req = RestContext.request;
     RestResponse res = Restcontext.response;
    Integer TotalAcssAdded = ParseJSON(req.requestBody);
-   return TotalAcssAdded;
+   return TotalAcssAdded + 'Accounts Created';
     //Map<String, object> responseFromPostman =  req.requestBody;
    // system.debug('Response from Postman=='+ responseFromPostman);
     }
+
  @httpGet
  global static string getAccounts()
  {
@@ -114,6 +141,4 @@ JsonResponse = gen.getAsString();
  // return JsonResponse;
  */
     }
-
-
  }
