@@ -22,3 +22,10 @@ System.debug(acs);
 
 string s = AccountRestResource.getAccounts();
 system.debug(s);
+
+List<Contact> deleteCons = [Select Id, firstname from contact where accountid = null];
+system.debug('deleted'+ deleteCons.size());
+delete deleteCons;
+
+List<Account>deleteAccs = [Select Id, website from account where website like '%example.com'];
+delete deleteAccs;

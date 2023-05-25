@@ -4,114 +4,95 @@ Rest Resource class to update Accounts and its related contacts from PostMan
 @RestResource(UrlMapping='/UpdateAccountswithContacts')
 global with sharing class UpdateAccountsandContacts 
 {
+    /* 
+    Parsing Blob -> String -> Wrapper -> SObjects
+  */
     private static void ParseAccountsandContactsJson(Blob requestBody)
     {
         String blobToJson  = requestBody.toString();
-       // system.debug('Data to Insert is'+ blobToJson);
         AccountContactsWrapper RestAccwithCons = (AccountContactsWrapper)JSON.deserialize(blobToJson, AccountContactsWrapper.class);
-
         List<AccountContactsWrapper.Accounts> accounts = RestAccwithCons.Accounts;
-
         Map<String, AccountContactsWrapper.Accounts> acsconMap  = new Map<String, AccountContactsWrapper.Accounts>();
-        //system.debug('Account to Insert' + accounts);
-        // Map<AccountContactsWrapper.Accounts, List<AccountContactsWrapper.Contacts>> wraperMap =
-        //  new Map<AccountContactsWrapper.Accounts, List<AccountContactsWrapper.Contacts>>();
-        for(AccountContactsWrapper.Accounts accWrapper: accounts)
+        if(!accounts.isEmpty())
         {
-          // system.debug('Details===');
-         //  system.debug('AccountEx_ID====='+accWrapper.ExternalID);
-         //  system.debug('Contacts are-----'+  accWrapper.Contacts);
-           //wraperMap.put(accwrapper, accWrapper.Contacts);
-           acsconMap.put(accWrapper.ExternalID, accWrapper);
-        }
-
-        /*
-        Map Iteration...
-        */
-        System.debug('Map- Keyset=='+ acsconMap.keyset());
-        List<Account> accountsToInsert = new List<Account>();
-        List<Contact> contactsToInsert = new List<Contact>();
-        //for(AccountContactsWrapper.Accounts acs: acsconMap.keySet())
-        for(String  mapVar: acsconMap.keySet())
-        {
-            //System.debug('MAP values========='+ acsconMap.get(mapVar).AccountName);
-            // System.debug('Account ExtID ========='+ acsconMap.get(mapVar).ExternalID);
-            // System.debug('Account Email ========='+ acsconMap.get(mapVar).emailAddress);
-            //System.debug('Related Contacts for<<<<' + acsconMap.get(mapVar).AccountName +'>>>>is ====='+ acsconMap.get(mapVar).Contacts);// Its giving me the related contacts
-            //System.debug('More Info on Contact------'+ acsconMap.get(mapVar).Contacts[0].Contact_ExternalID);
-            /*====== *IMP(adding the desired Accounts and Contacts)======*/
-            accountsToInsert.add(new Account(Name= acsconMap.get(mapVar).AccountName, Website=acsconMap.get(mapVar).EmailAddress));
-            /*
-            first insert the accounts then get the ids -> map the ids to its contact->insert the contact as well
-            */
-            set<ID> insertedAccIds = new Set<ID>();
-            insertedAccIds=BeginAccountInsertion(accountsToInsert);
-            system.debug('Account>>>'+ accountsToInsert);
-            List<contact> contactsTestInsert  = new List<Contact>();
-            for(AccountContactsWrapper.Contacts i: acsconMap.get(mapVar).Contacts)
+            for(AccountContactsWrapper.Accounts accWrapper: accounts)
             {
-                contactsTestInsert.add(new Contact(
-                    LastName= i.Last_Name, FirstName = i.First_Name,
-                    Contact_ExternalID__c =i.Contact_ExternalID
-                ));
-           //     contactsToInsert.add(new Contact(LastName= i.Last_Name, FirstName=i.First_Name, Contact_ExternalID__c= i.Contact_ExternalID));
-                //system.debug('Related Contacts are--');
+                String externalID = accWrapper.ExternalID;
+                acsconMap.put(externalID, accWrapper);
             }
-            system.debug('Contacts added are=='+ contactsTestInsert);
-
-            //if(!accountsToInsert.isEmpty()){
-            //insert accountsToInsert;
-           // } // Accounts Inserted
-            
-            //System.debug('Related Cons===='+ acs.Contacts);
-            // accountsToInsert.add(
-            //         new Account(
-            //         Name=acs.AccountName, 
-            //         Account_External_Id__c = acs.ExternalID,
-            //         Website  = acs.emailAddress
-            //         ));
-            // List<AccountContactsWrapper.Contacts> cons = acs.Contacts ;
-            
-            // for(AccountContactsWrapper.Contacts contact:cons)
-            // {
-            //     contactsToInsert.add(
-            //         new Contact(
-            //             FirstName = contact.First_Name,
-            //             LastName  = contact.Last_Name
-            //     )
-            //     );
-            // }
         }
-        // System.debug('Accounts ready to insert are'+ accountsToInsert.size());
-        // System.debug('Contacts ready to insert are'+contactsToInsert.size());
-        //Set<ID> accountsInserted = new Set<Id>();
-        //accountsInserted = InsertAccountAndCons(accountsToInsert, contactsToInsert); 
-    }
-
-
+        List<Contact> contactsToInsert = new List<Contact>();
+        List<Account> accountsToInsert = new List<Account>();
+        Map<string,List<Contact>> finalMap = new Map<string ,List<Contact>>();
+        system.debug('Account with its contacts are---');
+        if(!acsconMap.isEmpty())
+        {
+            for(String  mapVar: acsconMap.keySet())
+            {
+                accountsToInsert.add(new Account(
+                Name    = acsconMap.get(mapVar).AccountName, 
+                Website = acsconMap.get(mapVar).emailAddress, 
+                Account_External_ID__c = acsconMap.get(mapVar).ExternalID
+                ));
+                 system.debug('Showing contacts----');
+                 system.debug(acsconMap.get(mapVar).Contacts);
+                 list<contact>cons = new List<Contact>();
+                 for(AccountContactsWrapper.Contacts con: acsconMap.get(mapVar).Contacts)
+                    {
+                          string lastName = con.Last_Name;
+                          string firstName = con.First_Name;
+                          string conExternalId = con.Contact_ExternalID;
+                          contact conObj  = new Contact(
+                            LastName = lastName,
+                            FirstName = firstName,
+                            Contact_ExternalID__c = conExternalId
+                            );
+                            cons.add(conObj); 
+                            finalMap.put(mapVar, cons);
+                    }
+             }
+        }
+        if(!accountsToInsert.isEmpty())
+        {
+            insert accountsToInsert;
+        }
+        Map<String, ID> accountIDs = new Map<String,Id>();
+        for(Account acc: accountsToInsert)
+        {
+            accountIDs.put(acc.Account_External_ID__c, acc.Id);
+        }
+        if(!finalMap.isEmpty()){
+        for(String AccexternalId : finalMap.keySet())
+        {
+            ID accountID = accountIDs.get(AccexternalId);
+            list<contact> contacts = finalMap.get(AccexternalId);
+            for(contact con:contacts )
+            {
+                con.AccountId= accountID;
+            }
+            contactsToInsert.addall(contacts);
+        }
+        if(!contactsToInsert.isEmpty())
+        {
+            insert contactsToInsert;
+        }
+    } 
+}           
     /*
-     Rest Resouce:
-    */ 
-
+   Rest Resouce:
+   */ 
     @HttpPost
-    global static void CreateAccountswithContacts()
+    global static String CreateAccountswithContacts()
     {
         RestRequest req = RestContext.request;
         RestResponse res  = RestContext.response;
-        ParseAccountsandContactsJson(req.requestBody);
+        if(res.responseBody!= null){
+            ParseAccountsandContactsJson(req.requestBody);
+            string Result = 'Accounts and Contacts Successfully Inserted into Salesforce';
+            return Result;
+        }
+        else{
+            return 'Bad Request';
+        }
     }	
-
-	private static Set<Id> InsertAccountAndCons(List<Account> accountsToInsert, List<Contact> contactsToInsert)
-    { 
-        Set<ID>accountInserted =  new Set<ID>();
-        Database.SaveResult[] accountRes = Database.insert( accountsToInsert);
-        for(Database.SaveResult result: accountRes)
-        {
-            if(result.getId()!= null)
-            {
-                accountInserted.add(result.id);
-            }
-        }        
-        return accountInserted;
-	} 
 }
