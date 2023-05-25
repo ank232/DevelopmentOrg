@@ -79,8 +79,8 @@ global with sharing class UpdateAccountsandContacts
         {
             insert contactsToInsert;
         }
-    } 
-}           
+      } 
+    }           
     /*
    Rest Resouce:
    */ 
