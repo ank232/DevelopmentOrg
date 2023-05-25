@@ -9,6 +9,9 @@ global with sharing class UpdateAccountsandContacts
   */
     private static void ParseAccountsandContactsJson(Blob requestBody)
     {
+        /* 
+        JSON Data
+         */
         String blobToJson  = requestBody.toString();
         AccountContactsWrapper RestAccwithCons = (AccountContactsWrapper)JSON.deserialize(blobToJson, AccountContactsWrapper.class);
         List<AccountContactsWrapper.Accounts> accounts = RestAccwithCons.Accounts;
@@ -36,7 +39,7 @@ global with sharing class UpdateAccountsandContacts
                 ));
                  system.debug('Showing contacts----');
                  system.debug(acsconMap.get(mapVar).Contacts);
-                 list<contact>cons = new List<Contact>();
+                 list<contact> cons = new List<Contact>();
                  for(AccountContactsWrapper.Contacts con: acsconMap.get(mapVar).Contacts)
                     {
                           string lastName = con.Last_Name;
