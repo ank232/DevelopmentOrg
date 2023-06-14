@@ -1,0 +1,19 @@
+<template>
+  <lightning-card title="Create New Record">
+    <div class="slds-p-horizontal_medium slds-p-vertical_medium">
+      <lightning-input label="Customer Name" required value={customerName} onchange={handleNameChange}></lightning-input>
+      <lightning-combobox
+      required
+       label="Status" 
+       options={invoiceStatus}
+        placeholder="Set the Status" 
+        >
+      </lightning-combobox>
+      <lightning-input label="Date" type="date" required value={invoiceDate}></lightning-input>
+     <lightning-input label="Due Date" type="date" required value={invoiceDueDate}></lightning-input>
+     <lightning-input label="Paid Date" type="date" required value={invoicePaidDate}></lightning-input>
+    <lightning-input label="Invoice Number" value={invoiceNumber}></lightning-input>
+      <lightning-button label="Save" onclick={createRecord} variant="brand" class="slds-m-top_medium"></lightning-button>
+    </div>
+  </lightning-card>
+</template>
