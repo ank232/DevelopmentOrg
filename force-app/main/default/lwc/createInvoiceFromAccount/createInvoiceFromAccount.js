@@ -4,7 +4,7 @@ import {
 } from 'lightning/uiObjectInfoApi';
 import INVOICE_STATUS_FIELD from '@salesforce/schema/Invoice__c.Status__c';
 export default class CreateInvoiceFromAccount extends LightningElement {
-
+    /* ------- Proprties-----------  */
     @track customerName = '';
     @track invoiceStatus;
 
