@@ -1,23 +1,49 @@
 <template>
-    <lightning-card title="Create Invoice">
-        <lightning-record-edit-form object-api-name={objectApiName} onsubmit={handleSubmit} >
-            <div class="slds-grid slds-gutters">
-                <div class="slds-col">
-                    <lightning-input-field field-name="Company__c" ></lightning-input-field>
-                    <lightning-input-field field-name="Customer__c"></lightning-input-field>
-                    <lightning-input-field field-name="Invoice_Date__c"></lightning-input-field>
-                    <lightning-input-field field-name="Status__c"></lightning-input-field>
-                    <lightning-input-field field-name="Due_Date__c"></lightning-input-field>
-                </div>
-                <div class="slds-col">
-                    <lightning-input-field field-name="Invoice_Paid_Date__c"></lightning-input-field>
-                    <lightning-input-field field-name="Description__c"></lightning-input-field>
-                </div>
-                
-            </div>
-            <div class="">
-                <lightning-button  label="Create Invoice" onclick={GenerateInvoice} variant="brand"></lightning-button>
-            </div>
-        </lightning-record-edit-form>
-    </lightning-card>
+  <lightning-card   title="Create Invoice">
+    <lightning-record-edit-form object-api-name={objectApiName} onsubmit={handleSubmit}>
+      <div class="slds-section slds-var-m-bottom_medium">
+        <h3 class="slds-section__title">Invoice Details</h3>
+        <div class="slds-grid slds-wrap">
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input-field field-name="Customer__c" onchange={handleCustomerDetail}></lightning-input-field>
+          </div>
+        </div>
+      </div>
+
+      <div class="slds-section slds-var-m-bottom_medium">
+        <h3 class="slds-section__title">Additional Details</h3>
+        <div class="slds-grid slds-wrap">
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input-field field-name="Status__c"></lightning-input-field>
+          </div>
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input-field field-name="Due_Date__c"></lightning-input-field>
+          </div>
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input-field field-name="Invoice_Number__c"></lightning-input-field>
+          </div>
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input-field field-name="Paid_Date__c"></lightning-input-field>
+          </div>
+        </div>
+      </div> 
+
+      <div class="slds-section slds-var-m-bottom_medium">
+        <h3 class="slds-section__title">Contact Details</h3>
+        <div class="slds-grid slds-wrap">
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input-field field-name="From_Phone__c"></lightning-input-field>
+          </div>
+          <div class="slds-col slds-size_1-of-2">
+            <lightning-input-field field-name="From_Email__c"></lightning-input-field>
+          </div>
+        </div>
+      </div>
+
+      <div class="slds-align_absolute-center slds-m-top_medium">
+        <lightning-button label="Create Invoice" onclick={GenerateInvoice} variant="brand"></lightning-button>
+      </div>
+
+    </lightning-record-edit-form>
+  </lightning-card>
 </template>

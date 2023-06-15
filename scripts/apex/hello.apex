@@ -29,3 +29,6 @@ delete deleteCons;
 
 List<Account>deleteAccs = [Select Id, website from account where website like '%example.com'];
 delete deleteAccs;
+
+Contact c = CustomerDetailsController.CustomerDetails('0032w000011YQGFAA4');
+system.debug('** I got this----'+ c.Phone);
