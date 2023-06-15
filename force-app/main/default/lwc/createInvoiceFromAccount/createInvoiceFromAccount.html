@@ -1,15 +1,23 @@
 <template>
-  <lightning-card title="Generate Invoice">
-    <div class="slds-var-p-horizontal_medium slds-var-p-vertical_medium">
-      <lightning-input label="Customer Name" required value={customerName} onchange={handleCustomerName}></lightning-input>
-      <lightning-combobox required label="Status" options={invoiceStatus}  placeholder="Status" onchange={handleInvoiceStatus}>
-      </lightning-combobox>
-      <lightning-input label="Date" type="date" required value={invoiceDate} onchange={handleInvoiceDate} ></lightning-input>
-      <lightning-input label="Due Date" type="date" required value={invoiceDueDate} onchange={handleInvoiceDueDate}></lightning-input>
-      <lightning-input label="Paid Date" type="date" required value={invoicePaidDate} onchange={handleInvoicePaidDate}></lightning-input>
-      <lightning-input label="Invoice Number" required value={invoiceNumber} onchange={handleInvoiceNumber}></lightning-input>
-      <lightning-button label="Generate Invoice" onclick={GenerateInvoice} variant="brand"
-        class="slds-var-m-top_medium"></lightning-button>
-    </div>
-  </lightning-card>
+    <lightning-card title="Create Invoice">
+        <lightning-record-edit-form object-api-name={objectApiName} onsubmit={handleSubmit} >
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning-input-field field-name="Company__c" ></lightning-input-field>
+                    <lightning-input-field field-name="Customer__c"></lightning-input-field>
+                    <lightning-input-field field-name="Invoice_Date__c"></lightning-input-field>
+                    <lightning-input-field field-name="Status__c"></lightning-input-field>
+                    <lightning-input-field field-name="Due_Date__c"></lightning-input-field>
+                </div>
+                <div class="slds-col">
+                    <lightning-input-field field-name="Invoice_Paid_Date__c"></lightning-input-field>
+                    <lightning-input-field field-name="Description__c"></lightning-input-field>
+                </div>
+                
+            </div>
+            <div class="">
+                <lightning-button  label="Create Invoice" onclick={GenerateInvoice} variant="brand"></lightning-button>
+            </div>
+        </lightning-record-edit-form>
+    </lightning-card>
 </template>
