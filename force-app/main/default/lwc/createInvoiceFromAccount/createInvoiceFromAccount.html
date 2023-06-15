@@ -1,19 +1,15 @@
 <template>
-  <lightning-card title="Create New Record">
-    <div class="slds-p-horizontal_medium slds-p-vertical_medium">
-      <lightning-input label="Customer Name" required value={customerName} onchange={handleNameChange}></lightning-input>
-      <lightning-combobox
-      required
-       label="Status" 
-       options={invoiceStatus}
-        placeholder="Set the Status" 
-        >
+  <lightning-card title="Generate Invoice">
+    <div class="slds-var-p-horizontal_medium slds-var-p-vertical_medium">
+      <lightning-input label="Customer Name" required value={customerName} onchange={handleCustomerName}></lightning-input>
+      <lightning-combobox required label="Status" options={invoiceStatus}  placeholder="Status" onchange={handleInvoiceStatus}>
       </lightning-combobox>
-      <lightning-input label="Date" type="date" required value={invoiceDate}></lightning-input>
-     <lightning-input label="Due Date" type="date" required value={invoiceDueDate}></lightning-input>
-     <lightning-input label="Paid Date" type="date" required value={invoicePaidDate}></lightning-input>
-    <lightning-input label="Invoice Number" value={invoiceNumber}></lightning-input>
-      <lightning-button label="Save" onclick={createRecord} variant="brand" class="slds-m-top_medium"></lightning-button>
+      <lightning-input label="Date" type="date" required value={invoiceDate} onchange={handleInvoiceDate} ></lightning-input>
+      <lightning-input label="Due Date" type="date" required value={invoiceDueDate} onchange={handleInvoiceDueDate}></lightning-input>
+      <lightning-input label="Paid Date" type="date" required value={invoicePaidDate} onchange={handleInvoicePaidDate}></lightning-input>
+      <lightning-input label="Invoice Number" required value={invoiceNumber} onchange={handleInvoiceNumber}></lightning-input>
+      <lightning-button label="Generate Invoice" onclick={GenerateInvoice} variant="brand"
+        class="slds-var-m-top_medium"></lightning-button>
     </div>
   </lightning-card>
 </template>
