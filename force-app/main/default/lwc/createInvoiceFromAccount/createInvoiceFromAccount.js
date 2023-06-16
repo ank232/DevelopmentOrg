@@ -1,60 +1,68 @@
-import { LightningElement, api, wire } from 'lwc';
-import { getPicklistValues } from 'lightning/uiObjectInfoApi';
-import INVOICE_OBJECT from '@salesforce/schema/Invoice__c';
-import { getRecord } from 'lightning/uiRecordApi';
-// import INVOICE_COMPANY_NAME_FIELD from '@salesforce/schema/Invoice__c.Company__c';
-// import INVOICE_CUSTOMER_NAME_FIELD from '@salesforce/schema/Invoice__c.Customer__c';
-// import INVOICE_STATUS_FIELD from '@salesforce/schema/Invoice__c.Status__c';
-// import INVOICE_DUE_DATE_FIELD from '@salesforce/schema/Invoice__c.Due_Date__c';
-// import INVOIC_PAID_DATE_FIELD from '@salesforce/schema/Invoice__c.Paid_Date__c';
-// import INVOICE_DATE_FIELD from '@salesforce/schema/Invoice__c.Invoice_Date__c';
-// import INVOICE_NUMBER_FIELD from '@salesforce/schema/Invoice__c.Invoice_Number__c';
-// import INVOICE_REFERENCE_FIELD from '@salesforce/schema/Invoice__c.Reference__c';
+import { LightningElement, wire } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import INVOICE_STATUS_FIELD from '@salesforce/schema/Invoice__c.Status__c';
+/*Contoller Class*/
+import CustomerDetails from '@salesforce/apex/CustomerDetailsController.CustomerDetails';
 export default class CreateInvoiceFromAccount extends LightningElement {
-    /* ------- Proprties-----------  */
-    customerName;
-    invoiceStatus;
-    invoiceDate;
-    invoiceDueDate;
-    nvoicePaidDate;
-    invoiceNumber;
-    objectApiName = INVOICE_OBJECT;
-    customerId;
-    customerData = {};
-    // @wire(getRecord, { recordId: '$customerId', fields: ['Customer__r.Name, Customer__r.Email'] })
-    // customerRecord({ error, data }) {
-    //     if (data) {
-    //         this.customerData = data.fields;
-    //     } else if (error) {
+    custName;
+    customerData;
 
-    //     }
-    // }
-    handleCustomerDetail(event) {
-        const recordtest = event.detail.records[this.objectApiName];
-        this.customerId = recordtest.fields.Customer__c.value;
-        console.log('-- -- --');
-        console.log(this.customerId);
+    @wire(CustomerDetails, {
+        CustomerId: '$custName'
+    })
+    wiredCustomerDetails({ data, error }) {
+        if (data) {
+            this.customerData = data;
+        } else if (error) {
+            console.log('Error occured');
+            console.log('Details---', error);
+        }
+    }
+    handleCustomerName(event) {
+        this.custName = event.detail.value[0];
     }
     GenerateInvoice(event) {
+        this.haserror = false;
+        console.log('I called  once...');
+        console.log('0--000----00hi', INVOICE_STATUS_FIELD.fieldApiName);
         event.preventDefault();
-        const formInputs = this.template.querySelectorAll('lightning-input-field');
-        formInputs.forEach(inputfield => {
-            console.log('FieldName=');
-            console.log(inputfield.fieldName);
-            console.log(inputfield.value);
-        });
+        const userInput = {};
+        const requiredFields = [INVOICE_STATUS_FIELD.fieldApiName];
+        const forminpt = this.template.querySelectorAll('lightning-input-field');
+        if (forminpt.length == 0) {
+            console.log(':(');
+        }
+        forminpt.forEach(inputfield => {
+            const fieldName = inputfield.fieldName;
+            const fieldValue = inputfield.value;
+            if (requiredFields.includes(fieldName) && fieldValue == null) {
+                console.log('I am satisfied :)');
+                this.haserror = true;
+                // this.showerror();
+            }
+            userInput[fieldName] = fieldValue;
+        })
+        console.log('User Input');
+        console.log(JSON.parse(JSON.stringify(userInput)));
+        if (haserror) {
+            this.ShowToast('Error', 'please fill field', 'error');
+            return;
+        }
     }
-
-    // @wire(getPicklistValues, {
-    //     recordTypeId: '012000000000000AAA',
-    //     fieldApiName: INVOICE_STATUS_FIELD
-    // })
-    // wiredPicklistValues({ data, error }) {
-    //     if (data) {
-    //         this.invoiceStatus = data.values;
-    //     }
-    //     if (error) {
-    //         console.log('Errorr!!! ');
-    //     }
-    // }
+    showerror() {
+        const event = new ShowToastEvent({
+            title: 'Error',
+            message: 'Please fill field',
+            variant: 'error'
+        });
+        this.dispatchEvent(event);
+    }
+    ShowToast(title, message, variant) {
+        const event = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(event);
+    }
 }
