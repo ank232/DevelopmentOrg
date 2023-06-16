@@ -23,8 +23,6 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     }
     GenerateInvoice(event) {
         this.haserror = false;
-        console.log('I called  once...');
-        console.log('0--000----00hi', INVOICE_STATUS_FIELD.fieldApiName);
         event.preventDefault();
         const userInput = {};
         const requiredFields = [INVOICE_STATUS_FIELD.fieldApiName];
@@ -36,7 +34,6 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             const fieldName = inputfield.fieldName;
             const fieldValue = inputfield.value;
             if (requiredFields.includes(fieldName) && fieldValue == null) {
-                console.log('I am satisfied :)');
                 this.haserror = true;
                 // this.showerror();
             }
