@@ -32,3 +32,11 @@ delete deleteAccs;
 
 Contact c = CustomerDetailsController.CustomerDetails('0032w000011YQGFAA4');
 system.debug('** I got this----'+ c.Phone);
+Id recId = '0012w00001R41h4AAB';
+string searchterm = 'prim';
+string searstr = '%'+ searchterm + '%';
+list<Contact> query=  new List<Contact>();
+query = [select id, name from contact where AccountId =: recId and Name like: searstr];
+System.debug('0-0-0-0-0-0-0-0-0-');
+system.debug(query.size());
+system.debug('-0-0-0-0-0-0-0-0-0-');

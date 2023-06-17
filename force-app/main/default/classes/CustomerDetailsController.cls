@@ -13,14 +13,19 @@ public with sharing class CustomerDetailsController {
     @params: String-> CompanyId
     */ 
     @AuraEnabled(cacheable=true)
-    public static List<Contact> RelatedContacts(string CompanyId)
+    public static List<Contact> RelatedContacts(string CompanyId, String searchterm)
     {
+        string searchquery = '%'+ searchterm + '%';
         try {
-        List<Contact> relatedCustomers = [SELECT Id, NAME FROM CONTACT WHERE ACCOUNTID =: CompanyId];
+        List<Contact> relatedCustomers = [SELECT Id, NAME FROM CONTACT WHERE ACCOUNTID =: CompanyId AND NAME 
+        LIKE: searchquery];
         if(!relatedCustomers.isEmpty())
         {
             return relatedCustomers;
             } 
+        else if(relatedCustomers.isEmpty()){
+return relatedCustomers;
+            }
             else{
                 throw new AuraHandledException('No Customers Found');
             }
