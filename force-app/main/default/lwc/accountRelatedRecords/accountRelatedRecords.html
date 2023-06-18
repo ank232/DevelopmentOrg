@@ -1,5 +1,18 @@
 <template>
     <lightning-card title="This LWC will display related contacts v1.0 ">
-        <lightning-input type="text" value={searchQuery} onchange={customername} ></lightning-input>
+        <lightning-input type="search" label="search" value={searchQuery} onchange={customername}></lightning-input>
+        <template if:true={hascontacts}>
+            <h2> Search Results :)</h2>
+            <ul>
+                <template for:each={searchResults} for:item="result">
+                    <li key={result.Id} data-contactid={result.Id} onclick={handleCustomerinfo}>{result.Name}</li>
+                </template>
+            </ul>
+        </template>
+        <h1>{showinfo}</h1>
+        <template if:true={showinfo}>
+            <h1>Customer Details will be shown here</h1>
+            <p>{customerInfo.Name}</p>
+        </template>
     </lightning-card>
 </template>
