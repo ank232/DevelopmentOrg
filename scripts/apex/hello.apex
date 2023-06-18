@@ -40,3 +40,12 @@ query = [select id, name from contact where AccountId =: recId and Name like: se
 System.debug('0-0-0-0-0-0-0-0-0-');
 system.debug(query.size());
 system.debug('-0-0-0-0-0-0-0-0-0-');
+// Testing lwc controller
+
+string rightterm = 'con';
+string wrongterm = '&^';
+string acId = '0012w00001R41h4AAB';
+system.debug('-------------');
+List<Contact> s   = CustomerDetailsController.RelatedContacts('', 'wrongterm');
+system.debug(s);
+System.debug('----------------------');

@@ -1,0 +1,24 @@
+.search-results {
+    list-style-type: none;
+    padding: 0;
+}
+
+.result-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.result-info {
+    margin-left: 10px;
+}
+
+.result-name {
+    font-weight: bold;
+}
+
+.result-email {
+    color: #666;
+}
