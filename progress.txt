@@ -1,3 +1,6 @@
 I need to make a component that will fetch some record details by its record id. -> done
-Now, I created the invoice lwc, now need to validate the inputs
+Now, I created the invoice lwc, now need to validate the inputs(!Not Done)
 Then, I need to create an invoice inside the system.
+Successfully added the child component in parent component.
+To-do: --> I need to style the child component, and need to validate the invoice object fields before inserting into system,
+
