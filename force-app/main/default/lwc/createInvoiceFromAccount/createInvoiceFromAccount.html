@@ -15,66 +15,65 @@
                                 <span class="slds-form-element__label">Email</span>
                                 <p>No Found</p>
                             </template>
-                            <template if:false={customerData.Phone}>
+<template if:false={customerData.Phone}>
                                 <p>No Found</p>
                             </template>
-                            <div class="slds-form-element">
-                                <div class="slds-form-element__control">
-                                    <span class="slds-form-element__label">Email</span>
-                                    <p>{customerData.Email}</p>
-                                </div>
-                            </div>
-                            <div class="slds-form-element">
-                                <div class="slds-form-element__control">
-                                    <p>{customerData.Phone}</p>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-                <div class="slds-col slds-size_1-of-2">
-                    <div class="slds-form">
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field required field-name="Status__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Paid_Date__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Due_Date__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Invoice_Number__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Reference__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Invoice_Date__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Comments__c"></lightning-input-field>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="slds-form-element">
+    <div class="slds-form-element__control">
+        <span class="slds-form-element__label">Email</span>
+        <p>{customerData.Email}</p>
+    </div>
+</div>
+<div class="slds-form-element">
+    <div class="slds-form-element__control">
+        <p>{customerData.Phone}</p>
+    </div>
+</div>
+</template>
+</div>
+</div>
+<div class="slds-col slds-size_1-of-2">
+    <div class="slds-form">
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <lightning-input-field required field-name="Status__c"></lightning-input-field>
             </div>
-            <lightning-button type="submit" label="Generate Invoice" onclick={GenerateInvoice} variant="brand"
-                class="slds-var-m-top_medium"></lightning-button>
-        </lightning-record-edit-form>
-    </lightning-card>
-    <c-invoicecustomerinfo></c-invoicecustomerinfo>
+        </div>
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <lightning-input-field field-name="Paid_Date__c"></lightning-input-field>
+            </div>
+        </div>
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <lightning-input-field field-name="Due_Date__c"></lightning-input-field>
+            </div>
+        </div>
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <lightning-input-field field-name="Invoice_Number__c"></lightning-input-field>
+            </div>
+        </div>
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <lightning-input-field field-name="Reference__c"></lightning-input-field>
+            </div>
+        </div>
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <lightning-input-field field-name="Invoice_Date__c"></lightning-input-field>
+            </div>
+        </div>
+        <div class="slds-form-element">
+            <div class="slds-form-element__control">
+                <lightning-input-field field-name="Comments__c"></lightning-input-field>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<lightning-button type="submit" label="Generate Invoice" onclick={GenerateInvoice} variant="brand" class="slds-var-m-top_medium"></lightning-button>
+</lightning-record-edit-form>
+<c-account-related-records record-id={recordId} oncustomerselected={handlechildEvent}></c-account-related-records>
+</lightning-card>
 </template>

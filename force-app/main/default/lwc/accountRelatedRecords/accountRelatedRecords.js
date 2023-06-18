@@ -89,5 +89,14 @@ export default class AccountRelatedRecords extends LightningElement {
         console.log('Completed-----');
         this.searchQuery = '';
         this.hascontacts = false;
+        const customEvent = new CustomEvent('customerselected', {
+            detail: {
+                customerId: conid,
+                customerdetail: this.customerInfo
+            }
+        });
+        this.dispatchEvent(customEvent);
+        console.log('-----Dispatched event!');
+        console.log(this.customEvent);
     }
 }

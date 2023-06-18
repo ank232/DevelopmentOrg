@@ -1,6 +1,6 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import Invoicecustomerinfo from '../invoicecustomerinfo/invoicecustomerinfo';
+import AccountRelatedRecords from 'c/accountRelatedRecords';
 /* Importing object Fields */
 import INVOICE_STATUS_FIELD from '@salesforce/schema/Invoice__c.Status__c';
 /* Contoller Class */
@@ -8,6 +8,7 @@ import CustomerDetails from '@salesforce/apex/CustomerDetailsController.Customer
 export default class CreateInvoiceFromAccount extends LightningElement {
     custName;
     customerData;
+    @api recordId;
     @wire(CustomerDetails, {
             CustomerId: '$custName'
         })
@@ -26,7 +27,15 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         Event handler for CustomerId 
         */
     handleCustomerName(event) {
-            this.custName = event.detail.value[0];
+        this.custName = event.detail.value[0];
+        console.log(this.recordId);
+    }
+    handlechildEvent(event) {
+            console.log('I called from child!');
+            const { customerId, customerdetail } = event.detail;
+            // Access the sent data
+            console.log('Selected Customer ID:', customerId);
+            console.log('Selected Customer Details:', customerdetail);
         }
         /* 
         Generate invoice =====>>> event-> onclick() 
