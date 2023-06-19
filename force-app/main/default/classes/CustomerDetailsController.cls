@@ -1,21 +1,4 @@
 public with sharing class CustomerDetailsController {
-    @AuraEnabled(cacheable=true)
-    public static contact CustomerDetails(string CustomerId){
-        try {
-            Contact customerdetail = [SELECT 
-            NAME, 
-            Email, 
-            Phone
-             FROM 
-             CONTACT 
-             WHERE 
-             ID =: customerId 
-             limit 1];
-            return customerdetail;
-        } catch (Exception e) {
-            throw new AuraHandledException(e.getMessage());
-        }
-    }
     /*
     Method to return Related Contacts of an account
     @params: String-> CompanyId
@@ -49,30 +32,40 @@ public with sharing class CustomerDetailsController {
                 throw new AuraHandledException(e.getMessage());
             } 
     }
-    @AuraEnabled(cacheable=true)
-    public static List<Contact> allContacts(string CompanyId){
-        try {
-            List<Contact> allContacts = [SELECT 
-    NAME, 
-    EMAIL
-     FROM 
-     CONTACT 
-     WHERE
-     AccountId=: CompanyId
-     ];
-     if(!allContacts.isEmpty()){
-        return allContacts;
-     }
-     else if(allContacts.isEmpty())
-     {
-        return allContacts;
-     }
-     else{
-        throw new AuraHandledException('No contact Found');
 
-     }
-} catch(Exception e) {
-   throw new AuraHandledException(e.getMessage());
-}
+    @AuraEnabled(cacheable=true)
+    public static List<Contact> AllCustomers(string CompanyId)
+    {
+        try 
+        {
+            List<Contact> allContacts = [
+                SELECT 
+                NAME, 
+                Phone,
+                EMAIL,
+                MailingCity,
+                MailingState,
+                MailingCountry
+                FROM 
+                CONTACT 
+                WHERE
+                AccountId=: CompanyId
+                 ];
+                 if(!allContacts.isEmpty())
+                 {
+                    return allContacts;
+                }
+                else if(allContacts.isEmpty())
+                {
+                    return allContacts;
+                }
+                else
+                {
+                    throw new AuraHandledException('No contact Found');
+                }
+            } 
+            catch(Exception e) {
+                throw new AuraHandledException(e.getMessage());
+            }
+        }
     }
-}

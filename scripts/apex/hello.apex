@@ -49,3 +49,5 @@ system.debug('-------------');
 List<Contact> s   = CustomerDetailsController.RelatedContacts('', 'wrongterm');
 system.debug(s);
 System.debug('----------------------');
+List<Contact> s = [select id, name, mailiingAddress from contact limit 1];
+system.debug(s);

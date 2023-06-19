@@ -5,19 +5,35 @@
         <template if:true={showSpinner}>
             <lightning-spinner size="medium" alternative-text="Loading Customers..."></lightning-spinner>
         </template>
-        <template if:true={hascontacts}>
+<template if:true={hascontacts}>
             <ul>
                 <template for:each={searchResults} for:item="result">
                     <li key={result.Id} data-contactid={result.Id} onclick={handleCustomerinfo} class="slds-list__item">
-                        {result.Name}
-                    </li>
-                </template>
-            </ul>
-        </template>
-        <template if:true={showinfo}>
-            <p class="slds-text-heading_medium">Name: {customerInfo.Name}</p>
-            <p class="slds-text-heading_medium">Phone: {customerInfo.Phone}</p>
-            <p class="slds-text-heading_medium">Email: {customerInfo.Email}</p>
-        </template>
-    </lightning-card>
+                        <template if:true={result.isLoading}>
+                            <lightning-spinner size="small" alternative-text="Loading Contacts..."></lightning-spinner>
+                        </template>
+<template if:false={result.isLoading}>
+                            {result.Name}
+                        </template>
+</li>
+</template>
+</ul>
+
+</template>
+<template if:true={selectedcontactId}>
+            <p class="slds-text-heading_medium">Name: {showDetails.Name}</p>
+            <template if:true={showDetails.Phone}>
+                <p class="slds-text-heading_medium">Phone: {showDetails.Phone}</p>
+            </template>
+<template if:false={showDetails.Phone}>
+                <p>Phone Not Found</p>
+            </template>
+<template if:true={showDetails.Email}>
+                <p class="slds-text-heading_medium">Email: {showDetails.Email}</p>
+            </template>
+<template if:false={showDetails.Email}>
+                <p>Email Not Found</p>
+            </template>
+</template>
+</lightning-card>
 </template>
