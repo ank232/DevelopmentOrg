@@ -1,6 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import AllCustomers from '@salesforce/apex/CustomerDetailsController.AllCustomers'; // method to fetch all related contacts
-const DELAY = 300;
+const DELAY = 560;
 export default class AccountRelatedRecords extends LightningElement {
     /*
     ========>>>>>>>>   Properties <<<<<<<<========
@@ -23,7 +23,7 @@ export default class AccountRelatedRecords extends LightningElement {
                 this.hascontacts = false;
                 this.contactData = null; // since, its empty, no data!
             } else {
-                console.log('Account as contact(s)');
+                console.log('Account has contact(s)');
                 this.contactData = result;
                 this.hascontacts = true;
                 console.log('Result Recieved');
@@ -37,8 +37,14 @@ export default class AccountRelatedRecords extends LightningElement {
         });
     }
     customername(event) {
-            console.log('-------------');
+            // console.log('-------------');
             this.searchQuery = event.target.value;
+            // Adding another condition: 
+            if (!this.searchQuery) {
+                this.searchResults = [];
+                this.showDetails = {};
+                return;
+            }
             if (this.hascontacts && this.searchQuery) {
                 const searchInput = this.searchQuery.toLowerCase();
                 this.searchResults = [];
@@ -48,7 +54,9 @@ export default class AccountRelatedRecords extends LightningElement {
                         const con = this.CustomerInfoMap[contactId];
                         const conName = con.Name.toLowerCase();
                         if (conName.includes(searchInput)) {
-                            // this.searchResults.push(con);
+                            console.log('-----');
+                            console.log(con);
+                            console.log('-----');
                             this.searchResults.push({...con, isLoading: false });
                         }
                     }
@@ -64,7 +72,11 @@ export default class AccountRelatedRecords extends LightningElement {
     handleCustomerinfo(event) {
         const conid = event.target.dataset.contactid;
         this.selectedcontactId = conid;
-        if (this.CustomerInfoMap) {
+        console.log('Selected ConId(From Parent)');
+        console.log(this.selectedcontactId);
+        console.log('Con Details(From Parent)');
+        console.log(this.CustomerInfoMap);
+        if (conid && this.CustomerInfoMap && this.CustomerInfoMap[conid]) { //=> original = if (this.CustomerInfoMap) 
             console.log("Map is not empty");
             console.log(this.CustomerInfoMap[conid]);
             this.showDetails = this.CustomerInfoMap[conid];
@@ -77,8 +89,15 @@ export default class AccountRelatedRecords extends LightningElement {
             this.dispatchEvent(customEvent);
 
         } else {
-            console.log('map is empty');
+            console.log('Selected contact ID is null or not found in the map');
             this.showDetails = {};
+            const customEvent = new CustomEvent('customerselected', {
+                detail: {
+                    customerId: '',
+                    customerdetail: null
+                }
+            });
+            this.dispatchEvent(customEvent);
         }
     }
 }
