@@ -1,8 +1,10 @@
 <template>
     <lightning-card title="Generate Invoice">
-        <c-account-related-records record-id={recordId}
-            oncustomerselected={handlechildEvent}></c-account-related-records>
-        <lightning-record-edit-form object-api-name="Invoice__c">
+        <!-- <c-account-related-records record-id={recordId}
+            oncustomerselected={handlechildEvent}></c-account-related-records> -->
+        <lightning-record-edit-form object-api-name="Invoice__c" onsubmit={GenerateInvoice}>
+            <c-account-related-records record-id={recordId}
+                oncustomerselected={handlechildEvent}></c-account-related-records>
             <div class="slds-grid slds-gutters">
                 <div class="slds-col slds-size_1-of-2">
                     <div class="slds-form">
@@ -44,9 +46,8 @@
                     </div>
                 </div>
             </div>
-            <lightning-button type="submit" label="Generate Invoice" onclick={GenerateInvoice} variant="brand"
+            <lightning-button type="submit" label="Generate Invoice"  variant="brand"
                 class="slds-var-m-top_medium"></lightning-button>
         </lightning-record-edit-form>
-
     </lightning-card>
 </template>

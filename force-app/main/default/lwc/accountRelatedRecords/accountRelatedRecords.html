@@ -1,7 +1,7 @@
 <template>
     <lightning-card>
-        <lightning-input type="search" label="Search Customer" value={searchQuery}
-            onchange={customername}></lightning-input>
+        <lightning-input type="search" label="Search Customer" value={searchQuery} onchange={customername}
+            required></lightning-input>
         <template if:true={showSpinner}>
             <lightning-spinner size="medium" alternative-text="Loading Customers..."></lightning-spinner>
         </template>
