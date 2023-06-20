@@ -1,4 +1,4 @@
-import { LightningElement, api, wire } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import AccountRelatedRecords from 'c/accountRelatedRecords';
 export default class CreateInvoiceFromAccount extends LightningElement {
@@ -15,16 +15,24 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             console.log('Selected Customer Details:', customerdetail);
             this.customerId = customerId;
             this.customerInformation = customerdetail;
-            this.GetCustomerInfo(this.customerInformation);
+            this.GetCustomerInfo(this.customerInformation, this.customerId);
         }
         /*
         Method to extract customer's information
          */
-    GetCustomerInfo(customerinfo) {
+    GetCustomerInfo(customerinfo, customerID) {
             console.log('customerInfo');
             console.log(JSON.stringify(customerinfo));
             console.log('Values-->');
-            console.log(customerinfo.Phone);
+            // console.log(customerinfo.Phone);
+            const customerId = customerID;
+            const { Name, Phone, Email, MailingCity, MailingCountry, MailingState, MailingStreet } = customerinfo;
+            console.log('<><><>><>');
+            console.log(Name);
+            console.log(Phone);
+            console.log('<><<><<><>');
+            console.log('Whole Address===');
+            console.log(MailingStreet + MailingCity + MailingState + MailingCountry);
         }
         /*
          Method to Validate Date: Date should be in proper timeline 

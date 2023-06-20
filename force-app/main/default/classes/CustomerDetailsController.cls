@@ -43,6 +43,7 @@ public with sharing class CustomerDetailsController {
                 NAME, 
                 Phone,
                 EMAIL,
+                MailingStreet,
                 MailingCity,
                 MailingState,
                 MailingCountry
