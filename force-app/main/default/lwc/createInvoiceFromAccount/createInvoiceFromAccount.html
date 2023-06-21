@@ -1,13 +1,18 @@
 <template>
     <lightning-card title="Generate Invoice">
-        <!-- <c-account-related-records record-id={recordId}
-            oncustomerselected={handlechildEvent}></c-account-related-records> -->
-        <lightning-record-edit-form object-api-name="Invoice__c" onsubmit={GenerateInvoice}>
+        <lightning-record-edit-form object-api-name="Invoice__c" onsubmit={GenerateInvoice} onerror={handleError}>
             <c-account-related-records record-id={recordId}
                 oncustomerselected={handlechildEvent}></c-account-related-records>
             <div class="slds-grid slds-gutters">
                 <div class="slds-col slds-size_1-of-2">
                     <div class="slds-form">
+                        <!-- Adding the req field -->
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <lightning-input-field required field-name="Company__c"
+                                    value={recordId}></lightning-input-field>
+                            </div>
+                        </div>
                         <div class="slds-form-element">
                             <div class="slds-form-element__control">
                                 <lightning-input-field required field-name="Status__c"></lightning-input-field>

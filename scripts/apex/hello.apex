@@ -51,3 +51,20 @@ system.debug(s);
 System.debug('----------------------');
 List<Contact> s = [select id, name, mailiingAddress from contact limit 1];
 system.debug(s);
+
+List<Invoice__c> invoices = [SELECT id, company__c, customer__c from Invoice__c where customer__c!= null];
+for(integer i =0;i<invoices.size();i++){
+System.debug('***********************'+invoices[i]);
+}
+
+string date1 = '2023-03-26';
+system.debug(Date.valueOf(date1));
+
+String dateString = '2023-06-22';
+Date dateValue = Date.valueOf(dateString);
+Datetime dateTimeValue = Datetime.newInstance(dateValue.year(), dateValue.month(), dateValue.day());
+String formattedDate = dateTimeValue.format('dd/MM/yyyy');
+System.debug(formattedDate); // Output: 22/06/2023
+// Deleting all invoices: 
+List<Invoice__c> invoice = [select id , company__c from Invoice__c];
+delete invoice;

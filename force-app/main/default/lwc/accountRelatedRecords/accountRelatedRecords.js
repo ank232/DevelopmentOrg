@@ -38,37 +38,40 @@ export default class AccountRelatedRecords extends LightningElement {
         });
     }
     customername(event) {
-        // console.log('-------------');
-        this.searchQuery = event.target.value;
-        // Adding another condition: 
-        if (!this.searchQuery) {
-            this.searchResults = [];
-            this.showDetails = {};
-            return;
-        }
-        if (this.hascontacts && this.searchQuery) {
-            const searchInput = this.searchQuery.toLowerCase();
-            this.searchResults = [];
-            this.showSpinner = true;
-            setTimeout(() => {
-                for (const contactId in this.CustomerInfoMap) {
-                    const con = this.CustomerInfoMap[contactId];
-                    const conName = con.Name.toLowerCase();
-                    if (conName.includes(searchInput)) {
-                        console.log('-----');
-                        console.log(con);
-                        console.log('-----');
-                        this.searchResults.push({...con, isLoading: false });
+            // console.log('-------------');
+            this.searchQuery = event.target.value;
+            // Adding another condition: 
+            if (!this.searchQuery) {
+                this.searchResults = [];
+                this.showDetails = {};
+                return;
+            }
+            if (this.hascontacts && this.searchQuery) {
+                const searchInput = this.searchQuery.toLowerCase();
+                this.searchResults = [];
+                this.showSpinner = true;
+                setTimeout(() => {
+                    for (const contactId in this.CustomerInfoMap) {
+                        const con = this.CustomerInfoMap[contactId];
+                        const conName = con.Name.toLowerCase();
+                        if (conName.includes(searchInput)) {
+                            console.log('-----');
+                            console.log(con);
+                            console.log('-----');
+                            this.searchResults.push({...con, isLoading: false });
+                        }
                     }
-                }
-                this.showSpinner = false;
-            }, DELAY);
-        } else if (!this.hascontacts || !this.searchQuery) {
-            console.log('Account has no contact, hence search result should be empty');
-            this.searchResults = [];
-            this.showDetails = {};
+                    this.showSpinner = false;
+                }, DELAY);
+            } else if (!this.hascontacts || !this.searchQuery) {
+                console.log('Account has no contact, hence search result should be empty');
+                this.searchResults = [];
+                this.showDetails = {};
+            }
         }
-    }
+        /*
+        Destructuring CustomerInfomap to generate address
+         */
     MakeAddress({ MailingStreet, MailingState, MailingCountry, MailingCity }) {
             return MailingStreet + ',' +
                 MailingCity + ',' + MailingState + ',' + MailingCountry;
@@ -86,7 +89,6 @@ export default class AccountRelatedRecords extends LightningElement {
             console.log(this.CustomerInfoMap[conid]);
             this.showDetails = this.CustomerInfoMap[conid];
             this.customerAddress = this.MakeAddress(this.showDetails);
-            // this.customerAddress = this.showDetails.MailingStreed + this.showDetails.M;
             const customEvent = new CustomEvent('customerselected', {
                 detail: {
                     customerId: conid,

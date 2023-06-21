@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import AccountRelatedRecords from 'c/accountRelatedRecords';
+import GetInvoiceDetails from '@salesforce/apex/CreateInvoice.GetInvoiceDetails';
 export default class CreateInvoiceFromAccount extends LightningElement {
     @api recordId;
     customerId;
@@ -22,17 +23,6 @@ export default class CreateInvoiceFromAccount extends LightningElement {
          */
     GetCustomerInfo(customerinfo, customerID) {
             console.log('customerInfo');
-            console.log(JSON.stringify(customerinfo));
-            console.log('Values-->');
-            // console.log(customerinfo.Phone);
-            const customerId = customerID;
-            const { Name, Phone, Email, MailingCity, MailingCountry, MailingState, MailingStreet } = customerinfo;
-            console.log('<><><>><>');
-            console.log(Name);
-            console.log(Phone);
-            console.log('<><<><<><>');
-            console.log('Whole Address===');
-            console.log(MailingStreet + MailingCity + MailingState + MailingCountry);
         }
         /*
          Method to Validate Date: Date should be in proper timeline 
@@ -55,30 +45,71 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         }
     }
     showNoficiation(title, message, variant) {
-            const showToast = new ShowToastEvent({
-                title: title,
-                message: message,
-                variant: variant
+        const showToast = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(showToast);
+    }
+
+    CreateInvoiceRecord(userInput) {
+            const {
+                Due_Date__c,
+                Paid_Date__c,
+                Invoice_Date__c,
+                Invoice_Number__c,
+                Status__c,
+                Customer__c,
+                Company__c,
+                Reference_Number__c,
+                Comments__c
+            } = userInput;
+
+            GetInvoiceDetails({
+                status: Status__c,
+                companyId: Company__c,
+                customerId: Customer__c,
+                invoicedate: Invoice_Date__c,
+                duedate: Due_Date__c,
+                paiddate: Paid_Date__c,
+                comment: Comments__c,
+                invoiceno: Invoice_Number__c,
+                referenceno: Reference_Number__c
+            }).
+            then(result => {
+                console.log('Created ');
+                console.log(result);
+            }).catch(error => {
+                console.log('Uh oh!!');
+                console.log(error);
             });
-            this.dispatchEvent(showToast);
         }
         /* 
         Generate invoice =====>>> event-> onclick() 
         */
     GenerateInvoice(event) {
         event.preventDefault();
-        console.log('Event happened');
-        console.log(JSON.stringify(event.detail));
+        console.log('**** Event happened');
+        const userinput = event.detail.fields;
         const { Due_Date__c: dueDate, Paid_Date__c: paidDate, Invoice_Date__c: invoiceDate } = event.detail.fields;
         const valid = this.validateDates(dueDate, paidDate, invoiceDate);
-
         if (valid) {
             console.log("Can proceed further");
-
+            userinput.Customer__c = this.customerId;
+            event.target.fields = userinput;
+            console.log(userinput);
+            event.target.submit();
+            this.CreateInvoiceRecord(userinput);
+            console.log('Submitting user values....');
         } else {
-            // console.log(x);
             console.log('Cannot proceed further');
-
         }
+    }
+    handleError(event) {
+        console.log('Cannot done!!');
+        console.log(event);
+        const errorMessage = event.detail;
+        this.showNoficiation('Error', errorMessage, 'Error');
     }
 }
