@@ -6,23 +6,21 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     @api recordId;
     customerId;
     customerInformation;
+    isContactSelected;
     /*
     Getting values from child component (search contact)
      */
     handlechildEvent(event) {
-            console.log('I called from child!');
-            const { customerId, customerdetail } = event.detail;
-            console.log('Selected Customer ID:', customerId);
-            console.log('Selected Customer Details:', customerdetail);
-            this.customerId = customerId;
-            this.customerInformation = customerdetail;
-            this.GetCustomerInfo(this.customerInformation, this.customerId);
-        }
-        /*
-        Method to extract customer's information
-         */
-    GetCustomerInfo(customerinfo, customerID) {
-            console.log('customerInfo');
+        console.log(event.detail);
+        console.log('I called from child!');
+        const { customerId, customerdetail } = event.detail;
+        console.log('Selected Customer ID:', customerId);
+        console.log('Selected Customer Details:', customerdetail);
+        this.isContactSelected = true;
+    }
+    handleNotSelected(event) {
+            console.log("------------------------");
+            console.log(event.detail);
         }
         /*
          Method to Validate Date: Date should be in proper timeline 
@@ -94,13 +92,17 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         const userinput = event.detail.fields;
         const { Due_Date__c: dueDate, Paid_Date__c: paidDate, Invoice_Date__c: invoiceDate } = event.detail.fields;
         const valid = this.validateDates(dueDate, paidDate, invoiceDate);
-        if (valid) {
+        if (!this.isContactSelected) {
+            this.showNoficiation('Warning', 'Please Select a Contact', 'Error');
+            return;
+        }
+        if (valid && this.isContactSelected) {
             console.log("Can proceed further");
             userinput.Customer__c = this.customerId;
             event.target.fields = userinput;
             console.log(userinput);
             event.target.submit();
-            this.CreateInvoiceRecord(userinput);
+            // this.CreateInvoiceRecord(userinput);
             console.log('Submitting user values....');
         } else {
             console.log('Cannot proceed further');

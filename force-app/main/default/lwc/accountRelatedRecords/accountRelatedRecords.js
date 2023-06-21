@@ -100,7 +100,7 @@ export default class AccountRelatedRecords extends LightningElement {
         } else {
             console.log('Selected contact ID is null or not found in the map');
             this.showDetails = {};
-            const customEvent = new CustomEvent('customerselected', {
+            const customEvent = new CustomEvent('customernotselected', {
                 detail: {
                     customerId: '',
                     customerdetail: null
