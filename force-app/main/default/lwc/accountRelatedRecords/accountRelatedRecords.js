@@ -1,20 +1,19 @@
 import { LightningElement, api } from 'lwc';
 import AllCustomers from '@salesforce/apex/CustomerDetailsController.AllCustomers'; // method to fetch all related contacts
-const DELAY = 560;
 export default class AccountRelatedRecords extends LightningElement {
     /*
     ========>>>>>>>>   Properties <<<<<<<<========
      */
     @api recordId;
     searchResults = []; //To show Contactlists
-    searchQuery;
+    searchQuery; // UserInput
     hascontacts; // bool
     contactData; // to store related contacts 
     selectedcontactId; // contact that user selected.
-    CustomerInfoMap = {};
-    showDetails = {};
+    CustomerInfoMap = {}; // contact data map
+    showDetails = {}; // to render the selected contactDetail
     showSpinner = false; //spinner value
-    customerAddress;
+
     // Connected Callback -> invoking allContacts apex method to fetch all related contacts by providing accountId
     connectedCallback() {
         AllCustomers({
@@ -28,6 +27,7 @@ export default class AccountRelatedRecords extends LightningElement {
                 this.contactData = result;
                 this.hascontacts = true;
                 console.log('Result Recieved');
+                // Making a key value pair: key-> contactId ; value-> contactData
                 for (let i = 0; i < this.contactData.length; i++) {
                     console.log(this.contactData[i]);
                     this.CustomerInfoMap[this.contactData[i].Id] = this.contactData[i];
@@ -37,58 +37,71 @@ export default class AccountRelatedRecords extends LightningElement {
             console.log(error);
         });
     }
+
+    /*
+    Purpose : to handle user Input
+    event-> Onchange() 
+    */
     customername(event) {
-            // console.log('-------------');
-            this.searchQuery = event.target.value;
-            // Adding another condition: 
-            if (!this.searchQuery) {
-                this.searchResults = [];
-                this.showDetails = {};
-                return;
-            }
+        this.searchQuery = event.target.value;
+        clearTimeout(this.searchTimeout);
+        // If searchQuery is empty; do nothing
+        this.showSpinner = true;
+        if (!this.searchQuery) {
+            console.log('You searched nothing');
+            this.searchResults = [];
+            this.showDetails = {};
+            this.showSpinner = false;
+            return;
+        }
+        this.showSpinner = true;
+        this.searchTimeout = setTimeout(() => {
+            // If searchQuery is not empty and also the account has contacts; perform search operation
             if (this.hascontacts && this.searchQuery) {
-                const searchInput = this.searchQuery.toLowerCase();
                 this.searchResults = [];
-                this.showSpinner = true;
-                setTimeout(() => {
-                    for (const contactId in this.CustomerInfoMap) {
-                        const con = this.CustomerInfoMap[contactId];
-                        const conName = con.Name.toLowerCase();
-                        if (conName.includes(searchInput)) {
-                            console.log('-----');
-                            console.log(con);
-                            console.log('-----');
-                            this.searchResults.push({...con, isLoading: false });
-                        }
-                    }
-                    this.showSpinner = false;
-                }, DELAY);
-            } else if (!this.hascontacts || !this.searchQuery) {
-                console.log('Account has no contact, hence search result should be empty');
-                this.searchResults = [];
-                this.showDetails = {};
+                this.searchContact(this.searchQuery);
+                this.showSpinner = false;
+            }
+        }, 300);
+    }
+
+    /*
+     method to search contact 
+     @params: String searchTerm
+     */
+    searchContact(searchterm) {
+        for (const contactId in this.CustomerInfoMap) {
+            const con = this.CustomerInfoMap[contactId];
+            const contactName = con.Name.toLowerCase();
+            if (contactName.includes(searchterm)) {
+                this.searchResults.push({...con, isLoading: false });
+                console.log(this.searchResults);
             }
         }
-        /*
-        Destructuring CustomerInfomap to generate address
-         */
+    }
+
+    /*
+    Destructuring CustomerInfomap to generate address to rnder on UI
+     */
     MakeAddress({ MailingStreet, MailingState, MailingCountry, MailingCity }) {
-            return MailingStreet + ',' +
-                MailingCity + ',' + MailingState + ',' + MailingCountry;
-        }
-        //This event handler will give me the selected contactId
+        return MailingStreet + ',' +
+            MailingCity + ',' + MailingState + ',' + MailingCountry;
+    }
+
+    /*
+    This event handler will give me the selected contactId and will dispatch an event containing contactDetails 
+    */
     handleCustomerinfo(event) {
         const conid = event.target.dataset.contactid;
         this.selectedcontactId = conid;
-        console.log('Selected ConId(From Parent)');
-        console.log(this.selectedcontactId);
-        console.log('Con Details(From Parent)');
-        console.log(this.CustomerInfoMap);
         if (conid && this.CustomerInfoMap && this.CustomerInfoMap[conid]) { //=> original = if (this.CustomerInfoMap) 
             console.log("Map is not empty");
             console.log(this.CustomerInfoMap[conid]);
-            this.showDetails = this.CustomerInfoMap[conid];
-            this.customerAddress = this.MakeAddress(this.showDetails);
+            const address = this.MakeAddress(this.CustomerInfoMap[conid]);
+            this.showDetails = {
+                ...this.CustomerInfoMap[conid],
+                address: address
+            };
             const customEvent = new CustomEvent('customerselected', {
                 detail: {
                     customerId: conid,
@@ -100,13 +113,6 @@ export default class AccountRelatedRecords extends LightningElement {
         } else {
             console.log('Selected contact ID is null or not found in the map');
             this.showDetails = {};
-            const customEvent = new CustomEvent('customernotselected', {
-                detail: {
-                    customerId: '',
-                    customerdetail: null
-                }
-            });
-            this.dispatchEvent(customEvent);
         }
     }
 }

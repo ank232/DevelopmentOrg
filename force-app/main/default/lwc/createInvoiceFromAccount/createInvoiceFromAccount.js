@@ -6,21 +6,17 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     @api recordId;
     customerId;
     customerInformation;
-    isContactSelected;
+    isContactSelected = false;
     /*
     Getting values from child component (search contact)
      */
     handlechildEvent(event) {
-        console.log(event.detail);
-        console.log('I called from child!');
-        const { customerId, customerdetail } = event.detail;
-        console.log('Selected Customer ID:', customerId);
-        console.log('Selected Customer Details:', customerdetail);
-        this.isContactSelected = true;
-    }
-    handleNotSelected(event) {
-            console.log("------------------------");
             console.log(event.detail);
+            console.log('I called from child!');
+            const { customerId, customerdetail } = event.detail;
+            console.log('Selected Customer ID:', customerId);
+            console.log('Selected Customer Details:', customerdetail);
+            this.isContactSelected = true;
         }
         /*
          Method to Validate Date: Date should be in proper timeline 
@@ -101,6 +97,7 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             userinput.Customer__c = this.customerId;
             event.target.fields = userinput;
             console.log(userinput);
+            this.showNoficiation("Success", "Invoice has been Generated", "Success");
             event.target.submit();
             // this.CreateInvoiceRecord(userinput);
             console.log('Submitting user values....');
