@@ -52,6 +52,13 @@ export default class AccountRelatedRecords extends LightningElement {
             this.searchResults = [];
             this.showDetails = {};
             this.showSpinner = false;
+            const fireEvent = new CustomEvent('customernotselected', {
+                detail: {
+                    customerId: null,
+                    customerdetail: null
+                }
+            });
+            this.dispatchEvent(fireEvent);
             return;
         }
         this.showSpinner = true;
@@ -95,25 +102,22 @@ export default class AccountRelatedRecords extends LightningElement {
         const conid = event.target.dataset.contactid;
         console.log(conid);
         this.selectedcontactId = conid;
-        // if (conid && this.CustomerInfoMap && this.CustomerInfoMap[conid]) { //=> original = if (this.CustomerInfoMap) 
-        // console.log("Map is not empty");
         console.log(this.CustomerInfoMap[conid]);
         const address = this.MakeAddress(this.CustomerInfoMap[conid]);
-        this.showDetails = {
-            ...this.CustomerInfoMap[conid],
-            address: address
-        };
-        const customEvent = new CustomEvent('customerselected', {
-            detail: {
-                customerId: conid,
-                customerdetail: this.CustomerInfoMap[conid]
-            }
-        });
-        this.dispatchEvent(customEvent);
-        // }
-        // } else {
-        //     console.log('Selected contact ID is null or not found in the map');
-        //     this.showDetails = {};
-        // }
+        if (this.CustomerInfoMap[conid]) {
+            this.showDetails = {
+                ...this.CustomerInfoMap[conid],
+                address: address
+            };
+            const customEvent = new CustomEvent('customerselected', {
+                detail: {
+                    customerId: conid,
+                    customerdetail: this.CustomerInfoMap[conid]
+                }
+            });
+            this.dispatchEvent(customEvent);
+        } else {
+            this.showDetails = {};
+        }
     }
 }

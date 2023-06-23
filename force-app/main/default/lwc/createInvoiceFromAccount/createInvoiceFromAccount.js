@@ -11,13 +11,20 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     Getting values from child component (search contact)
      */
     handlechildEvent(event) {
-            console.log(event.detail);
-            console.log('I called from child!');
-            const { customerId, customerdetail } = event.detail;
-            console.log('Selected Customer ID:', customerId);
-            console.log('Selected Customer Details:', customerdetail);
-            this.customerId = customerId;
-            this.isContactSelected = true;
+        console.log(event.detail);
+        console.log('I called from child!');
+        const { customerId, customerdetail } = event.detail;
+        console.log('Selected Customer ID:', customerId);
+        console.log('Selected Customer Details:', customerdetail);
+        this.customerId = customerId;
+        this.isContactSelected = true;
+    }
+    handleNotSelected(event) {
+            const detail = event.detail;
+            console.log('I was fired when input was null');
+            this.showNoficiation('Waring', 'You Left the field blank ', 'Warning');
+            console.log(detail);
+            this.isContactSelected = false;
         }
         /*
          Method to Validate Date: Date should be in proper timeline 
@@ -110,7 +117,7 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             console.log('Submitting user values....');
             this.showNoficiation("Success", "Invoice has been Generated", "Success");
             console.log('---------------------------------------');
-            this.ResetForm();
+            // this.ResetForm();
         } else {
             console.log('Cannot proceed further');
         }
