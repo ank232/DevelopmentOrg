@@ -6,3 +6,21 @@ To-do: --> I need to style the child component, and need to validate the invoice
 The LWc is now can create the invoice, 
 Need to see the userInput state
  (See: "StockPriceCard Lwc")
+                    <<<<<<<<<<<<<<******************************************************************>>>>>>>>>>>>>>
+ Data Flow: 
+ Component loads -> get all related contacts(Child Component)
+     |
+     V
+      -> user input a searchterm ->
+      |
+      v
+       -> if-found->show results (child Component) -> dispatch custom event to parent component -> event contains the contactId
+       |
+       V 
+        -> User Filled the form (Parent Component) -> Checks userInput -> if all okay -> Create the record(Invoice__c)
+        |
+        V
+        If the invoice is saved Successfully ?:Yes: No -> handle the case (Show notification!)
+                                               |
+                                               V                                         
+                                               -> Also need to create the invoice lineItem!

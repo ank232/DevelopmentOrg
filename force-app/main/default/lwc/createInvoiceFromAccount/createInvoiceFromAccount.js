@@ -16,6 +16,7 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             const { customerId, customerdetail } = event.detail;
             console.log('Selected Customer ID:', customerId);
             console.log('Selected Customer Details:', customerdetail);
+            this.customerId = customerId;
             this.isContactSelected = true;
         }
         /*
@@ -48,36 +49,43 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     }
 
     CreateInvoiceRecord(userInput) {
-            const {
-                Due_Date__c,
-                Paid_Date__c,
-                Invoice_Date__c,
-                Invoice_Number__c,
-                Status__c,
-                Customer__c,
-                Company__c,
-                Reference_Number__c,
-                Comments__c
-            } = userInput;
+        const {
+            Due_Date__c,
+            Paid_Date__c,
+            Invoice_Date__c,
+            Invoice_Number__c,
+            Status__c,
+            Customer__c,
+            Company__c,
+            Reference_Number__c,
+            Comments__c
+        } = userInput;
 
-            GetInvoiceDetails({
-                status: Status__c,
-                companyId: Company__c,
-                customerId: Customer__c,
-                invoicedate: Invoice_Date__c,
-                duedate: Due_Date__c,
-                paiddate: Paid_Date__c,
-                comment: Comments__c,
-                invoiceno: Invoice_Number__c,
-                referenceno: Reference_Number__c
-            }).
-            then(result => {
-                console.log('Created ');
-                console.log(result);
-            }).catch(error => {
-                console.log('Uh oh!!');
-                console.log(error);
-            });
+        GetInvoiceDetails({
+            status: Status__c,
+            companyId: Company__c,
+            customerId: Customer__c,
+            invoicedate: Invoice_Date__c,
+            duedate: Due_Date__c,
+            paiddate: Paid_Date__c,
+            comment: Comments__c,
+            invoiceno: Invoice_Number__c,
+            referenceno: Reference_Number__c
+        }).
+        then(result => {
+            console.log('Created ');
+            console.log(result);
+        }).catch(error => {
+            console.log('Uh oh!!');
+            console.log(error);
+        });
+    }
+
+    ResetForm() {
+            const formfieldTorest = this.template.querySelectorAll('lightning-input-field');
+            formfieldTorest.forEach(formfield => {
+                formfield.reset();
+            })
         }
         /* 
         Generate invoice =====>>> event-> onclick() 
@@ -97,10 +105,12 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             userinput.Customer__c = this.customerId;
             event.target.fields = userinput;
             console.log(userinput);
-            this.showNoficiation("Success", "Invoice has been Generated", "Success");
             event.target.submit();
             // this.CreateInvoiceRecord(userinput);
             console.log('Submitting user values....');
+            this.showNoficiation("Success", "Invoice has been Generated", "Success");
+            console.log('---------------------------------------');
+            this.ResetForm();
         } else {
             console.log('Cannot proceed further');
         }

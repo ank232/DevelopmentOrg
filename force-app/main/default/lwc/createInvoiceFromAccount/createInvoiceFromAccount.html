@@ -1,10 +1,5 @@
 <template>
     <lightning-card title="Generate Invoice">
-        <!-- <template if:false={isContactSelected}>
-            <div class="slds-var-m-vertical_medium">
-                <p class="slds-text-color_error">Please select a customer.</p>
-            </div>
-        </template> -->
 <lightning-record-edit-form object-api-name="Invoice__c" onsubmit={GenerateInvoice} onerror={handleError}>
     <c-account-related-records record-id={recordId} oncustomerselected={handlechildEvent} oncustomernotselected={handleNotSelected}></c-account-related-records>
     <div class="slds-grid slds-gutters">

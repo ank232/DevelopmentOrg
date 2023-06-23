@@ -93,26 +93,27 @@ export default class AccountRelatedRecords extends LightningElement {
     */
     handleCustomerinfo(event) {
         const conid = event.target.dataset.contactid;
+        console.log(conid);
         this.selectedcontactId = conid;
-        if (conid && this.CustomerInfoMap && this.CustomerInfoMap[conid]) { //=> original = if (this.CustomerInfoMap) 
-            console.log("Map is not empty");
-            console.log(this.CustomerInfoMap[conid]);
-            const address = this.MakeAddress(this.CustomerInfoMap[conid]);
-            this.showDetails = {
-                ...this.CustomerInfoMap[conid],
-                address: address
-            };
-            const customEvent = new CustomEvent('customerselected', {
-                detail: {
-                    customerId: conid,
-                    customerdetail: this.CustomerInfoMap[conid]
-                }
-            });
-            this.dispatchEvent(customEvent);
-
-        } else {
-            console.log('Selected contact ID is null or not found in the map');
-            this.showDetails = {};
-        }
+        // if (conid && this.CustomerInfoMap && this.CustomerInfoMap[conid]) { //=> original = if (this.CustomerInfoMap) 
+        // console.log("Map is not empty");
+        console.log(this.CustomerInfoMap[conid]);
+        const address = this.MakeAddress(this.CustomerInfoMap[conid]);
+        this.showDetails = {
+            ...this.CustomerInfoMap[conid],
+            address: address
+        };
+        const customEvent = new CustomEvent('customerselected', {
+            detail: {
+                customerId: conid,
+                customerdetail: this.CustomerInfoMap[conid]
+            }
+        });
+        this.dispatchEvent(customEvent);
+        // }
+        // } else {
+        //     console.log('Selected contact ID is null or not found in the map');
+        //     this.showDetails = {};
+        // }
     }
 }
