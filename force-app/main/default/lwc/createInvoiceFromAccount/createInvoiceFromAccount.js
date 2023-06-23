@@ -56,6 +56,7 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     }
 
     CreateInvoiceRecord(userInput) {
+        console.log('*** Creating record here');
         const {
             Due_Date__c,
             Paid_Date__c,
@@ -67,7 +68,6 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             Reference_Number__c,
             Comments__c
         } = userInput;
-
         GetInvoiceDetails({
             status: Status__c,
             companyId: Company__c,
@@ -78,14 +78,17 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             comment: Comments__c,
             invoiceno: Invoice_Number__c,
             referenceno: Reference_Number__c
-        }).
-        then(result => {
-            console.log('Created ');
-            console.log(result);
-        }).catch(error => {
-            console.log('Uh oh!!');
-            console.log(error);
-        });
+        }).then(
+            result => {
+                console.log('Created ');
+                console.log(result);
+            }
+        ).catch(
+            error => {
+                console.log('Uh oh!!');
+                console.log(error);
+            }
+        );
     }
 
     ResetForm() {
@@ -111,9 +114,10 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             console.log("Can proceed further");
             userinput.Customer__c = this.customerId;
             event.target.fields = userinput;
+            console.log("**************************************");
             console.log(userinput);
-            event.target.submit();
-            // this.CreateInvoiceRecord(userinput);
+            // event.target.submit();
+            this.CreateInvoiceRecord(userinput);
             console.log('Submitting user values....');
             this.showNoficiation("Success", "Invoice has been Generated", "Success");
             console.log('---------------------------------------');
