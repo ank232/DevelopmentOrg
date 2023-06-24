@@ -53,6 +53,11 @@
             </div>
             <lightning-button type="submit" label="Generate Invoice" variant="brand"
                 class="slds-var-m-top_medium"></lightning-button>
-        </lightning-record-edit-form>
-    </lightning-card>
+                <template if:true={showSpinner}>
+                    <div class="slds-var-m-top_medium">
+                        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+                    </div>
+                </template>
+</lightning-record-edit-form>
+</lightning-card>
 </template>

@@ -1,10 +1,13 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import AllCustomers from '@salesforce/apex/CustomerDetailsController.AllCustomers'; // method to fetch all related contacts
 export default class AccountRelatedRecords extends LightningElement {
+    @wire(CurrentPageReference) pageRef;
+    recordId;
     /*
     ========>>>>>>>>   Properties <<<<<<<<========
      */
-    @api recordId;
+    // @api recordId;
     searchResults = []; //To show Contactlists
     searchQuery; // UserInput
     hascontacts; // bool
@@ -16,6 +19,9 @@ export default class AccountRelatedRecords extends LightningElement {
 
     // Connected Callback -> invoking allContacts apex method to fetch all related contacts by providing accountId
     connectedCallback() {
+        // Inside a method or connectedCallback
+        this.recordId = this.pageRef && this.pageRef.state && this.pageRef.state.recordId;
+
         AllCustomers({
             CompanyId: this.recordId
         }).then(result => {

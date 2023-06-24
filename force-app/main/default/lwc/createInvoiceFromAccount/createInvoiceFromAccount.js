@@ -7,6 +7,7 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     customerId;
     customerInformation;
     isContactSelected = false;
+    showSpinner = false;
     /*
     Getting values from child component (search contact)
      */
@@ -21,9 +22,7 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     }
     handleNotSelected(event) {
             const detail = event.detail;
-            console.log('I was fired when input was null');
             this.showNoficiation('Waring', 'You Left the field blank ', 'Warning');
-            console.log(detail);
             this.isContactSelected = false;
         }
         /*
@@ -117,10 +116,13 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             console.log("**************************************");
             console.log(userinput);
             // event.target.submit();
-            this.CreateInvoiceRecord(userinput);
+            this.showSpinner = true;
+            setTimeout(() => {
+                this.CreateInvoiceRecord(userinput);
+                this.showSpinner = false;
+            }, 300);
             console.log('Submitting user values....');
             this.showNoficiation("Success", "Invoice has been Generated", "Success");
-            console.log('---------------------------------------');
             // this.ResetForm();
         } else {
             console.log('Cannot proceed further');
