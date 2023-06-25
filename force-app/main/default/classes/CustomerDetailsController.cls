@@ -1,4 +1,23 @@
 public with sharing class CustomerDetailsController {
+    @AuraEnabled(cacheable=true)
+    public static List<Invoice__c> ShowInvoices(string companyId){
+        try {
+            List<Invoice__c>invoices = [
+                Select 
+                Id,
+                Customer__r.FirstName,
+                Customer__r.LastName,
+                paid_date__c
+                FROM
+                invoice__c
+                WHERE
+                Company__c =: companyId
+            ];
+            return Invoices;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
     /*
     Method to return Related Contacts of an account
     @params: String-> CompanyId
