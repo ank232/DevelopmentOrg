@@ -7,7 +7,9 @@ public with sharing class CustomerDetailsController {
                 Id,
                 Customer__r.FirstName,
                 Customer__r.LastName,
-                paid_date__c
+                paid_date__c,
+                Status__c,
+                Total_Line_Amount__c
                 FROM
                 invoice__c
                 WHERE
