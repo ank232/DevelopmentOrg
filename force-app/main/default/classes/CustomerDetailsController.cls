@@ -5,9 +5,11 @@ public with sharing class CustomerDetailsController {
             List<Invoice__c>invoices = [
                 Select 
                 Id,
+                Name,
                 Customer__r.FirstName,
                 Customer__r.LastName,
-                paid_date__c,
+                Paid_Date__c,
+                Due_Date__c,
                 Status__c,
                 Total_Line_Amount__c
                 FROM

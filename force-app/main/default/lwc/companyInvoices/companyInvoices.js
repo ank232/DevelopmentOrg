@@ -6,7 +6,12 @@ import Status_FIELD from '@salesforce/schema/Invoice__c.Status__c';
 import PAID_DATE from '@salesforce/schema/Invoice__c.Paid_date__c';
 import Line_AMOUNT_FIELD from '@salesforce/schema/Invoice__c.Total_Line_Amount__c';
 import DUE_DATE from '@salesforce/schema/Invoice__c.Due_Date__c';
+import INVOICE_NO_FIELD from '@salesforce/schema/Invoice__c.Name';
 const COLS = [{
+        label: 'Invoice No',
+        fieldName: INVOICE_NO_FIELD.fieldApiName
+    },
+    {
         label: 'Customer Name',
         fieldName: 'CustomerName',
         type: 'text'
@@ -23,6 +28,9 @@ const COLS = [{
     {
         label: 'Paid Date',
         fieldName: PAID_DATE.fieldApiName
+    }, {
+        label: 'Due Date',
+        fieldName: DUE_DATE.fieldApiName
     }
 ];
 /*

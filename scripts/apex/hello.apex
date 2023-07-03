@@ -68,3 +68,8 @@ System.debug(formattedDate); // Output: 22/06/2023
 // Deleting all invoices: 
 List<Invoice__c> invoice = [select id , company__c from Invoice__c];
 delete invoice;
+id acId = '0012w00001cWKxTAAW';
+List<invoice__c> inv = [SELECT id, customer__c from invoice__c where company__c =: aciD];
+System.debug('--------');
+System.debug(inv);
+system.debug('--------');

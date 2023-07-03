@@ -24,3 +24,9 @@ Need to see the userInput state
                                                |
                                                V                                         
                                                -> Also need to create the invoice lineItem!
+
+Need to create a LWC that will show all invoices(number) by status for a company
+|
+ -> to update the rollup field 
+   |
+    -> use triggers(considering all cases)
