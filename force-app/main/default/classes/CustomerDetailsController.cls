@@ -92,4 +92,15 @@ public with sharing class CustomerDetailsController {
                 throw new AuraHandledException(e.getMessage());
             }
         }
+
+    @AuraEnabled(Cacheable= true)
+    public static Account  InvoicesTotal(String companyId){
+        try {
+            string query = 'SELECT Open_Invoices__c, Paid_Invoices__c, OverDue_Invoices__c FROM ACCOUNT WHERE ID =: companyId';
+            Account getInvoices = Database.query(query);
+            return getInvoices;         
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
     }
+}

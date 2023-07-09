@@ -1,11 +1,23 @@
-trigger TriggerOnCustomInvoice on Invoice__c (before insert,after insert, after update, after delete) 
+trigger TriggerOnCustomInvoice on Invoice__c (before insert,before delete,before update,
+                                              after insert, after update, after delete) 
 {
-    if(Trigger.isAfter && Trigger.isInsert)
+    // Before Delete
+    if(Trigger.IsBefore && Trigger.IsDelete)
     {
-        InvoiceHandler.InsertInvoice(Trigger.new);
+        InvoiceHandler.restrictDeleteInvoices(Trigger.OldMap);
     }
-    if(Trigger.isBefore && Trigger.isInsert)
+    if(Trigger.IsBefore && Trigger.IsUpdate)
     {
-        InvoiceHandler.InsertInvoiceOnBefore(Trigger.new);
+        InvoiceHandler.restrictUpdate(Trigger.New, Trigger.OldMap);
     }
+    // After Insert
+    if(Trigger.IsAfter && Trigger.IsInsert)
+    {
+        InvoiceHandler.UpdateInvoice(Trigger.New, Null);
+    }
+    // After Update
+    if(Trigger.IsAfter && Trigger.IsUpdate)
+    {
+        InvoiceHandler.UpdateInvoice(Trigger.New, Trigger.Oldmap);
+    }  
 }

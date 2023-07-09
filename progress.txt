@@ -30,3 +30,11 @@ Need to create a LWC that will show all invoices(number) by status for a company
  -> to update the rollup field 
    |
     -> use triggers(considering all cases)
+
+*************/\**/\****/\***/\*****/\*****/\****/\**/\***********
+
+Apex Triggers: 
+-> Prevent Deletion of Invoice if it's in Draft Mode (Invoice Object)
+-> Need to show open, overdue and paid invoices(amount[Rollup Field])
+-> max 5 invoices can be created at a time
+-> develop batch apex to delete last 1 year invoices

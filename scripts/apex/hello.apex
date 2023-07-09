@@ -73,3 +73,6 @@ List<invoice__c> inv = [SELECT id, customer__c from invoice__c where company__c 
 System.debug('--------');
 System.debug(inv);
 system.debug('--------');
+
+DumpClass.DoSomething();
+CustomerDetailsController.InvoicesTotal('0012w00001OOKMhAAP');

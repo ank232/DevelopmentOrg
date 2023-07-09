@@ -1,3 +1,21 @@
 <template>
-    <lightning-card title="I will display the invoice ammount by status"></lightning-card>
+    <lightning-card title="You Invoice Total">
+        <div class="slds-var-p-around_medium">
+            <h2 class="slds-text-heading_medium slds-text-color_brand slds-var-p-bottom_small">Paid Invoices:
+                <lightning-icon icon-name="utility:moneybag" size="small" class="slds-m-right_x-small"></lightning-icon>
+                {paidinvoiceTotal}
+            </h2>
+        </div>
+        <div class="slds-var-m-around_medium">
+            <h2 class="slds-text-heading_medium slds-text-color_brand slds-p-bottom_small">OverDue Invoices:
+            <lightning-icon icon-name="utility:moneybag" size="small" class="slds-var-m-right_x-small"></lightning-icon>
+                {dueinvoiceTotal}</h2>
+        </div>
+        <div class="slds-var-p-around_medium">
+            <h2 class="slds-text-heading_medium slds-text-color_brand slds-var-p-bottom_small">Open Invoices:
+                <lightning-icon icon-name="utility:moneybag" size="small" class="slds-var-m-right_x-small"></lightning-icon>
+                {openinvoiceTotal}
+            </h2>
+        </div>
+    </lightning-card>
 </template>

@@ -1,17 +1,159 @@
 public with sharing class InvoiceHandler {
-    public InvoiceHandler() {
-
+    private static List<String> FetchAllStatusPicklistVals()
+    {
+        String strObjectName = 'Invoice__c';
+        String strPicklistField = 'Status__c';
+        Map<String, String> mapPickListValues = new Map<String, String>();
+        Schema.SObjectType objSobjectType = Schema.getGlobalDescribe().get(strObjectName);
+        Schema.DescribeSObjectResult objDescribeSobject = objSobjectType.getDescribe();
+        Map<String, Schema.SObjectField> mapFields = objDescribeSobject.fields.getMap();
+        List<Schema.PicklistEntry> lstPickListValues = mapFields.get(strPicklistField).getDescribe().getPickListValues();
+        List<String> PicklistValues = new List<String>();
+        for(Schema.PicklistEntry picklistVal: lstPickListValues)
+        {
+            PicklistValues.add(picklistVal.getValue());
+        }
+        return PicklistValues;
+    }
+    private static Map<Id, Map<String,Decimal>> MapProcessor(Map<Id, List<Invoice__c>> relatedInvoices){
+        Set<Id> CompanyIds = relatedInvoices.keyset();
+        Map<Id, Map<String,Decimal>> TotalAmntOnAccount = new Map<Id, Map<String,Decimal>>();
+        for(Id companyId: CompanyIds){
+            List<Invoice__c> invoices = relatedInvoices.get(companyId);
+            Map<String,Decimal> InvoiceGrandTotalByStatus = new Map<String, Decimal>();
+            for(Invoice__c inv: invoices)
+            { 
+                String InvoiceStatus = inv.Status__c;
+                Decimal InvoiceTotalAmount= inv.Grand_Total__c;
+                if(!InvoiceGrandTotalByStatus.containsKey(InvoiceStatus))
+                {
+                    InvoiceGrandTotalByStatus.put(InvoiceStatus,0);
+                }
+                InvoiceGrandTotalByStatus.put(InvoiceStatus,InvoiceGrandTotalByStatus.get(InvoiceStatus)+ InvoiceTotalAmount);
+            }
+            for(String statusVal: FetchAllStatusPickListVals())
+            {
+                if(!InvoiceGrandTotalByStatus.containskey(statusVal))
+                {
+                    InvoiceGrandTotalByStatus.put(statusVal, 0);
+                }
+            }
+            TotalAmntOnAccount.put(companyId, InvoiceGrandTotalByStatus);
+        }
+        return TotalAmntOnAccount;
     }
     /*
-    This method is used to Calulate the open, closed and overdue invoices.
-    */ 
+This method used to prevent prevent any update on paid Invoice
+*/
+    public static void restrictUpdate(List<Invoice__c> newInvoices , Map<Id, Invoice__c> oldInvoices)
+    {
+        for(Invoice__c inv: newInvoices)
+        {
+            if(inv.Status__c == 'Paid')
+            {
+                inv.AddError('Cannot update any paid invoice');
+            }
+        }
+    }
+    /*
+Method to restrict invoices which having status as Draft
+*/    
+    public static void restrictDeleteInvoices(Map<Id, Invoice__c> InvoicesToDelete){
+        
+        System.debug('I ran');
+        Set<Id>invoiceIds = new Set<Id>();
+        invoiceIds = InvoicesToDelete.keyset();
+        List<Invoice__c> deletedInvoices = [SELECT 
+                                            ID, 
+                                            Company__c 
+                                            FROM 
+                                            Invoice__c 
+                                            WHERE 
+                                            Status__c = 'Draft' 
+                                            AND 
+                                            Id IN: invoiceIds];
+        if(!deletedInvoices.isEmpty())
+        {
+            for(Invoice__c invoice: deletedInvoices)
+            {
+                InvoicesToDelete.get(invoice.Id).addError(
+                    'This Invoice cannot be deleted since it is saved as Draft'
+                );
+            }
+        }
+    }
+    /*
+This method is used to Calulate the open, closed and overdue invoices on insert.
+*/ 
     public static void InsertInvoice(List<Invoice__c> NewInvoices ){
         Set<Id> invoiceRecIds = new Set<Id>();
         for(Invoice__c invoiceRec: NewInvoices){
-            invoiceRecIds.add(invoiceRec.Id);
+            invoiceRecIds.add(invoiceRec.Company__c);
         }
-        System.debug('Invoices to update...');
+        System.debug('Invoices to Insert...');
         System.debug(invoiceRecIds);
-        // List<Invoices__c> getInvoices =  [SELECT ID, STATUS__C FROM INVOICE__C GROUP BY STATUS__C];
+        List<Account> RelatedCompany = [SELECT Id, Name From Account where Id in: invoiceRecIds];
+        for(Account acc: RelatedCompany)
+        {
+            System.debug(acc);
+        }
+    }
+    /*
+This method used calucate open, closed and overdue invoices on update
+*/ 
+    public static void UpdateInvoice(List<Invoice__c> newInvoices, Map<id,Invoice__c> oldInvoices)
+    {
+        System.debug('I will update the invoices(after)');
+        Set<Id>invoiceIds = new Set<Id>();
+        Map<Id, AggregateResult> InvoiceMap = new Map<Id,AggregateResult>();
+        for(Invoice__c inv: newInvoices)
+        {
+            invoiceIds.add(inv.Company__c);
+        }
+        Map<id, List<Invoice__c>> companyInvoicemap = new Map<id, List<invoice__c>>();
+        if(!invoiceIds.isEmpty()){
+            List<Account> relatedCompanyList = new List<Account>([SELECT id,
+                                                                  (Select customer__c, 
+                                                                   status__c ,
+                                                                   grand_total__c 
+                                                                   from 
+                                                                   Invoices__r) 
+                                                                  From Account
+                                                                  Where Id in: invoiceIds]);
+            if(!relatedCompanyList.isEmpty()){
+                for(Account a: relatedCompanyList)
+                {
+                    companyInvoicemap.put(a.id, a.Invoices__r);
+                }
+                Map<Id, Map<String,Decimal>> CompanyInvoicesTotal =MapProcessor(companyInvoicemap);
+                if(!CompanyInvoicesTotal.isEmpty())
+                {
+                    List<Account> AccsToUpdate = New List<Account>();
+                    for(Id AccId: CompanyInvoicesTotal.keyset())
+                    { 
+                        Map<String,Decimal> invtotal = CompanyInvoicesTotal.get(AccId);
+                        Decimal PaidInvoiceTotal = invtotal.get('Paid');
+                        Decimal OverDueInvoiceTotal = invTotal.get('Pending');
+                        Decimal OpenInvoiceTotal = invtotal.get('Draft')+ OverDueInvoiceTotal + invTotal.get('Approved');
+                        Account acc = New Account(
+                            Id= AccId,
+                            Open_Invoices__c = OpenInvoiceTotal,
+                            Paid_Invoices__c = PaidInvoiceTotal,
+                            OverDue_Invoices__c = OverDueInvoiceTotal
+                        );
+                        AccsToUpdate.add(acc);
+                    }
+                    if(! AccsToUpdate.isEmpty())
+                    {
+                        System.debug('Accounts Ready to Update');
+                        System.debug(AccsToUpdate);
+                        Update AccsToUpdate;
+                    }
+                }
+            }
+        }
+        else{
+            System.debug('Ids are null');
+        }
     }
 }
