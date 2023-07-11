@@ -52,7 +52,7 @@ export default class CompanyInvoices extends LightningElement {
                     CustomerName: customerName
                 }
             });
-            console.log(JSON.stringify(this.invoiceData));
+            //console.log(JSON.stringify(this.invoiceData));
         }
         if (error) {
             console.log("--- ------ -----  -----");

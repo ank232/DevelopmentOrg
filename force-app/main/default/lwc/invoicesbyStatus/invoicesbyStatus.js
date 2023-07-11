@@ -8,7 +8,6 @@ export default class InvoicesbyStatus extends LightningElement {
     @wire(InvoicesTotal, { companyId: '$recordId' })
     wiredInvoices({ data, error }) {
         if (data) {
-            console.log('** ** ', data);
             this.paidinvoiceTotal = data.Paid_Invoices__c;
             this.dueinvoiceTotal = data.OverDue_Invoices__c;
             this.openinvoiceTotal = data.Open_Invoices__c;

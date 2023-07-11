@@ -1,0 +1,14 @@
+<template>
+    <lightning-card title="I will insert the invoice Line Item">
+        <lightning-record-edit-form object-api-name="Invoice_Line_Items__c" onsubmit={handleInvoiceLineInput}>
+            <template for:each={fields} for:item="field">
+                <lightning-input-field key={field} field-name={field}></lightning-input-field>
+            </template>
+<lightning-button type="submit" label="Create Invoice Line" variant="brand"></lightning-button>
+</lightning-record-edit-form>
+<h1>Calucated Tax is: </h1>
+<p>{CalclulatedTax}</p>
+<h1>Cacluated Total Amount is: </h1>
+<p>{CalculatedTotalAmount}</p>
+</lightning-card>
+</template>
