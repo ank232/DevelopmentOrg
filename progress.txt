@@ -23,8 +23,28 @@ Need to see the userInput state
         If the invoice is saved Successfully ?:Yes: No -> handle the case (Show notification!)
                                                |
                                                V                                         
-                                               -> Also need to create the invoice lineItem!
+                                                -> Also need to create the invoice lineItem!
+                                                |
+                                                V
+                          ---------------------<-
+                          |
+                          |
+                          |
+                          V  
+     -------->>>> Invoice Line Item LWc <<<<----------------
+                           |
+                           |
+                           V
+-> Let User to create multiple line-items at a time
+-> user can add a line item or delete any line item
+-> after saving the line items -=> that will create the line items 
+-> the line-item should be in a table format
+  |
+  V -> one Line item, user can search for product (custom search utility to search for product Name )
+      |
+      V -> one line item, there's also a picklist for tax type
 
+/*********************************************************************************************************************************************/
 Need to create a LWC that will show all invoices(number) by status for a company
 |
  -> to update the rollup field 

@@ -11,10 +11,13 @@ const COLS = [
 ];
 export default class CreateInvoiceLineItem extends LightningElement {
     keyIndex = 0;
-    LineItemColumns = [{
-        Product: '',
-        Quantity: '',
-        Tax: TAX_FIELD
+    lineItems = [{
+        Id: '1',
+        Product__c: '',
+        Quantity__c: '',
+        Unit_Amount__c: '',
+        Tax_Type__c: '',
+        Tax_Amount__c: ''
     }];
 
 }
