@@ -34,8 +34,7 @@
                 <template for:each={lineItems} for:item="item" for:index="index">
                     <tr key={item.Id}>
                         <td data-label="Product Name">
-                            <lightning-input type="text" onchange={handleProductName} data-row-index={index}
-                                data-field-name="Product__c"></lightning-input>
+                            <c-product-search></c-product-search>
                         </td>
                         <td data-label="Description">
                             <lightning-input type="text" onchange={handleDescription}
@@ -50,10 +49,10 @@
                                 data-field-name="Unit_Amount__c"></lightning-input>
                         </td>
                         <td data-label="Tax Type">
-                            <lightning-input type="text" onchange={handleTaxType}
-                                data-field-name="Tax_Type__c"></lightning-input>
+                            <lightning-combobox name="Tax Type" options={TaxPicklistVals} label="Type">
+                            </lightning-combobox>
                         </td>
-                        <td data-label="Tax">
+                        <td data-label="Tax2">
                             <lightning-input type="text" onchange={handleTax}
                                 data-field-name="Tax_Amount__c"></lightning-input>
                         </td>

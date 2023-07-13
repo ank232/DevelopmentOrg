@@ -103,4 +103,23 @@ public with sharing class CustomerDetailsController {
             throw new AuraHandledException(e.getMessage());
         }
     }
+    @AuraEnabled(cacheable=true)
+    public static List<Product2> productSearch(string ProductName){
+        string searchTerm ='%'+ ProductName + '%';
+        try {
+            List<Product2> products = [
+                SELECT 
+                ID,
+                Name
+                FROM 
+                PRODUCT2 
+                WHERE 
+                NAME 
+                LIKE: searchTerm
+            ];
+            return products;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
 }
