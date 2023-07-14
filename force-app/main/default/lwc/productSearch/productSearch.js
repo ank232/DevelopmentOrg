@@ -46,10 +46,19 @@ export default class ProductSearch extends LightningElement {
         event -> onClick()
         */
     ProductSelection = (event) => {
-        console.log('You selected a product');
+        console.log('You selected a product(Child Component');
         console.log(event.target.innerText);
         this.searchProductName = event.target.innerText;
         this.showProd = false;
         console.log(event.target.dataset.product);
+        const productid = event.target.dataset.product;
+        const sendproductname = new CustomEvent(
+            'selectedproduct', {
+                detail: {
+                    productId: productid,
+                    productName: this.searchProductName
+                }
+            });
+        this.dispatchEvent(sendproductname);
     }
 }

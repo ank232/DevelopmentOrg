@@ -11,7 +11,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
         Quantity: '',
         Description: '',
         UnitAmount: '',
-        TaxPercent: ''
+        TaxPercent: '',
+        TaxType: ''
     }];
 
     @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
@@ -37,28 +38,42 @@ export default class CreateInvoiceLineItem extends LightningElement {
             console.log(template);
         }
         // Event Handlers:
+    handleProductName = (event) => {
+        console.log('Row is=====');
+        console.log(event.target.dataset.id);
+        console.log('Data recieved from Child---');
+        console.log(JSON.stringify(event.detail));
+        const prodName = event.detail.productName;
+        console.log(prodName);
+    }
     handleDescription = (event) => {
-        console.log("^^^^&&&&&^^^^");
         console.log(event.target.value);
+        const row = event.target.dataset.id;
+        console.log(row);
+        this.lineItems[row]['Description'] = event.target.value;
     }
     handleQuantity = (event) => {
-        console.log("^^^^&&&&&^^^^");
         console.log(event.target.value);
     }
     handleunitAmount = (event) => {
-        console.log("^^^^&&&&&^^^^");
         console.log(event.target.value);
     }
     handleTaxType = (event) => {
-        console.log("^^^^&&&&&^^^^");
         console.log(event.target.value);
+        const row = event.target.dataset.id;
+        console.log('Row----');
+        console.log(row);
+        this.lineItems[row]['TaxType'] = event.target.value;
     }
     handleTaxInput = (event) => {
-        console.log("^^^^&&&&&^^^^");
         console.log(event.target.value);
     }
     handleDeleteLineItem = (event) => {
-        this.userInput();
+        console.log('I will delete the row');
+        const rowIndex = event.target.dataset.rowIndex;
+        console.log("YOu selected---------", rowIndex);
+        console.log('Related Data:');
+        console.log(JSON.stringify(this.lineItems[rowIndex]));
     }
     AddLineItem = () => {
         console.log('I clickeed!!!');
@@ -67,8 +82,13 @@ export default class CreateInvoiceLineItem extends LightningElement {
             ProductName: '',
             Quantity: '',
             UnitAmount: '',
-            TaxPercent: ''
+            TaxPercent: '',
+            TaxType: ''
         };
         this.lineItems = [...this.lineItems, newItem];
+    }
+    SaveLineItem = () => {
+        console.log('I will save the data');
+        console.log(JSON.stringify(this.lineItems));
     }
 }

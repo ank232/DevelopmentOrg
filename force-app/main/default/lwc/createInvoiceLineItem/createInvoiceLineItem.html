@@ -1,7 +1,7 @@
 <template>
     <lightning-card title="Invoice Line Item">
         <lightning-button label="Add Line Item" variant="brand" onclick={AddLineItem}></lightning-button>
-        <lightning-button label="Save Line Item" variant=" brand"></lightning-button>
+        <lightning-button label="Save Line Item" variant=" brand" onclick={SaveLineItem}></lightning-button>
         <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
             aria-label="Example table of Opportunities with vertical borders">
             <thead>
@@ -33,13 +33,13 @@
             </thead>
             <tbody>
                 <template for:each={lineItems} for:item="item" for:index="index">
-                    <tr key={item.Id}>
+                    <tr key={item.Id} data-row-index="index">
                         <td data-label="Product Name">
-                            <c-product-search></c-product-search>
+                            <c-product-search data-id={index} onselectedproduct={handleProductName}></c-product-search>
                         </td>
                         <td data-label="Description">
-                            <lightning-input type="text" onchange={handleDescription}
-                                data-field-name="Description__c"></lightning-input>
+                            <lightning-input type="text" onchange={handleDescription} data-field-name="Description__c"
+                                data-id={index}></lightning-input>
                         </td>
                         <td data-label="Quantity">
                             <lightning-input type="text" onchange={handleQuantity}
@@ -51,7 +51,7 @@
                         </td>
                         <td data-label="Tax Type">
                             <lightning-combobox name="Tax Type" options={TaxPicklistVals} onchange={handleTaxType}
-                                label="Type">
+                                data-id={index} label="Type">
                             </lightning-combobox>
                         </td>
                         <td data-label="Tax %">
@@ -59,7 +59,7 @@
                                 data-field-name="Tax"></lightning-input>
                         </td>
                         <td>
-                            <lightning-button label="Delete" onclick={handleDeleteLineItem}>
+                            <lightning-button label="Delete" onclick={handleDeleteLineItem} data-row-index={index}>
                             </lightning-button>
                         </td>
                     </tr>
