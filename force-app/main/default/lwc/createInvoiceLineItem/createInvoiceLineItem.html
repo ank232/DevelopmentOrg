@@ -1,5 +1,7 @@
 <template>
     <lightning-card title="Invoice Line Item">
+        <lightning-button label="Add Line Item" variant="brand" onclick={AddLineItem}></lightning-button>
+        <lightning-button label="Save Line Item" variant=" brand"></lightning-button>
         <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
             aria-label="Example table of Opportunities with vertical borders">
             <thead>
@@ -17,15 +19,14 @@
                         <div class="slds-truncate" title="Unit Amount">Unit Amount</div>
                     </th>
                     <th class="" scope="col">
-                        <div class="slds-truncate" title="Tax %">Tax</div>
+                        <div class="slds-truncate" title="Tax Type">Tax</div>
                     </th>
                     <th class="" scope="col">
-                        <div class="slds-truncate" title="Tax Type">Tax Type</div>
+                        <div class="slds-truncate" title="Tax %">Tax % </div>
                     </th>
                     <th class="" scope="col">
                         <div class="slds-truncate" title="Delete Line Item">
-                            <lightning-button title="Delete" onclick={handleDeleteLineItem}
-                                variant="brand"></lightning-button>
+                            Actions
                         </div>
                     </th>
                 </tr>
@@ -49,12 +50,17 @@
                                 data-field-name="Unit_Amount__c"></lightning-input>
                         </td>
                         <td data-label="Tax Type">
-                            <lightning-combobox name="Tax Type" options={TaxPicklistVals} label="Type">
+                            <lightning-combobox name="Tax Type" options={TaxPicklistVals} onchange={handleTaxType}
+                                label="Type">
                             </lightning-combobox>
                         </td>
-                        <td data-label="Tax2">
-                            <lightning-input type="text" onchange={handleTax}
-                                data-field-name="Tax_Amount__c"></lightning-input>
+                        <td data-label="Tax %">
+                            <lightning-input type="text" onchange={handleTaxInput}
+                                data-field-name="Tax"></lightning-input>
+                        </td>
+                        <td>
+                            <lightning-button label="Delete" onclick={handleDeleteLineItem}>
+                            </lightning-button>
                         </td>
                     </tr>
                 </template>
