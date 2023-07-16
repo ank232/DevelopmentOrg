@@ -25,6 +25,12 @@
                         <div class="slds-truncate" title="Tax %">Tax % </div>
                     </th>
                     <th class="" scope="col">
+                        <div class="slds-truncate" title="Total Tax">Total Tax </div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Total Amount">Total Amount </div>
+                    </th>
+                    <th class="" scope="col">
                         <div class="slds-truncate" title="Delete Line Item">
                             Actions
                         </div>
@@ -42,12 +48,12 @@
                                 data-id={index}></lightning-input>
                         </td>
                         <td data-label="Quantity">
-                            <lightning-input type="text" onchange={handleQuantity}
+                            <lightning-input type="number" onchange={handleQuantity} data-id={index}
                                 data-field-name="Quantity__c"></lightning-input>
                         </td>
                         <td data-label="Unit Amount">
-                            <lightning-input type="text" onchange={handleunitAmount}
-                                data-field-name="Unit_Amount__c"></lightning-input>
+                            <lightning-input type="number" formatter="currency" onchange={handleunitAmount}
+                                data-id={index} data-field-name="Unit_Amount__c"></lightning-input>
                         </td>
                         <td data-label="Tax Type">
                             <lightning-combobox name="Tax Type" options={TaxPicklistVals} onchange={handleTaxType}
@@ -55,8 +61,15 @@
                             </lightning-combobox>
                         </td>
                         <td data-label="Tax %">
-                            <lightning-input type="text" onchange={handleTaxInput}
+                            <lightning-input type="number" onchange={handleTaxInput} data-id={index}
                                 data-field-name="Tax"></lightning-input>
+                        </td>
+                        <td data-label="Tax Amount">
+                            <lightning-input value={taxAmount} read-only="true" type="number"
+                                formatter="currency"></lightning-input>
+                        </td>
+                        <td data-label="Total Amount">
+                            <lightning-input value={totalAmount} read-only="true" type="number" formatter="currency"></lightning-input>
                         </td>
                         <td>
                             <lightning-button label="Delete" onclick={handleDeleteLineItem} data-row-index={index}>
