@@ -134,4 +134,9 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         const errorMessage = event.detail;
         this.showNoficiation('Error', errorMessage, 'Error');
     }
+    handleInvoiceLineItems(event) {
+        const lineItems = event.detail;
+        console.log('LineItems Recieved!!!');
+        console.log(lineItems);
+    }
 }

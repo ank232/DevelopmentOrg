@@ -31,7 +31,7 @@ Need to see the userInput state
                           |
                           |
                           V  
-     -------->>>> Invoice Line Item LWc <<<<----------------
+     -------->>>> Invoice Line Item LWc <<<<---------------- (Child Component)
                            |
                            |
                            V
@@ -40,7 +40,7 @@ Need to see the userInput state
 -> after saving the line items -=> that will create the line items 
 -> the line-item should be in a table format
   |
-  V -> one Line item, user can search for product (custom search utility to search for product Name )
+  V -> one Line item, user can search for product (custom search utility to search for product Name ) (Child Component)
       |
       V -> one line item, there's also a picklist for tax type
 
@@ -58,3 +58,16 @@ Apex Triggers:
 -> Need to show open, overdue and paid invoices(amount[Rollup Field])
 -> max 5 invoices can be created at a time
 -> develop batch apex to delete last 1 year invoices
+
+Parent LWC ==> createInvoiceFromAccount (GrandParent)
+              |          |
+              |          V ===> Child Component =-> accountRelatedRecords
+              |
+              V
+Parent LWC ==> CreateInvoiceLineItem (child)
+       |               |
+       ==> ---------- L-->-===> Child Component =-> ProductSearch
+
+Also ,
+
+    (Parent) createInvoiceFromAccount --====> CreateInvoiceLineItem (child)

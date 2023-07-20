@@ -4,7 +4,6 @@ import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import TAX_TYPE_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax_Type__c';
 import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
-import EmailPreferencesStayInTouchReminder from '@salesforce/schema/User.EmailPreferencesStayInTouchReminder';
 export default class CreateInvoiceLineItem extends LightningElement {
     lineItems = [{
         Id: '0',
@@ -48,7 +47,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
     handleProductName = (event) => {
         const rowId = event.target.dataset.id;
         const prodName = event.detail.productName;
-        console.log(prodName);
         this.lineItems[rowId]['ProductName'] = prodName;
     }
     handleDescription = (event) => {
@@ -77,7 +75,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
     }
     handleDeleteLineItem = (event) => {
         const rowIndex = event.target.dataset.rowIndex;
-        console.log('This row--> ', rowIndex);
         if (this.lineItems.length > 1) {
             this.lineItems.splice(rowIndex, 1);
             this.lineItems = [...this.lineItems];
@@ -107,6 +104,11 @@ export default class CreateInvoiceLineItem extends LightningElement {
             return;
         }
         this.showNoficiation("Success", "Line Item will be created", "Success");
+        const savedLineItems = new CustomEvent(
+            'savedlineitems', {
+                detail: this.lineItems
+            });
+        this.dispatchEvent(savedLineItems);
     }
     CalculateTaxAmount(row) {
         const item = this.lineItems[row];
@@ -114,17 +116,11 @@ export default class CreateInvoiceLineItem extends LightningElement {
         const quant = parseInt(item["Quantity"]);
         const tax = parseInt(item["TaxPercent"]);
         if (!isNaN(unit) && !isNaN(quant) && !isNaN(tax)) {
-            console.log('Amount---> ');
-            console.log(unit * quant);
             item["totalAmount"] = unit * quant;
             const taxAmount = (unit * (tax / 100) * quant);
             item["taxAmount"] = taxAmount;
-            console.log('Item=--->');
-            console.log(JSON.stringify(this.lineItems[row]));
             this.lineItems = [...this.lineItems];
         } else {
-            console.log('Somethings off');
-            console.log(unit * quant);
             item["totalAmount"] = 0;
             item["taxAmount"] = 0;
             this.lineItems = [...this.lineItems];
