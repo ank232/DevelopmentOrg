@@ -6,7 +6,6 @@ import TAX_TYPE_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax_Type__c
 import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
 import EmailPreferencesStayInTouchReminder from '@salesforce/schema/User.EmailPreferencesStayInTouchReminder';
 export default class CreateInvoiceLineItem extends LightningElement {
-    keyIndex = 0;
     lineItems = [{
         Id: '0',
         ProductName: '',
@@ -127,7 +126,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
             console.log('Somethings off');
             console.log(unit * quant);
             item["totalAmount"] = 0;
-            item["totalAmount"] = 0;
+            item["taxAmount"] = 0;
             this.lineItems = [...this.lineItems];
         }
     }
