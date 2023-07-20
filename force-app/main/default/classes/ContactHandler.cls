@@ -6,7 +6,7 @@ public class ContactHandler {
                 accountIDs.add(conRec.AccountId);
             }
         }
-        list<contact> accountwithcons = [select accountid,id, is_primary_contact__c from contact where accountid in: accountIDs];
+        list<contact>accountwithcons = [select accountid,id, is_primary_contact__c from contact where accountid in: accountIDs];
 map<id, list<contact>> acconmap = new map<id, list<contact>>();
         if(!accountwithcons.isempty()){
             for(contact conRec: accountwithcons){

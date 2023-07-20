@@ -1,4 +1,16 @@
 public with sharing class DumpClass {
+    public static void UpdateMax(){
+         Id ac1 = '0012w00001bcwf6AAA';
+    id ac2 = '0012w00001OOKMjAAP';
+        List<Id> ids = new List<id>{ac1,ac2};
+    List<Account> accounts = [SELECT id, Name from Account Where Id in: ids] ;
+        List<Opportunity> opps  =[Select AccountId, Description from Opportunity where AccountId in: ids];
+        for(Opportunity op: opps)
+        {
+            op.Description = 'Just Testing';
+        }
+        update opps;
+}
     public static void DoSomething(){
           Id ac1 = '0012w00001cWKxTAAW';
     id ac2 = '0012w00001OOKMhAAP';

@@ -18,6 +18,7 @@ trigger TriggerOnCustomInvoice on Invoice__c (before insert,before delete,before
     // After Update
     if(Trigger.IsAfter && Trigger.IsUpdate)
     {
-        InvoiceHandler.UpdateInvoice(Trigger.New, Trigger.Oldmap);
+        //InvoiceHandler.UpdateInvoice(Trigger.New, Trigger.Oldmap);
+        InvoiceHandler.PerformInvoiceTotal(Trigger.New, Trigger.Oldmap);
     }  
 }

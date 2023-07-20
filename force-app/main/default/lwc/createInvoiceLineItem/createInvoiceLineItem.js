@@ -6,17 +6,17 @@ import TAX_TYPE_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax_Type__c
 import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
 import EmailPreferencesStayInTouchReminder from '@salesforce/schema/User.EmailPreferencesStayInTouchReminder';
 export default class CreateInvoiceLineItem extends LightningElement {
-    taxAmount;
-    totalAmount
     keyIndex = 0;
     lineItems = [{
-        Id: '1',
+        Id: '0',
         ProductName: '',
         Quantity: '',
         Description: '',
         UnitAmount: '',
         TaxPercent: '',
-        TaxType: ''
+        TaxType: '',
+        totalAmount: '',
+        taxAmount: ''
     }];
 
     @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
@@ -48,8 +48,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
         // Event Handlers:
     handleProductName = (event) => {
         const rowId = event.target.dataset.id;
-        console.log('Data recieved from Child---');
-        console.log(JSON.stringify(event.detail));
         const prodName = event.detail.productName;
         console.log(prodName);
         this.lineItems[rowId]['ProductName'] = prodName;
@@ -76,9 +74,11 @@ export default class CreateInvoiceLineItem extends LightningElement {
         const row = event.target.dataset.id;
         this.lineItems[row]['TaxPercent'] = event.target.value;
         this.CalculateTaxAmount(row);
+
     }
     handleDeleteLineItem = (event) => {
         const rowIndex = event.target.dataset.rowIndex;
+        console.log('This row--> ', rowIndex);
         if (this.lineItems.length > 1) {
             this.lineItems.splice(rowIndex, 1);
             this.lineItems = [...this.lineItems];
@@ -98,34 +98,37 @@ export default class CreateInvoiceLineItem extends LightningElement {
         this.lineItems = [...this.lineItems, newItem];
     }
     SaveLineItem = () => {
-        this.lineItems.map((item) => {
-            if (!item.Description) {
-                console.log('Error at row---> ' + item.Id);
-                this.showNoficiation(
-                    "Error",
-                    `Item at Row${item.Id}Field Cannot be left empty `,
-                    "Error"
-                );
-                return;
-            } else {
-                console.log("VVVVVV");
-                console.log(JSON.stringify(item));
-                this.showNoficiation("Sucess", "I will create the line Items", "Success");
-            }
+        const validateInput = this.lineItems.every((item) => {
+            return (
+                item.Description && item.ProductName && item.TaxPercent && item.UnitAmount && item.Quantity && item.TaxType
+            );
         });
+        if (!validateInput) {
+            this.showNoficiation("Error", "Please Enter proper Data", "Error");
+            return;
+        }
+        this.showNoficiation("Success", "Line Item will be created", "Success");
     }
     CalculateTaxAmount(row) {
-        const unitAmount = parseFloat(this.lineItems[row]["UnitAmount"]);
-        const quantity = parseFloat(this.lineItems[row]["Quantity"]);
-        const taxperecnt = parseFloat(this.lineItems[row]["TaxPercent"]);
-        if (!isNaN(unitAmount) && !isNaN(quantity) && !isNaN(taxperecnt)) {
-            const calcluatedTax = (unitAmount * (taxperecnt / 100)) * quantity;
-            this.taxAmount = calcluatedTax.toFixed(2);
-            const calclulatedAmount = unitAmount * quantity;
-            this.totalAmount = calclulatedAmount;
+        const item = this.lineItems[row];
+        const unit = parseFloat(item["UnitAmount"]);
+        const quant = parseInt(item["Quantity"]);
+        const tax = parseInt(item["TaxPercent"]);
+        if (!isNaN(unit) && !isNaN(quant) && !isNaN(tax)) {
+            console.log('Amount---> ');
+            console.log(unit * quant);
+            item["totalAmount"] = unit * quant;
+            const taxAmount = (unit * (tax / 100) * quant);
+            item["taxAmount"] = taxAmount;
+            console.log('Item=--->');
+            console.log(JSON.stringify(this.lineItems[row]));
+            this.lineItems = [...this.lineItems];
         } else {
-            this.taxAmount = '';
-            this.totalAmount = '';
+            console.log('Somethings off');
+            console.log(unit * quant);
+            item["totalAmount"] = 0;
+            item["totalAmount"] = 0;
+            this.lineItems = [...this.lineItems];
         }
     }
 }

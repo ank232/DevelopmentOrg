@@ -76,3 +76,4 @@ system.debug('--------');
 
 DumpClass.DoSomething();
 CustomerDetailsController.InvoicesTotal('0012w00001OOKMhAAP');
+DumpClass.UpdateMax();

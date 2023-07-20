@@ -156,4 +156,32 @@ This method used calucate open, closed and overdue invoices on update
             System.debug('Ids are null');
         }
     }
+    public static void PerformInvoiceTotal(List<Invoice__c> newInvoices, Map<Id, Invoice__c> oldInvoices){
+        Map<Id, Invoice__c> invmap = new Map<id, Invoice__c>();
+        System.debug('I am runnin');
+        for(Invoice__c inv: newInvoices)
+        {
+            if(inv.Company__c!= NULL){
+            invmap.put(inv.Company__c, inv);
+            }
+        }
+        List<AggregateResult> res = [SELECT Company__c,                                   
+                                     Status__c,
+                                     Sum(Grand_total__c) 
+                                     FROM INVOICE__C
+                                     WHERE
+                                     COMPANY__C IN: invmap.keySet()
+                                     group by Status__c, Company__c];
+        Map<String, Decimal> agrMap = new Map<String, Decimal>();
+        List<String> choices= FetchAllStatusPicklistVals();
+        for(AggregateResult agr: res)
+        {
+           String Status = (String)agr.get('Status__c');
+           Decimal amount = (Decimal)agr.get('expr0');
+           String Company = (String)agr.get('Company__c');
+           System.debug('---+++ CId--' + Company );
+           System.debug('+++++----- Status---'+ Status);
+           System.debug('++++++------+ Amnt---' + amount);  
+        }
+    }
 }

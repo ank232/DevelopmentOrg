@@ -1,4 +1,4 @@
-trigger TriggeronAccount on Account (after update) {
+trigger TriggeronAccount on Account (after update, before delete,after delete) {
     if(trigger.isAfter && trigger.isupdate){
     set<ID> accIds = new set<ID>();
         for(account acRec: trigger.new){
@@ -7,5 +7,9 @@ trigger TriggeronAccount on Account (after update) {
             }
         }
         AccountHandler.updateAccount(accIds);    
+    }
+    if(Trigger.isBefore && Trigger.isDelete)
+    {
+        AccountHandler.RestrictDeleteonDraft(Trigger.OldMap);
     }
 }

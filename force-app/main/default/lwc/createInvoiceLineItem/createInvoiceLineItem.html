@@ -65,11 +65,12 @@
                                 data-field-name="Tax"></lightning-input>
                         </td>
                         <td data-label="Tax Amount">
-                            <lightning-input value={taxAmount} read-only="true" type="number"
+                            <lightning-input value={item.taxAmount} read-only="true" type="number"
                                 formatter="currency"></lightning-input>
                         </td>
                         <td data-label="Total Amount">
-                            <lightning-input value={totalAmount} read-only="true" type="number" formatter="currency"></lightning-input>
+                            <lightning-input value={item.totalAmount} read-only="true" type="number"
+                                formatter="currency"></lightning-input>
                         </td>
                         <td>
                             <lightning-button label="Delete" onclick={handleDeleteLineItem} data-row-index={index}>
