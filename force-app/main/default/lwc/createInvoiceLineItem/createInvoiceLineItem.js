@@ -48,7 +48,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         // Event Handlers:
     handleProductName = (event) => {
-        console.log("Parent Calling");
         const rowId = event.target.dataset.id;
         const prodName = event.detail.productName;
         const prodId = event.detail.productId;
@@ -100,23 +99,15 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         // Method to create the lineItems and also checking whether the invoice is created or not?
     SaveLineItem = () => {
-        console.log('Is Invoice Saved????');
-        console.log(this.isinvoicecreated);
-        console.log('Invoice iD______');
-        console.log(this.invoicerecid);
         if (!this.isinvoicecreated && !this.invoicerecid) { //Invoice has not been saved!
             this.showNoficiation("Error", "Please Save the Invoice First", "Error");
             return;
         } else {
             if (!this.validateLineItemInput(this.lineItems)) {
-                console.log('Not a valid input-----');
                 this.showNoficiation("Error", "Please Enter proper Data", "Error");
                 return;
             }
             this.showNoficiation("Success", "Line Item will be created", "Success");
-            console.log('Invoice ID collected is_____==');
-            console.log(this.invoicerecid);
-            console.log('Line Items Collected are--');
             this.CreateLineItems(this.lineItems, this.invoicerecid);
         }
     }
@@ -145,8 +136,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
     }
     async CreateLineItems(data, invoiceId) {
-        console.log('Data---');
-        console.log(JSON.stringify(data));
         const lineItemsdata = [];
         for (let item of data) {
             const newItem = {
@@ -167,5 +156,4 @@ export default class CreateInvoiceLineItem extends LightningElement {
             this.showNoficiation("Error", String(error), "Error");
         }
     }
-
 }
