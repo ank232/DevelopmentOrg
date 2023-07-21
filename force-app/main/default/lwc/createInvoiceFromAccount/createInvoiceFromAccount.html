@@ -53,13 +53,13 @@
             </div>
             <lightning-button type="submit" label="Generate Invoice" variant="brand"
                 class="slds-var-m-top_medium"></lightning-button>
-            <template if:true={showSpinner}>
+            <!-- <template if:true={showSpinner}>
                 <div class="slds-var-m-top_medium">
                     <lightning-spinner alternative-text="Loading"></lightning-spinner>
                 </div>
-            </template>
+            </template> -->
+<c-create-invoice-line-item isinvoicecreated={isinvoicecreated} invoicerecid={invoicerecid}></c-create-invoice-line-item>
 </lightning-record-edit-form>
 <!-- Trying to render invoiceLineItem LWC -->
-<!-- <c-create-invoice-line-item></c-create-invoice-line-item> -->
 </lightning-card>
 </template>

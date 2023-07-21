@@ -1,10 +1,13 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, wire, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import TAX_TYPE_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax_Type__c';
 import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
+import InsertLineItems from '@salesforce/apex/CreateInvoice.InsertLineItems';
 export default class CreateInvoiceLineItem extends LightningElement {
+    @api isinvoicecreated;
+    @api invoicerecid;
     lineItems = [{
         Id: '0',
         ProductName: '',
@@ -45,9 +48,11 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         // Event Handlers:
     handleProductName = (event) => {
+        console.log("Parent Calling");
         const rowId = event.target.dataset.id;
         const prodName = event.detail.productName;
-        this.lineItems[rowId]['ProductName'] = prodName;
+        const prodId = event.detail.productId;
+        this.lineItems[rowId]['ProductName'] = prodId;
     }
     handleDescription = (event) => {
         const row = event.target.dataset.id;
@@ -83,32 +88,45 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
     }
     AddLineItem = () => {
-        const newItem = {
-            Id: String(this.lineItems.length + 1),
-            ProductName: '',
-            Quantity: '',
-            UnitAmount: '',
-            TaxPercent: '',
-            TaxType: ''
-        };
-        this.lineItems = [...this.lineItems, newItem];
-    }
+            const newItem = {
+                Id: String(this.lineItems.length + 1),
+                ProductName: '',
+                Quantity: '',
+                UnitAmount: '',
+                TaxPercent: '',
+                TaxType: ''
+            };
+            this.lineItems = [...this.lineItems, newItem];
+        }
+        // Method to create the lineItems and also checking whether the invoice is created or not?
     SaveLineItem = () => {
-        const validateInput = this.lineItems.every((item) => {
+        console.log('Is Invoice Saved????');
+        console.log(this.isinvoicecreated);
+        console.log('Invoice iD______');
+        console.log(this.invoicerecid);
+        if (!this.isinvoicecreated && !this.invoicerecid) { //Invoice has not been saved!
+            this.showNoficiation("Error", "Please Save the Invoice First", "Error");
+            return;
+        } else {
+            if (!this.validateLineItemInput(this.lineItems)) {
+                console.log('Not a valid input-----');
+                this.showNoficiation("Error", "Please Enter proper Data", "Error");
+                return;
+            }
+            this.showNoficiation("Success", "Line Item will be created", "Success");
+            console.log('Invoice ID collected is_____==');
+            console.log(this.invoicerecid);
+            console.log('Line Items Collected are--');
+            this.CreateLineItems(this.lineItems, this.invoicerecid);
+        }
+    }
+    validateLineItemInput(data) {
+        const validate = data.every((item) => {
             return (
                 item.Description && item.ProductName && item.TaxPercent && item.UnitAmount && item.Quantity && item.TaxType
             );
         });
-        if (!validateInput) {
-            this.showNoficiation("Error", "Please Enter proper Data", "Error");
-            return;
-        }
-        this.showNoficiation("Success", "Line Item will be created", "Success");
-        const savedLineItems = new CustomEvent(
-            'savedlineitems', {
-                detail: this.lineItems
-            });
-        this.dispatchEvent(savedLineItems);
+        return validate;
     }
     CalculateTaxAmount(row) {
         const item = this.lineItems[row];
@@ -126,4 +144,28 @@ export default class CreateInvoiceLineItem extends LightningElement {
             this.lineItems = [...this.lineItems];
         }
     }
+    async CreateLineItems(data, invoiceId) {
+        console.log('Data---');
+        console.log(JSON.stringify(data));
+        const lineItemsdata = [];
+        for (let item of data) {
+            const newItem = {
+                Invoice__c: invoiceId,
+                Product__c: item.ProductName,
+                Quantity__c: item.Quantity,
+                Tax_Type__c: item.TaxType,
+                Tax__c: item.TaxPercent,
+                Unit_Amount__c: item.UnitAmount,
+                Description__c: item.Description
+            }
+            lineItemsdata.push(newItem);
+        }
+        try {
+            const createLineItems = await InsertLineItems({ LineItems: lineItemsdata });
+
+        } catch (error) {
+            this.showNoficiation("Error", String(error), "Error");
+        }
+    }
+
 }

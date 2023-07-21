@@ -28,5 +28,18 @@ public with sharing class CreateInvoice {
     private static Date convertDate(String invoicedate){
         Date newDate = Date.valueOf(invoicedate);
         return newDate;
-    } 
+    }
+    // Method to insert LineItems: 
+    @AuraEnabled
+    public static String  InsertLineItems(List<Invoice_Line_Items__c> LineItems){
+        System.debug('This method will take list of lineiTems and then insert them');
+        System.debug('Values are-----');
+        System.debug(LineItems);
+        try{
+insert LineItems;
+return 'Created LineItems';
+        }catch(Exception e){
+             throw new AuraHandledException('Problem!!' + e.getMessage());
+        }
+    }
 }

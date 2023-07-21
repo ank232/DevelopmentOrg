@@ -4,6 +4,8 @@ import AccountRelatedRecords from 'c/accountRelatedRecords';
 import GetInvoiceDetails from '@salesforce/apex/CreateInvoice.GetInvoiceDetails';
 export default class CreateInvoiceFromAccount extends LightningElement {
     @api recordId;
+    @api isinvoicecreated = false;
+    @api invoicerecid;
     customerId;
     customerInformation;
     isContactSelected = false;
@@ -81,11 +83,13 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             result => {
                 console.log('Created ');
                 console.log(result);
+                this.invoicerecid = result;
             }
         ).catch(
             error => {
                 console.log('Uh oh!!');
                 console.log(error);
+                this.invoicerecid = null;
             }
         );
     }
@@ -117,15 +121,17 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             console.log(userinput);
             // event.target.submit();
             this.showSpinner = true;
-            setTimeout(() => {
-                this.CreateInvoiceRecord(userinput);
-                this.showSpinner = false;
-            }, 300);
+            // setTimeout(() => {
+            this.CreateInvoiceRecord(userinput);
+            this.showSpinner = false;
+            // }, 300);
             console.log('Submitting user values....');
             this.showNoficiation("Success", "Invoice has been Generated", "Success");
-            // this.ResetForm();
+            this.isinvoicecreated = true;
         } else {
             console.log('Cannot proceed further');
+            this.isinvoicecreated = false;
+            this.invoicerecid = null;
         }
     }
     handleError(event) {
@@ -133,10 +139,5 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         console.log(event);
         const errorMessage = event.detail;
         this.showNoficiation('Error', errorMessage, 'Error');
-    }
-    handleInvoiceLineItems(event) {
-        const lineItems = event.detail;
-        console.log('LineItems Recieved!!!');
-        console.log(lineItems);
     }
 }
