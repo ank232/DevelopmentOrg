@@ -5,7 +5,8 @@
             <h1>No Data Found!1</h1>
         </template>
         <template if:true={invoiceData}>
-            <lightning-datatable key-field="Id" data={invoiceData} columns={columns}>
+            <lightning-datatable key-field="Id" data={invoiceData} columns={columns} show-row-number-column
+                onrowaction={Rowmenu}>
             </lightning-datatable>
         </template>
     </lightning-card>
