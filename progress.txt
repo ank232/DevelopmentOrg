@@ -71,3 +71,15 @@ Parent LWC ==> CreateInvoiceLineItem (child)
 Also ,
 
     (Parent) createInvoiceFromAccount --====> CreateInvoiceLineItem (child)
+
+  
+----------------------------------------------------------------------------------------
+
+    ----------------------------->>>> New Update <<<<---------------------------------
+    
+    1. Create Invoice From Account LWC :
+        |
+        V-------------> 
+                      |-> Need to remove these Fields: -> Status | Paid Date |  CompanyName
+                      |->  Need to add these Fields: -> From Address        
+

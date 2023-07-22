@@ -30,16 +30,16 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         /*
          Method to Validate Date: Date should be in proper timeline 
          */
-    validateDates(duedate, paiddate, invoicedate) {
-        const dateFields = [duedate, paiddate, invoicedate];
+    validateDates(duedate, invoicedate) {
+        const dateFields = [duedate, invoicedate];
         if (dateFields.some(field => field === null)) {
             this.showNoficiation('Error', 'Date Fields cannot be blank', 'error');
             return false;
         } else {
-            let paidDate = new Date(paiddate);
+            let dueDate = new Date(duedate);
             let invoiceDate = new Date(invoicedate);
-            if (paidDate >= invoiceDate) {
-                this.showNoficiation('Error', 'Paid Date should be atleast one day ahead of invoice Date', 'error');
+            if (dueDate >= invoiceDate) {
+                this.showNoficiation('Error', 'Due Date should be atleast one day ahead of invoice Date', 'error');
                 return false;
             } else {
                 // this.showNoficiation('Success', 'All good!', 'success');
@@ -60,25 +60,23 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         console.log('*** Creating record here');
         const {
             Due_Date__c,
-            Paid_Date__c,
             Invoice_Date__c,
             Invoice_Number__c,
-            Status__c,
             Customer__c,
             Company__c,
-            Reference_Number__c,
+            From_Address__c,
+            Reference__c,
             Comments__c
         } = userInput;
         GetInvoiceDetails({
-            status: Status__c,
             companyId: Company__c,
             customerId: Customer__c,
             invoicedate: Invoice_Date__c,
             duedate: Due_Date__c,
-            paiddate: Paid_Date__c,
+            fromAddress: From_Address__c,
             comment: Comments__c,
             invoiceno: Invoice_Number__c,
-            referenceno: Reference_Number__c
+            referenceno: Reference__c
         }).then(
             result => {
                 console.log('Created ');
@@ -107,8 +105,8 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         event.preventDefault();
         console.log('**** Event happened');
         const userinput = event.detail.fields;
-        const { Due_Date__c: dueDate, Paid_Date__c: paidDate, Invoice_Date__c: invoiceDate } = event.detail.fields;
-        const valid = this.validateDates(dueDate, paidDate, invoiceDate);
+        const { Due_Date__c: dueDate, Invoice_Date__c: invoiceDate } = event.detail.fields;
+        const valid = this.validateDates(dueDate, invoiceDate);
         if (!this.isContactSelected) {
             this.showNoficiation('Warning', 'Please Select a Contact', 'Error');
             return;

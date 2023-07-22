@@ -6,22 +6,8 @@
             <div class="slds-grid slds-gutters">
                 <div class="slds-col slds-size_1-of-2">
                     <div class="slds-form">
-                        <!-- Adding the req field -->
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field required field-name="Company__c"
-                                    value={recordId}></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field required field-name="Status__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Paid_Date__c"></lightning-input-field>
-                            </div>
+                        <div class="slds-hide">
+                            <lightning-input-field field-name="Company__c" value={recordId}></lightning-input-field>
                         </div>
                         <div class="slds-form-element">
                             <div class="slds-form-element__control">
@@ -48,6 +34,11 @@
                                 <lightning-input-field field-name="Comments__c"></lightning-input-field>
                             </div>
                         </div>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control">
+                                <lightning-input-field field-name="From_Address__c"></lightning-input-field>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -60,6 +51,5 @@
             </template> -->
 <c-create-invoice-line-item isinvoicecreated={isinvoicecreated} invoicerecid={invoicerecid}></c-create-invoice-line-item>
 </lightning-record-edit-form>
-<!-- Trying to render invoiceLineItem LWC -->
 </lightning-card>
 </template>
