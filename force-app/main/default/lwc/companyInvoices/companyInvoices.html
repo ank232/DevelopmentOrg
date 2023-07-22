@@ -1,7 +1,12 @@
 <!-- sldsValidatorIgnore -->
 <template>
     <lightning-card title="I will display your invoices----">
-        <lightning-datatable key-field="Id" data={invoiceData} columns={columns}>
-        </lightning-datatable>
+        <template if:false={invoiceData}>
+            <h1>No Data Found!1</h1>
+        </template>
+        <template if:true={invoiceData}>
+            <lightning-datatable key-field="Id" data={invoiceData} columns={columns}>
+            </lightning-datatable>
+        </template>
     </lightning-card>
 </template>

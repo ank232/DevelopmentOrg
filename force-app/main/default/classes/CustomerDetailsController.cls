@@ -2,14 +2,14 @@ public with sharing class CustomerDetailsController {
     @AuraEnabled(cacheable=true)
     public static List<Invoice__c> ShowInvoices(string companyId){
         try {
-            List<Invoice__c>invoices = [
+            List<Invoice__c> invoices = [
                 Select 
                 Id,
                 Name,
                 Customer__r.FirstName,
                 Customer__r.LastName,
-                Paid_Date__c,
                 Due_Date__c,
+                Invoice_Date__c,
                 Status__c,
                 Total_Line_Amount__c
                 FROM
