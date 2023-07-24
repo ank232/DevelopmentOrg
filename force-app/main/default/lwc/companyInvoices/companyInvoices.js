@@ -59,7 +59,6 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
     @wire(ShowInvoices, { companyId: '$recordId' })
     wiredInvoices({ data, error }) {
         if (data) {
-            console.log("**", data);
             if (data.length == 0) {
                 this.invoiceData = null;
             } else {
@@ -85,7 +84,7 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
         console.log('You selected a row!!');
         const row = event.detail.row;
         const actionName = event.detail.action.name;
-        console.log(JSON.stringify(row), '---Action---> ', actionName);
+
         switch (actionName) {
             case 'view':
                 this[NavigationMixin.Navigate]({

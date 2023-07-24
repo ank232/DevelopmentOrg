@@ -5,6 +5,7 @@ import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import TAX_TYPE_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax_Type__c';
 import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
 import InsertLineItems from '@salesforce/apex/CreateInvoice.InsertLineItems';
+import { CurrentPageReference } from 'lightning/navigation';
 export default class CreateInvoiceLineItem extends LightningElement {
     @api isinvoicecreated;
     @api invoicerecid;
@@ -19,6 +20,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
         totalAmount: '',
         taxAmount: ''
     }];
+    @wire(CurrentPageReference)
+    currentPageReference;
 
     @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
     objectInfo;
@@ -39,14 +42,13 @@ export default class CreateInvoiceLineItem extends LightningElement {
         return [];
     }
     showNoficiation(title, message, variant) {
-            const showToast = new ShowToastEvent({
-                title: title,
-                message: message,
-                variant: variant
-            });
-            this.dispatchEvent(showToast);
-        }
-        // Event Handlers:
+        const showToast = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(showToast);
+    }
     handleProductName = (event) => {
         const rowId = event.target.dataset.id;
         const prodName = event.detail.productName;
@@ -87,28 +89,42 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
     }
     AddLineItem = () => {
-            const newItem = {
-                Id: String(this.lineItems.length + 1),
-                ProductName: '',
-                Quantity: '',
-                UnitAmount: '',
-                TaxPercent: '',
-                TaxType: ''
-            };
-            this.lineItems = [...this.lineItems, newItem];
-        }
-        // Method to create the lineItems and also checking whether the invoice is created or not?
+        const newItem = {
+            Id: String(this.lineItems.length + 1),
+            ProductName: '',
+            Quantity: '',
+            UnitAmount: '',
+            TaxPercent: '',
+            TaxType: ''
+        };
+        this.lineItems = [...this.lineItems, newItem];
+    }
     SaveLineItem = () => {
-        if (!this.isinvoicecreated && !this.invoicerecid) { //Invoice has not been saved!
-            this.showNoficiation("Error", "Please Save the Invoice First", "Error");
-            return;
-        } else {
+        const currentPageRef = this.currentPageReference;
+        console.log(currentPageRef);
+        if (currentPageRef.type.includes('quickAction')) {
+            console.log('LWC is running in Account Page');
+            if (!this.isinvoicecreated && !this.invoicerecid) { //Invoice has not been saved!
+                this.showNoficiation("Error", "Please Save the Invoice First", "Error");
+                return;
+            } else {
+                if (!this.validateLineItemInput(this.lineItems)) {
+                    this.showNoficiation("Error", "Please Enter proper Data", "Error");
+                    return;
+                }
+                this.showNoficiation("Success", "Line Item will be created", "Success");
+                // this.CreateLineItems(this.lineItems, this.invoicerecid);
+            }
+        }
+        if (currentPageRef.type.includes('recordPage')) {
+            console.log('LWC is running in Invoice Rec Page');
+            const invoiceId = currentPageRef.attributes.recordId;
             if (!this.validateLineItemInput(this.lineItems)) {
                 this.showNoficiation("Error", "Please Enter proper Data", "Error");
                 return;
             }
-            this.showNoficiation("Success", "Line Item will be created", "Success");
-            this.CreateLineItems(this.lineItems, this.invoicerecid);
+            // this.showNoficiation("Success", "Line Item will be created", "Success");
+            this.CreateLineItems(this.lineItems, invoiceId);
         }
     }
     validateLineItemInput(data) {
@@ -151,6 +167,9 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         try {
             const createLineItems = await InsertLineItems({ LineItems: lineItemsdata });
+            if (createLineItems) {
+                this.showNoficiation("Success", "Line Item will be created", "Success");
+            }
 
         } catch (error) {
             this.showNoficiation("Error", String(error), "Error");

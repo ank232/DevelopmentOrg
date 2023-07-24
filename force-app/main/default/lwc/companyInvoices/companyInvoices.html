@@ -2,7 +2,7 @@
 <template>
     <lightning-card title="I will display your invoices----">
         <template if:false={invoiceData}>
-            <h1>No Data Found!1</h1>
+            <div class="slds-error">No data to show.</div>
         </template>
         <template if:true={invoiceData}>
             <lightning-datatable key-field="Id" data={invoiceData} columns={columns} show-row-number-column
