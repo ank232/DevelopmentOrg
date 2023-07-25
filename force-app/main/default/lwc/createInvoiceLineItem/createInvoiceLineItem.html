@@ -1,7 +1,8 @@
 <template>
     <lightning-card title="Invoice Line Item">
         <lightning-button label="Add Line Item" variant="brand" onclick={AddLineItem}></lightning-button>
-        <lightning-button label="Save Line Item" variant=" brand" onclick={SaveLineItem}></lightning-button>
+        <lightning-button class="saveLine" label="Save Line Item" variant=" brand"
+            onclick={SaveLineItem}></lightning-button>
         <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
             aria-label="Example table of Opportunities with vertical borders">
             <thead>
@@ -48,11 +49,11 @@
                                 data-id={index}></lightning-input>
                         </td>
                         <td data-label="Quantity">
-                            <lightning-input type="number" onchange={handleQuantity} data-id={index}
+                            <lightning-input type="number" onchange={handleQuantity} data-id={index} required
                                 data-field-name="Quantity__c"></lightning-input>
                         </td>
                         <td data-label="Unit Amount">
-                            <lightning-input type="number" formatter="currency" onchange={handleunitAmount}
+                            <lightning-input type="number" formatter="currency" onchange={handleunitAmount} required
                                 data-id={index} data-field-name="Unit_Amount__c"></lightning-input>
                         </td>
                         <td data-label="Tax Type">

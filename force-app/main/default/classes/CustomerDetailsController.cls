@@ -122,4 +122,18 @@ public with sharing class CustomerDetailsController {
             throw new AuraHandledException(e.getMessage());
         }
     }
+    @AuraEnabled(cacheable= true)
+    public static List<Invoice_Line_Items__c> RelatedLineItems(Id  invoiceId){
+        try{
+            List<Invoice_line_Items__c> LineItems = [
+                SELECT 
+                product__c, description__c ,
+                tax__c ,tax_type__c, Tax_Amount__c, unit_Amount__c, Total_Amount__c
+                FROM INVOICE_LINE_ITEMS__c 
+                WHERE invoice__c=:invoiceId With SECURITY_ENFORCED];
+            return LineItems;
+        }catch(Exception e){
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
 }

@@ -1,14 +1,17 @@
 import { LightningElement, wire, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getPicklistValues } from 'lightning/uiObjectInfoApi';
+import { CurrentPageReference } from 'lightning/navigation';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import TAX_TYPE_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax_Type__c';
 import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
 import InsertLineItems from '@salesforce/apex/CreateInvoice.InsertLineItems';
-import { CurrentPageReference } from 'lightning/navigation';
+import RelatedLineItems from '@salesforce/apex/CustomerDetailsController.RelatedLineItems';
 export default class CreateInvoiceLineItem extends LightningElement {
+    RelatedLineItem;
     @api isinvoicecreated;
     @api invoicerecid;
+    @api recordId;
     lineItems = [{
         Id: '0',
         ProductName: '',
@@ -23,6 +26,28 @@ export default class CreateInvoiceLineItem extends LightningElement {
     @wire(CurrentPageReference)
     currentPageReference;
 
+    renderedCallback() {
+        console.log('Rendered callback is runnin!');
+        this.ComponentVisibility();
+    }
+    connectedCallback() {
+        console.log('Connected Callback is runnin');
+        console.log('The current Pageref(connectedcallback) ');
+        console.log(this.currentPageReference.type);
+    }
+    @wire(RelatedLineItems, { invoiceId: '$recordId' })
+    LineItemData({ data, error }) {
+        if (data) {
+            if (data.length == 0) {
+                this.RelatedLineItem = null;
+            }
+            console.log(data);
+            this.RelatedLineItem = data;
+        }
+        if (error) {
+            console.log(error);
+        }
+    }
     @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
     objectInfo;
 
@@ -31,6 +56,24 @@ export default class CreateInvoiceLineItem extends LightningElement {
         fieldApiName: TAX_TYPE_FIELD
     })
     taxPicklistValues;
+
+    ComponentVisibility() {
+        const currentPage = this.currentPageReference.type;
+        if (currentPage.includes('recordPage')) {
+            const saveLineButton = this.template.querySelector('.saveLine');
+            saveLineButton.classList.add('slds-hidden');
+            console.log('I will show the related records if any!!');
+            console.log('Related Data---+++');
+            console.log(this.RelatedLineItem);
+            const predata = this.RelatedLineItem;
+            console.log('*', typeof predata);
+        } else {
+            console.log('We are on Account page  & Add line items button is visible');
+        }
+    }
+    RelatedLines(data) {
+
+    }
 
     get TaxPicklistVals() {
         if (this.taxPicklistValues.data) {
@@ -124,7 +167,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 return;
             }
             // this.showNoficiation("Success", "Line Item will be created", "Success");
-            this.CreateLineItems(this.lineItems, invoiceId);
+            // this.CreateLineItems(this.lineItems, invoiceId);
         }
     }
     validateLineItemInput(data) {
