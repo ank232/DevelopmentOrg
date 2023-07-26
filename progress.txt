@@ -1,13 +1,4 @@
-I need to make a component that will fetch some record details by its record id. -> done
-Now, I created the invoice lwc, now need to validate the inputs(!Not Done)
-Then, I need to create an invoice inside the system.
-Successfully added the child component in parent component.
-To-do: --> I need to style the child component, and need to validate the invoice object fields before inserting into system,
-The LWc is now can create the invoice, 
-Need to see the userInput state
- (See: "StockPriceCard Lwc")
-                    <<<<<<<<<<<<<<******************************************************************>>>>>>>>>>>>>>
- Data Flow: 
+  Data Flow: 
  Component loads -> get all related contacts(Child Component)
      |
      V
@@ -23,15 +14,15 @@ Need to see the userInput state
         If the invoice is saved Successfully ?:Yes: No -> handle the case (Show notification!)
                                                |
                                                V                                         
-                                                -> Also need to create the invoice lineItem!
-                                                |
-                                                V
-                          ---------------------<-
+                                                -> Also need to create the invoice lineItem!=>
+                                                                                              |
+                                                                                              |
+                           <------------------------------------------------------------------
                           |
                           |
                           |
                           V  
-     -------->>>> Invoice Line Item LWc <<<<---------------- (Child Component)
+         >>>> Invoice Line Item LWc <<<< (Child Component)
                            |
                            |
                            V
@@ -65,15 +56,12 @@ Parent LWC ==> createInvoiceFromAccount (GrandParent)
               |
               V
 Parent LWC ==> CreateInvoiceLineItem (child)
-       |               |
-       ==> ---------- L-->-===> Child Component =-> ProductSearch
+       |               
+       L-->-===> Child Component =-> ProductSearch
 
 Also ,
 
     (Parent) createInvoiceFromAccount --====> CreateInvoiceLineItem (child)
-
-  
-----------------------------------------------------------------------------------------
 
     ----------------------------->>>> New Update <<<<---------------------------------
     
@@ -83,3 +71,18 @@ Also ,
                       |-> Need to remove these Fields: -> Status | Paid Date |  CompanyName
                       |->  Need to add these Fields: -> From Address        
 
+CreateInvoiceLineItem LWC: -> Can be created from two places
+                            1. Account Record Page (child Component)
+                            2. Invoice Detail Page (Parent Component) 
+Account Record Page Data Flow form CreateInvoiceLineItem LWC ===> First we should check if the invoice is created or not -> field validation(lineItem LWC)-> Db insert
+Invoice Detail Page Data flow from CreateInvoiceLineItem LWC --=> We should only check for the field validation->field validation(lineItem LWC)-> dbInsert
+                                                               ^
+                                                               |
+Also ---====-> Change the behaviour of component accordingly--- 
+                           |
+                           L-> On Invoice Record Page it will be shown as a related list 
+                           Functionalities-> 1. user can add line items and can also view the existing line items.
+                                             2. saveLine Item should be hidden initially and also along with the table of line-item recs 
+                                                           |
+That table should show the related line            <=------V 
+items and as well can we can also delete them    

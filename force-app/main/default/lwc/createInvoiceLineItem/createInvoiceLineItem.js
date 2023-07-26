@@ -8,6 +8,7 @@ import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
 import InsertLineItems from '@salesforce/apex/CreateInvoice.InsertLineItems';
 import RelatedLineItems from '@salesforce/apex/CustomerDetailsController.RelatedLineItems';
 export default class CreateInvoiceLineItem extends LightningElement {
+    // Properties
     RelatedLineItem;
     @api isinvoicecreated;
     @api invoicerecid;
@@ -23,29 +24,56 @@ export default class CreateInvoiceLineItem extends LightningElement {
         totalAmount: '',
         taxAmount: ''
     }];
+
+    // Wire methods
     @wire(CurrentPageReference)
     currentPageReference;
 
-    renderedCallback() {
-        console.log('Rendered callback is runnin!');
-        this.ComponentVisibility();
-    }
     connectedCallback() {
-        console.log('Connected Callback is runnin');
         console.log('The current Pageref(connectedcallback) ');
         console.log(this.currentPageReference.type);
+        if (this.currentPageReference.type.includes("recordPage")) {
+            console.log('You are on Invoice Record Page? Save Button is not visible!');
+        }
     }
+
+    get isLineItemVisible() {
+        const ref = this.currentPageReference.type;
+        return ref.includes('recordPage');
+    }
+
     @wire(RelatedLineItems, { invoiceId: '$recordId' })
     LineItemData({ data, error }) {
         if (data) {
             if (data.length == 0) {
-                this.RelatedLineItem = null;
+                console.log('Your line items are 0');
             }
-            console.log(data);
-            this.RelatedLineItem = data;
+            console.log('Related line Items are: ');
+            // console.log(data);
+            this.RelatedLineItems(data);
         }
         if (error) {
+            this.RelatedLineItem = null;
             console.log(error);
+        }
+    }
+    RelatedLineItems(data) {
+        console.log('data');
+        console.log(data);
+        const prevItems = [];
+        for (let item of data) {
+            const reLItem = {
+                ProductName: item.Product__c,
+                Quantity: item.Quantity__c,
+                Description: item.Description__c,
+                UnitAmount: item.Unit_Amount__c,
+                TaxPercent: item.Tax__c,
+                TaxType: item.Tax_Type__c,
+                totalAmount: 0,
+                taxAmount: 0
+            };
+            // prevItems.push(reLItem);
+            this.lineItems = [...this.lineItems, reLItem];
         }
     }
     @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
@@ -57,24 +85,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
     })
     taxPicklistValues;
 
-    ComponentVisibility() {
-        const currentPage = this.currentPageReference.type;
-        if (currentPage.includes('recordPage')) {
-            const saveLineButton = this.template.querySelector('.saveLine');
-            saveLineButton.classList.add('slds-hidden');
-            console.log('I will show the related records if any!!');
-            console.log('Related Data---+++');
-            console.log(this.RelatedLineItem);
-            const predata = this.RelatedLineItem;
-            console.log('*', typeof predata);
-        } else {
-            console.log('We are on Account page  & Add line items button is visible');
-        }
-    }
-    RelatedLines(data) {
-
-    }
-
     get TaxPicklistVals() {
         if (this.taxPicklistValues.data) {
             return this.taxPicklistValues.data.values.map(picklist => ({
@@ -84,20 +94,23 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         return [];
     }
+
     showNoficiation(title, message, variant) {
-        const showToast = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant
-        });
-        this.dispatchEvent(showToast);
-    }
+            const showToast = new ShowToastEvent({
+                title: title,
+                message: message,
+                variant: variant
+            });
+            this.dispatchEvent(showToast);
+        }
+        /* ---------- Event Handlers ------------*/
     handleProductName = (event) => {
         const rowId = event.target.dataset.id;
         const prodName = event.detail.productName;
         const prodId = event.detail.productId;
         this.lineItems[rowId]['ProductName'] = prodId;
     }
+
     handleDescription = (event) => {
         const row = event.target.dataset.id;
         this.lineItems[row]['Description'] = event.target.value;
@@ -107,6 +120,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         this.lineItems[row]['Quantity'] = event.target.value;
         this.CalculateTaxAmount(row);
     }
+
     handleunitAmount = (event) => {
         const row = event.target.dataset.id;
         this.lineItems[row]['UnitAmount'] = event.target.value;
@@ -116,21 +130,26 @@ export default class CreateInvoiceLineItem extends LightningElement {
         const row = event.target.dataset.id;
         this.lineItems[row]['TaxType'] = event.target.value;
     }
+
     handleTaxInput = (event) => {
         const row = event.target.dataset.id;
         this.lineItems[row]['TaxPercent'] = event.target.value;
         this.CalculateTaxAmount(row);
 
     }
+
     handleDeleteLineItem = (event) => {
         const rowIndex = event.target.dataset.rowIndex;
         if (this.lineItems.length > 1) {
             this.lineItems.splice(rowIndex, 1);
             this.lineItems = [...this.lineItems];
+            console.log('After Deletion->');
+            console.log(this.lineItems);
         } else {
             this.showNoficiation('Warning', "Cannot delete all rows", "Warning");
         }
     }
+
     AddLineItem = () => {
         const newItem = {
             Id: String(this.lineItems.length + 1),
@@ -142,6 +161,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         };
         this.lineItems = [...this.lineItems, newItem];
     }
+
     SaveLineItem = () => {
         const currentPageRef = this.currentPageReference;
         console.log(currentPageRef);
@@ -161,6 +181,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         if (currentPageRef.type.includes('recordPage')) {
             console.log('LWC is running in Invoice Rec Page');
+            console.log('Line Items to be Updated/Inserted');
+            console.log(JSON.stringify(this.lineItems));
             const invoiceId = currentPageRef.attributes.recordId;
             if (!this.validateLineItemInput(this.lineItems)) {
                 this.showNoficiation("Error", "Please Enter proper Data", "Error");
@@ -170,6 +192,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
             // this.CreateLineItems(this.lineItems, invoiceId);
         }
     }
+
     validateLineItemInput(data) {
         const validate = data.every((item) => {
             return (
@@ -178,6 +201,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         });
         return validate;
     }
+
     CalculateTaxAmount(row) {
         const item = this.lineItems[row];
         const unit = parseFloat(item["UnitAmount"]);
@@ -194,6 +218,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
             this.lineItems = [...this.lineItems];
         }
     }
+
     async CreateLineItems(data, invoiceId) {
         const lineItemsdata = [];
         for (let item of data) {

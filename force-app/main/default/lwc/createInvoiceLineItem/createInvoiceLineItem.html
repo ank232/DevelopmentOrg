@@ -45,7 +45,7 @@
                             <c-product-search data-id={index} onselectedproduct={handleProductName}></c-product-search>
                         </td>
                         <td data-label="Description">
-                            <lightning-input type="text" onchange={handleDescription} data-field-name="Description__c"
+                            <lightning-input type="text" onchange={handleDescription} data-field-name="Description__c" value={item.Description}
                                 data-id={index}></lightning-input>
                         </td>
                         <td data-label="Quantity">
@@ -79,7 +79,7 @@
                         </td>
                     </tr>
                 </template>
-            </tbody>
-        </table>
-    </lightning-card>
+</tbody>
+</table>
+</lightning-card>
 </template>
