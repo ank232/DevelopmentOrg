@@ -63,7 +63,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         const prevItems = [];
         for (let item of data) {
             const reLItem = {
-                ProductName: item.Product__c,
+                ProductName: item.Product__r.Name,
                 Quantity: item.Quantity__c,
                 Description: item.Description__c,
                 UnitAmount: item.Unit_Amount__c,
@@ -75,6 +75,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
             // prevItems.push(reLItem);
             this.lineItems = [...this.lineItems, reLItem];
         }
+        console.log('Line Items are**');
+        console.log(JSON.stringify(this.lineItems));
     }
     @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
     objectInfo;
@@ -189,7 +191,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 return;
             }
             // this.showNoficiation("Success", "Line Item will be created", "Success");
-            // this.CreateLineItems(this.lineItems, invoiceId);
+            this.CreateLineItems(this.lineItems, invoiceId);
         }
     }
 
@@ -236,7 +238,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         try {
             const createLineItems = await InsertLineItems({ LineItems: lineItemsdata });
             if (createLineItems) {
-                this.showNoficiation("Success", "Line Item will be created", "Success");
+                this.showNoficiation("Success", "Line Item will be created " + createLineItems, "Success");
             }
 
         } catch (error) {

@@ -42,28 +42,30 @@
                 <template for:each={lineItems} for:item="item" for:index="index">
                     <tr key={item.Id} data-row-index="index">
                         <td data-label="Product Name">
-                            <c-product-search data-id={index} onselectedproduct={handleProductName}></c-product-search>
+                            <c-product-search data-id={index} onselectedproduct={handleProductName}
+                                value={item.ProductName}></c-product-search>
                         </td>
                         <td data-label="Description">
-                            <lightning-input type="text" onchange={handleDescription} data-field-name="Description__c" value={item.Description}
-                                data-id={index}></lightning-input>
+                            <lightning-input type="text" onchange={handleDescription} data-field-name="Description__c"
+                                value={item.Description} data-id={index}></lightning-input>
                         </td>
                         <td data-label="Quantity">
                             <lightning-input type="number" onchange={handleQuantity} data-id={index} required
-                                data-field-name="Quantity__c"></lightning-input>
+                                value={item.Quantity} data-field-name="Quantity__c"></lightning-input>
                         </td>
                         <td data-label="Unit Amount">
                             <lightning-input type="number" formatter="currency" onchange={handleunitAmount} required
-                                data-id={index} data-field-name="Unit_Amount__c"></lightning-input>
+                                value={item.UnitAmount} data-id={index}
+                                data-field-name="Unit_Amount__c"></lightning-input>
                         </td>
                         <td data-label="Tax Type">
                             <lightning-combobox name="Tax Type" options={TaxPicklistVals} onchange={handleTaxType}
-                                data-id={index} label="Type">
+                                value={item.TaxType} data-id={index} label="Type">
                             </lightning-combobox>
                         </td>
                         <td data-label="Tax %">
                             <lightning-input type="number" onchange={handleTaxInput} data-id={index}
-                                data-field-name="Tax"></lightning-input>
+                                value={item.TaxPercent} data-field-name="Tax"></lightning-input>
                         </td>
                         <td data-label="Tax Amount">
                             <lightning-input value={item.taxAmount} read-only="true" type="number"
