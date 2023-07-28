@@ -1,20 +1,32 @@
-import { LightningElement, wire, api } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { getPicklistValues } from 'lightning/uiObjectInfoApi';
-import { CurrentPageReference } from 'lightning/navigation';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
-import TAX_TYPE_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax_Type__c';
-import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
 import InsertLineItems from '@salesforce/apex/CreateInvoice.InsertLineItems';
 import RelatedLineItems from '@salesforce/apex/CustomerDetailsController.RelatedLineItems';
+import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
+import TAX_TYPE_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax_Type__c';
+import PRODUCT_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Product__c';
+import UNIT_AMOUNT_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Unit_Amount__c';
+import DESCRIPTION_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Description__c';
+import TAX_PERCENT_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Tax__c';
+import QUANTITY_FIELD from '@salesforce/schema/Invoice_Line_Items__c.Quantity__c';
+import { CurrentPageReference } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
+import { LightningElement, api, wire } from 'lwc';
+const cols = [
+    { label: '', fieldName: PRODUCT_FIELD.fieldApiName },
+    { label: '', fieldName: DESCRIPTION_FIELD.fieldApiName },
+    { label: '', fieldName: QUANTITY_FIELD.fieldApiName },
+    { label: '', fieldName: TAX_TYPE_FIELD.fieldApiName },
+    { label: '', fieldName: UNIT_AMOUNT_FIELD.fieldApiName },
+    { label: '', fieldName: TAX_PERCENT_FIELD.fieldApiName }
+];
 export default class CreateInvoiceLineItem extends LightningElement {
+    COLS = cols;
     // Properties
-    RelatedLineItem;
     @api isinvoicecreated;
     @api invoicerecid;
     @api recordId;
     lineItems = [{
-        Id: '0',
+
         ProductName: '',
         Quantity: '',
         Description: '',
@@ -24,6 +36,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         totalAmount: '',
         taxAmount: ''
     }];
+    // lineItems = [{}];
 
     // Wire methods
     @wire(CurrentPageReference)
@@ -48,31 +61,28 @@ export default class CreateInvoiceLineItem extends LightningElement {
             if (data.length == 0) {
                 console.log('Your line items are 0');
             }
-            console.log('Related line Items are: ');
-            // console.log(data);
-            this.RelatedLineItems(data);
+            console.log('Related line Items re:cieved ');
+            console.log(data);
+            this.RelatedLineItemData(data);
         }
         if (error) {
-            this.RelatedLineItem = null;
             console.log(error);
         }
     }
-    RelatedLineItems(data) {
-        console.log('data');
-        console.log(data);
-        const prevItems = [];
+    RelatedLineItemData(data) {
+        // console.log('data');
         for (let item of data) {
             const reLItem = {
-                ProductName: item.Product__r.Name,
+                Id: String(this.lineItems.length + 1),
+                ProductName: item.Product__c,
                 Quantity: item.Quantity__c,
                 Description: item.Description__c,
                 UnitAmount: item.Unit_Amount__c,
                 TaxPercent: item.Tax__c,
                 TaxType: item.Tax_Type__c,
-                totalAmount: 0,
-                taxAmount: 0
+                totalAmount: item.Total_Amount__c,
+                taxAmount: item.Tax_Amount__c
             };
-            // prevItems.push(reLItem);
             this.lineItems = [...this.lineItems, reLItem];
         }
         console.log('Line Items are**');
@@ -107,10 +117,12 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         /* ---------- Event Handlers ------------*/
     handleProductName = (event) => {
+        console.log('ProductName is---');
+        console.log(event.target.value);
         const rowId = event.target.dataset.id;
-        const prodName = event.detail.productName;
-        const prodId = event.detail.productId;
-        this.lineItems[rowId]['ProductName'] = prodId;
+        console.log('rowId');
+        console.log(rowId);
+        this.lineItems[rowId]['ProductName'] = event.target.value;
     }
 
     handleDescription = (event) => {
@@ -164,11 +176,14 @@ export default class CreateInvoiceLineItem extends LightningElement {
         this.lineItems = [...this.lineItems, newItem];
     }
 
-    SaveLineItem = () => {
+    SaveLineItem = (event) => {
+        event.preventDefault();
         const currentPageRef = this.currentPageReference;
         console.log(currentPageRef);
         if (currentPageRef.type.includes('quickAction')) {
             console.log('LWC is running in Account Page');
+            console.log('Line Item Data---');
+            console.log(JSON.stringify(this.lineItems));
             if (!this.isinvoicecreated && !this.invoicerecid) { //Invoice has not been saved!
                 this.showNoficiation("Error", "Please Save the Invoice First", "Error");
                 return;
@@ -177,8 +192,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
                     this.showNoficiation("Error", "Please Enter proper Data", "Error");
                     return;
                 }
-                this.showNoficiation("Success", "Line Item will be created", "Success");
-                // this.CreateLineItems(this.lineItems, this.invoicerecid);
+                this.CreateLineItems(this.lineItems, this.invoicerecid);
+                // this.showNoficiation("Success", "Line Item will be created", "Success");
             }
         }
         if (currentPageRef.type.includes('recordPage')) {
@@ -187,18 +202,19 @@ export default class CreateInvoiceLineItem extends LightningElement {
             console.log(JSON.stringify(this.lineItems));
             const invoiceId = currentPageRef.attributes.recordId;
             if (!this.validateLineItemInput(this.lineItems)) {
-                this.showNoficiation("Error", "Please Enter proper Data", "Error");
+                console.log(this.lineItems);
+                this.showNoficiation("Error", "Please Enter proper Data " + this.lineItems["Id"], "Error");
                 return;
             }
             // this.showNoficiation("Success", "Line Item will be created", "Success");
-            this.CreateLineItems(this.lineItems, invoiceId);
+            // this.CreateLineItems(this.lineItems, invoiceId);
         }
     }
 
     validateLineItemInput(data) {
         const validate = data.every((item) => {
             return (
-                item.Description && item.ProductName && item.TaxPercent && item.UnitAmount && item.Quantity && item.TaxType
+                item.Description && item.ProductName && item.TaxPercent >= 0 && item.UnitAmount && item.Quantity && item.TaxType
             );
         });
         return validate;
@@ -235,12 +251,13 @@ export default class CreateInvoiceLineItem extends LightningElement {
             }
             lineItemsdata.push(newItem);
         }
+        console.log('Creating Line-Items---');
+        console.log(JSON.stringify(lineItemsdata));
         try {
             const createLineItems = await InsertLineItems({ LineItems: lineItemsdata });
             if (createLineItems) {
                 this.showNoficiation("Success", "Line Item will be created " + createLineItems, "Success");
             }
-
         } catch (error) {
             this.showNoficiation("Error", String(error), "Error");
         }

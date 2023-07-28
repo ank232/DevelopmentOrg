@@ -86,3 +86,12 @@ Also ---====-> Change the behaviour of component accordingly---
                                                            |
 That table should show the related line            <=------V 
 items and as well can we can also delete them    
+
+Functionality -> 1. Showing the related Invoice Line Items -> all fields are showing except Prouduct Name 
+Product Search LWC -> Sending the product name and Id (selected product)
+When lineItem is used on recordPage -> ... productsearch should display the product name from related records(Wire Method)
+    |
+    L-> Instead of Using a child component, should use lightning record edit form !
+
+                                 >>>>>>>>>>>> New Update <<<<<<<<<<
+CreateLineItems LWC-> It will  be a table with lightning input field (more flexibility!)

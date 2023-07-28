@@ -1,11 +1,15 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import productSearch from '@salesforce/apex/CustomerDetailsController.productSearch';
 export default class ProductSearch extends LightningElement {
     /****************  Properties  ************/
+    @api relatedProductName;
     searchProductName;
     searchResults;
     showProd; // bool
     /*Method to Search Product*/
+    connectedCallback() {
+        this.relatedProductName = '';
+    }
     SearchQuery(prodName) {
             const searchTerm = prodName;
             productSearch({ ProductName: searchTerm })
