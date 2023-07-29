@@ -61,6 +61,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
     RelatedLineItemData(data) {
         for (let item of data) {
             const reLItem = {
+                Id: item.Id,
                 ProductName: item.Product__c,
                 Quantity: item.Quantity__c,
                 Description: item.Description__c,
@@ -187,7 +188,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 this.showNoficiation("Error", "Please Enter proper Data " + this.lineItems["Id"], "Error");
                 return;
             }
-            // this.showNoficiation("Success", "Line Item will be created", "Success");
+            this.showNoficiation("Success", "Line Item will be created", "Success");
             // this.CreateLineItems(this.lineItems, invoiceId);
         }
     }
@@ -222,6 +223,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         const lineItemsdata = [];
         for (let item of data) {
             const newItem = {
+                Id: item.Id,
                 Invoice__c: invoiceId,
                 Product__c: item.ProductName,
                 Quantity__c: item.Quantity,

@@ -41,9 +41,17 @@ public with sharing class CreateInvoice {
         System.debug('This method will take list of lineiTems and then insert them');
         System.debug('Values are-----');
         System.debug(LineItems);
+        Integer count=0;
         try{
-            insert LineItems;
-            return LineItems.size();
+           Database.UpsertResult [] upsertLineItems = Database.upsert(LineItems);
+           for(Database.UpsertResult res : upsertLineItems)
+           {
+            if(res.isSuccess())
+            {
+                count++;
+            }
+           }
+            return count;
         }catch(Exception e){
              throw new AuraHandledException('Problem!!' + e.getMessage());
         }
