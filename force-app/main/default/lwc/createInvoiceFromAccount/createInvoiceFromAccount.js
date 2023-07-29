@@ -81,7 +81,8 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             result => {
                 console.log('Created ');
                 console.log(result);
-                this.invoicerecid = result;
+                this.showNoficiation("Message", "Invoice is created" + result[1], "Message");
+                this.invoicerecid = result[0];
             }
         ).catch(
             error => {

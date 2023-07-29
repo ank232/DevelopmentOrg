@@ -2,7 +2,7 @@
     <lightning-card title="Invoice Line Item">
         <lightning-record-edit-form object-api-name="Invoice_Line_Items__c" onsubmit={SaveLineItem}>
             <lightning-button label="Add Line Item" variant="brand" onclick={AddLineItem}></lightning-button>
-            <lightning-button type="submit" class="saveLine" label="Save Line Item" variant=" brand"
+            <lightning-button type="submit" class="saveLine" label="Save Line Item" variant="brand"
                 onclick={SaveLineItem}></lightning-button>
             <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
                 aria-label="Example table of Opportunities with vertical borders">
@@ -52,7 +52,7 @@
                             </td>
                             <td>
                                 <lightning-input-field field-name="Quantity__c" value={item.Quantity}
-                                    data-id={index}></lightning-input-field>
+                                    onchange={handleQuantity} data-id={index}></lightning-input-field>
                             </td>
                             <td>
                                 <lightning-input-field field-name="Unit_Amount__c" value={item.UnitAmount}
