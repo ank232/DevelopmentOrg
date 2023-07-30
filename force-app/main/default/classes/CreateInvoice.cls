@@ -37,17 +37,24 @@ public with sharing class CreateInvoice {
     }
     // Method to insert LineItems: 
     @AuraEnabled
-    public static integer  InsertLineItems(List<Invoice_Line_Items__c> LineItems){
+    public static Integer  InsertLineItems(List<Invoice_Line_Items__c> LineItems){
         System.debug('This method will take list of lineiTems and then insert them');
         System.debug('Values are-----');
-        System.debug(LineItems);
+        // System.debug(LineItems);
         Integer count=0;
+        for(Invoice_Line_items__c line: LineItems)
+        {
+            System.debug('----');
+            System.debug(line);
+            System.debug('0000');
+        }
         try{
            Database.UpsertResult [] upsertLineItems = Database.upsert(LineItems);
            for(Database.UpsertResult res : upsertLineItems)
            {
             if(res.isSuccess())
             {
+                System.debug(res.isCreated());
                 count++;
             }
            }

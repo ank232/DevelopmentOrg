@@ -5,50 +5,36 @@
                 oncustomernotselected={handleNotSelected}></c-account-related-records>
             <div class="slds-grid slds-gutters">
                 <div class="slds-col slds-size_1-of-2">
-                    <div class="slds-form">
-                        <div class="slds-hide">
-                            <lightning-input-field field-name="Company__c" value={recordId}></lightning-input-field>
+                    <div class="slds-form slds-form_stacked">
+                        <div class="slds-form-element">
+                            <lightning-input-field field-name="Company__c" class="slds-hidden"
+                                value={recordId}></lightning-input-field>
+                            <lightning-input-field field-name="Due_Date__c"></lightning-input-field>
                         </div>
                         <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Due_Date__c"></lightning-input-field>
-                            </div>
+                            <lightning-input-field field-name="Invoice_Number__c"></lightning-input-field>
                         </div>
                         <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Invoice_Number__c"></lightning-input-field>
-                            </div>
+                            <lightning-input-field field-name="Reference__c"></lightning-input-field>
                         </div>
                         <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Reference__c"></lightning-input-field>
-                            </div>
+                            <lightning-input-field field-name="Invoice_Date__c"></lightning-input-field>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <div class="slds-form slds-form_stacked">
+                        <div class="slds-form-element">
+                            <lightning-input-field field-name="Comments__c"></lightning-input-field>
                         </div>
                         <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Invoice_Date__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="Comments__c"></lightning-input-field>
-                            </div>
-                        </div>
-                        <div class="slds-form-element">
-                            <div class="slds-form-element__control">
-                                <lightning-input-field field-name="From_Address__c"></lightning-input-field>
-                            </div>
+                            <lightning-input-field field-name="From_Address__c"></lightning-input-field>
                         </div>
                     </div>
                 </div>
             </div>
             <lightning-button type="submit" label="Generate Invoice" variant="brand"
                 class="slds-var-m-top_medium"></lightning-button>
-            <!-- <template if:true={showSpinner}>
-                <div class="slds-var-m-top_medium">
-                    <lightning-spinner alternative-text="Loading"></lightning-spinner>
-                </div>
-            </template> -->
             <c-create-invoice-line-item isinvoicecreated={isinvoicecreated}
                 invoicerecid={invoicerecid}></c-create-invoice-line-item>
         </lightning-record-edit-form>
