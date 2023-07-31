@@ -95,3 +95,6 @@ When lineItem is used on recordPage -> ... productsearch should display the prod
 
                                  >>>>>>>>>>>> New Update <<<<<<<<<<
 CreateLineItems LWC-> It will  be a table with lightning input field (more flexibility!)
+SaveLineItem Button Functionality is working fine but there's a catch => user cannot edit any 
+                                                                         existing line item without 
+                                                                         adding a line item ?

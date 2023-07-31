@@ -3,8 +3,8 @@
         <lightning-record-edit-form object-api-name="Invoice_Line_Items__c" onsubmit={SaveLineItem}>
             <lightning-button label="Add Line Item" variant="brand" onclick={AddLineItem}></lightning-button>
             <template if:true={hideSaveButton}>
-                <lightning-button class="saveLine" label="Save Line Item" variant="brand"
-                    onclick={SaveLineItem}></lightning-button>
+                <lightning-button class="saveLine" label="Save Line Item" variant="brand" onclick={SaveLineItem}>
+                </lightning-button>
             </template>
 <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-label="Example table of Opportunities with vertical borders">
     <thead>
@@ -76,7 +76,7 @@
                                     formatter="currency"></lightning-input>
                             </td>
                             <td data-label="Delete Item">
-                                <lightning-button label="Delete" onclick={handleDeleteLineItem}
+                                <lightning-button label="Delete" onclick={handleDeleteLineItem} data-id={index}
                                     variant="brand"></lightning-button>
                             </td>
                         </tr>

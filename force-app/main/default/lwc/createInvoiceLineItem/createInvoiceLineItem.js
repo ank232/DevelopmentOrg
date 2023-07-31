@@ -5,6 +5,7 @@ import { CurrentPageReference } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { LightningElement, api, wire } from 'lwc';
+import { deleteRecord } from 'lightning/uiRecordApi';
 export default class CreateInvoiceLineItem extends LightningElement {
     // Properties
     @api isinvoicecreated;
@@ -13,7 +14,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
     lineItems = [];
     hideSaveButton;
 
-    // Wire methods
     @wire(CurrentPageReference)
     currentPageReference;
 
@@ -25,13 +25,13 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
     }
 
+    /* Wire Method to fetch Related LineItems */
     @wire(RelatedLineItems, { invoiceId: '$recordId' })
     LineItemData({ data, error }) {
         if (data) {
             if (data.length == 0) {
                 console.log('Your line items are 0');
             } else {
-                console.log(data);
                 this.RelatedLineItemData(data);
             }
         }
@@ -39,6 +39,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
             console.log(error);
         }
     }
+
+    /*-------------   Method to Prepare the related Data and pushing it into lineItems --------------*/
     RelatedLineItemData(data) {
         for (let item of data) {
             const reLItem = {
@@ -54,21 +56,22 @@ export default class CreateInvoiceLineItem extends LightningElement {
             };
             this.lineItems = [...this.lineItems, reLItem];
         }
-        console.log('Line Items are**');
-        console.log(JSON.stringify(this.lineItems));
     }
+
+    /* Wire Method*/
     @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
     objectInfo;
 
     showNoficiation(title, message, variant) {
-            const showToast = new ShowToastEvent({
-                title: title,
-                message: message,
-                variant: variant
-            });
-            this.dispatchEvent(showToast);
-        }
-        /* ---------- Event Handlers ------------*/
+        const showToast = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(showToast);
+    }
+
+    /* ---------- Event Handlers ------------*/
     handleProductName = (event) => {
         const rowId = event.target.dataset.id;
         this.lineItems[rowId]['ProductName'] = event.target.value;
@@ -101,15 +104,39 @@ export default class CreateInvoiceLineItem extends LightningElement {
     }
 
     handleDeleteLineItem = (event) => {
-        const rowIndex = event.target.dataset.rowIndex;
-        if (this.lineItems.length > 1) {
-            this.lineItems.splice(rowIndex, 1);
-            this.lineItems = [...this.lineItems];
+        const rowIndex = event.target.dataset.id;
+        if (this.currentPageReference.type.includes("recordPage")) {
+            let itemDeleted = this.lineItems[rowIndex];
+            if (itemDeleted['Id'] === undefined) {
+                this.lineItems.splice(rowIndex, 1);
+                this.lineItems = [...this.lineItems];
+            } else {
+                console.log('This Item has Id and will be deleted from the DB!');
+                this.DeleteLineItem(itemDeleted.Id);
+                this.lineItems.splice(rowIndex, 1);
+                this.lineItems = [...this.lineItems];
+            }
         } else {
-            this.showNoficiation('Warning', "Cannot delete all rows", "Warning");
+            if (this.lineItems.length > 1) {
+                this.lineItems.splice(rowIndex, 1);
+                this.lineItems = [...this.lineItems];
+            } else {
+                this.showNoficiation('Warning', "Cannot delete all rows", "Warning");
+            }
         }
     }
 
+    DeleteLineItem(itemid) {
+        console.log('I am running!!!');
+        const itemTobeDeleted = itemid;
+        deleteRecord(itemTobeDeleted).then(() => {
+            this.showNoficiation("Success", "Line Item Deleted!", "Success");
+        }).catch((error) => {
+            this.showNoficiation("Error", String(error), "Error");
+        });
+    }
+
+    /*--------- Adding a new lineItem   ------------ */
     AddLineItem = () => {
         if (this.currentPageReference.type.includes("recordPage")) {
             this.hideSaveButton = true;
@@ -133,10 +160,10 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
     }
 
+    /* ----------- Inserting the LineItems into Database ----------------*/
     SaveLineItem = (event) => {
         event.preventDefault();
         const currentPageRef = this.currentPageReference;
-        console.log(currentPageRef);
         if (currentPageRef.type.includes('quickAction')) {
             if (!this.isinvoicecreated && !this.invoicerecid) {
                 this.showNoficiation("Error", "Please Save the Invoice First", "Error");
@@ -152,8 +179,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         if (currentPageRef.type.includes('recordPage')) {
             const invoiceId = currentPageRef.attributes.recordId;
             if (!this.validateLineItemInput(this.lineItems)) {
-                console.log(this.lineItems);
-                this.showNoficiation("Error", "Please Enter proper Data " + this.lineItems["Id"], "Error");
+                this.showNoficiation("Error", "Please Enter proper Data ", "Error");
                 return;
             }
             this.CreateLineItems(this.lineItems, invoiceId);
@@ -188,6 +214,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
     }
 
+    /* Method to Insert LineItems into Database */
     async CreateLineItems(data, invoiceId) {
         const lineItemsdata = [];
         for (let item of data) {
