@@ -49,6 +49,8 @@ Apex Triggers:
 -> Need to show open, overdue and paid invoices(amount[Rollup Field])
 -> max 5 invoices can be created at a time
 -> develop batch apex to delete last 1 year invoices
+-> User cannot edit the line items if an invoice is already paid
+-> User cannot edit any invoice if the invoice status is Pending
 
 Parent LWC ==> createInvoiceFromAccount (GrandParent)
               |          |
