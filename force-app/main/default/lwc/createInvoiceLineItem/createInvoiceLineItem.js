@@ -236,7 +236,12 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 this.showNoficiation("Success", createLineItems + " Line Item saved", "Success");
             }
         } catch (error) {
-            this.showNoficiation("Error", error.message, "Error");
+            if (error.body.message.includes("Invoice is paid, you cannot edit anything")) {
+                this.showNoficiation("Error", "Invoice is paid, you cannot edit LineItems", "Error");
+            } else {
+                console.log(error);
+                this.showNoficiation("Error", error.message, "Error");
+            }
         }
     }
 }

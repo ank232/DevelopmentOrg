@@ -10,7 +10,7 @@ public class AccountHandler {
         }
         update accountrecords;
     }
-    public static void RestrictDeleteonDraft(Map<Id, Account>DeletedAccounts){
+    public static void RestrictDeleteonDraft(Map<Id, Account> DeletedAccounts){
         System.debug('Account to be deleted==>');
         List<Invoice__c> DraftInvs = [SELECT ID, Company__c,
                                       STATUS__C FROM Invoice__c WHERE Company__c IN: DeletedAccounts.keySet() AND 
