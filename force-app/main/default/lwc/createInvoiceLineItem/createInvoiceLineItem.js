@@ -6,6 +6,8 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { LightningElement, api, wire } from 'lwc';
 import { deleteRecord } from 'lightning/uiRecordApi';
+import { MessageContext, createMessageContext, publish } from 'lightning/messageService';
+import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
 export default class CreateInvoiceLineItem extends LightningElement {
     // Properties
     @api isinvoicecreated;
@@ -13,7 +15,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
     @api recordId;
     lineItems = [];
     hideSaveButton;
-
+    context = createMessageContext();
     @wire(CurrentPageReference)
     currentPageReference;
 
@@ -56,6 +58,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
             };
             this.lineItems = [...this.lineItems, reLItem];
         }
+        this.EmitInvoiceTotalMessage();
     }
 
     /* Wire Method*/
@@ -111,7 +114,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 this.lineItems.splice(rowIndex, 1);
                 this.lineItems = [...this.lineItems];
             } else {
-                console.log('This Item has Id and will be deleted from the DB!');
                 this.DeleteLineItem(itemDeleted.Id);
                 this.lineItems.splice(rowIndex, 1);
                 this.lineItems = [...this.lineItems];
@@ -201,17 +203,24 @@ export default class CreateInvoiceLineItem extends LightningElement {
         const item = this.lineItems[row];
         const unit = parseFloat(item["UnitAmount"]);
         const quant = parseInt(item["Quantity"]);
-        const tax = parseInt(item["TaxPercent"]);
+        const tax = parseFloat(item["TaxPercent"]);
         if (!isNaN(unit) && !isNaN(quant) && !isNaN(tax)) {
             item["totalAmount"] = unit * quant;
             const taxAmount = (unit * (tax / 100) * quant);
-            item["taxAmount"] = taxAmount;
+            item["taxAmount"] = taxAmount.toFixed(3);
             this.lineItems = [...this.lineItems];
+            this.EmitInvoiceTotalMessage();
         } else {
             item["totalAmount"] = 0;
             item["taxAmount"] = 0;
             this.lineItems = [...this.lineItems];
+            this.EmitInvoiceTotalMessage();
         }
+    }
+
+    EmitInvoiceTotalMessage() {
+        const payload = this.lineItems;
+        publish(this.context, InvoiceTotalMC, payload);
     }
 
     /* Method to Insert LineItems into Database */
