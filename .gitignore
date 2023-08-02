@@ -40,3 +40,4 @@ $RECYCLE.BIN/
 .env
 /progress.txt
 scripts/apex/hello.apex
+progress.txt
