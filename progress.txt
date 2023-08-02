@@ -100,5 +100,16 @@ CreateLineItems LWC-> It will  be a table with lightning input field (more flexi
 SaveLineItem Button Functionality is working fine but there's a catch => user cannot edit any 
                                                                          existing line item without 
                                                                          adding a line item ?
+ 
+                                       >>>>>>> New Update <<<<<<<<
+Need to override the invoice detail page!
+One way: Using a lightning record page
+Other way: Using a VF page 
+                                              Invoice Record page Button functionalities
+                                                  |                           |
+                                                  |                           |
+                                                  V                           V
+                                         Record Payment Button           Refund Button
 
-Developing the record payment and refund button functionality!                                                                         
+Record Payment Button: Payment Button only be visible on condition! 
+Create a LWC that would have the req. buttons

@@ -4,7 +4,7 @@ import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
 import { CurrentPageReference } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
-import { LightningElement, api, wire } from 'lwc';
+import { LightningElement, api, track, wire } from 'lwc';
 import { deleteRecord } from 'lightning/uiRecordApi';
 import { MessageContext, createMessageContext, publish } from 'lightning/messageService';
 import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
@@ -13,7 +13,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
     @api isinvoicecreated;
     @api invoicerecid;
     @api recordId;
-    lineItems = [];
+    @track lineItems = [];
     hideSaveButton;
     context = createMessageContext();
     @wire(CurrentPageReference)
@@ -33,6 +33,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         if (data) {
             if (data.length == 0) {
                 console.log('Your line items are 0');
+                this.EmitInvoiceTotalMessage();
             } else {
                 this.RelatedLineItemData(data);
             }
