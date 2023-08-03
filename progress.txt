@@ -105,11 +105,12 @@ SaveLineItem Button Functionality is working fine but there's a catch => user ca
 Need to override the invoice detail page!
 One way: Using a lightning record page
 Other way: Using a VF page 
-                                              Invoice Record page Button functionalities
+                                             Invoice Record page Button functionalities
                                                   |                           |
                                                   |                           |
                                                   V                           V
                                          Record Payment Button           Refund Button
-
-Record Payment Button: Payment Button only be visible on condition! 
-Create a LWC that would have the req. buttons
+                                                 ||                           ||
+                                                 VV                           VV
+                                               If the invoice               When atleast one payment                                                
+                                               is paid and has lineItems    exist 
