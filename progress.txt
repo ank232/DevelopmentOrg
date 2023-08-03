@@ -114,3 +114,6 @@ Other way: Using a VF page
                                                  VV                           VV
                                                If the invoice               When atleast one payment                                                
                                                is paid and has lineItems    exist 
+How to get Invoice Status ??
+Path is also updating the status,that updated status value should also be reflected on Button visibility!
+Solition:======> in payload of LMS should add the invoice status and also add the refresh apex wire method to get refresh status 

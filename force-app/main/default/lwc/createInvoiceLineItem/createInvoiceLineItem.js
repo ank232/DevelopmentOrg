@@ -1,11 +1,12 @@
 import InsertLineItems from '@salesforce/apex/CreateInvoice.InsertLineItems';
 import RelatedLineItems from '@salesforce/apex/CustomerDetailsController.RelatedLineItems';
 import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
+import INVOICE_STATUS_FIELD from '@salesforce/schema/Invoice__c.Status__c';
 import { CurrentPageReference } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import { LightningElement, api, track, wire } from 'lwc';
-import { deleteRecord } from 'lightning/uiRecordApi';
+import { deleteRecord, getRecord, refreshApex } from 'lightning/uiRecordApi';
 import { MessageContext, createMessageContext, publish } from 'lightning/messageService';
 import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
 export default class CreateInvoiceLineItem extends LightningElement {
@@ -15,9 +16,27 @@ export default class CreateInvoiceLineItem extends LightningElement {
     @api recordId;
     @track lineItems = [];
     hideSaveButton;
+    wiredStatus;
+    invoiceStatus;
     context = createMessageContext();
     @wire(CurrentPageReference)
     currentPageReference;
+
+    @wire(getRecord, { 'recordId': '$recordId', fields: INVOICE_STATUS_FIELD })
+    latestInvoiceStatus(result) {
+        this.wiredStatus = result;
+        if (result.data) {
+            console.log('---');
+            console.log("Val->", result.data.fields.Status__c.value);
+            this.invoiceStatus = result.data.fields.Status__c.value;
+            this.showNoficiation("Message", result.data.fields.Status__c.value, "Message");
+            this.EmitInvoiceTotalMessage();
+            console.log('===');
+        } else if (result.error) {
+            console.log(result.error);
+            console.log('Error at fetch Status!');
+        }
+    }
 
     connectedCallback() {
         if (this.currentPageReference.type.includes("recordPage")) {
@@ -220,7 +239,10 @@ export default class CreateInvoiceLineItem extends LightningElement {
     }
 
     EmitInvoiceTotalMessage() {
-        const payload = this.lineItems;
+        const payload = {
+            invoicelines: this.lineItems,
+            status: this.invoiceStatus
+        };
         publish(this.context, InvoiceTotalMC, payload);
     }
 
