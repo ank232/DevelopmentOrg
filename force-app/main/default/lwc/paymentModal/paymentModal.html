@@ -1,0 +1,15 @@
+<template>
+    <lightning-modal-header label="Record Payment"></lightning-modal-header>
+    <lightning-modal-body>
+        <lightning-record-edit-form object-api-name="Payment__c" onsubmit={createPaymentRecord}>
+            <lightning-input-field field-name="Amount__c"></lightning-input-field>
+            <lightning-input-field field-name="Status__c"></lightning-input-field>
+            <lightning-input-field field-name="Date__c"></lightning-input-field>
+            <lightning-input-field field-name="Reference_Number__c"></lightning-input-field>
+            <lightning-button type="submit" label="Save" variant="brand" ></lightning-button>
+        </lightning-record-edit-form>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button label="Close" variant="brand" onclick={closePaymentModal}></lightning-button>
+    </lightning-modal-footer>
+</template>

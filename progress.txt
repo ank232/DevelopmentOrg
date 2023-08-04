@@ -116,4 +116,11 @@ Other way: Using a VF page
                                                is paid and has lineItems    exist 
 How to get Invoice Status ??
 Path is also updating the status,that updated status value should also be reflected on Button visibility!
-Solition:======> in payload of LMS should add the invoice status and also add the refresh apex wire method to get refresh status 
+Solution:======> in payload of LMS should add the invoice status and also add the refresh apex wire method to get refresh status (Not working!!)
+Problem with the above solution::
+-=> Invoice status handling!!, how to make sure that the data is synchronised?
+-=> If someone updates the invoice by any means and didn't update the page and try to click on payment method? 
+Another Solution ===> Platform Event? 
+How to get two properties in Sync??
+Prop1: lineItemsData (Coming from Related Records or user input data)
+Prop2: InvoiceStatus (Coming from Wire Method)
