@@ -17,18 +17,9 @@ export default class CreateInvoiceLineItem extends LightningElement {
     @track lineItems = [];
     hideSaveButton;
     invoiceStatus; //  status value
-
-    context = createMessageContext();
-    @wire(CurrentPageReference)
-    currentPageReference;
-
-    connectedCallback() {
-        if (this.currentPageReference.type.includes("recordPage")) {
-            this.hideSaveButton = false;
-        } else {
-            this.hideSaveButton = true;
-        }
-    }
+    /* Wire Methods: */
+    @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
+    objectInfo;
 
     /* Wire method to get the Invoice Status */
     @wire(getRecord, { recordId: '$recordId', fields: Status_field })
@@ -59,6 +50,18 @@ export default class CreateInvoiceLineItem extends LightningElement {
             console.log(error);
         }
     }
+    @wire(CurrentPageReference)
+    currentPageReference;
+
+    context = createMessageContext();
+
+    connectedCallback() {
+        if (this.currentPageReference.type.includes("recordPage")) {
+            this.hideSaveButton = false;
+        } else {
+            this.hideSaveButton = true;
+        }
+    }
 
     /*-------------   Method to Prepare the related Data and pushing it into lineItems --------------*/
     RelatedLineItemData(data) {
@@ -77,19 +80,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
             this.lineItems = [...this.lineItems, reLItem];
         }
         this.EmitInvoiceTotalMessage();
-    }
-
-    /* Wire Method*/
-    @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
-    objectInfo;
-
-    showNoficiation(title, message, variant) {
-        const showToast = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant
-        });
-        this.dispatchEvent(showToast);
     }
 
     /* ---------- Event Handlers ------------*/
@@ -125,87 +115,41 @@ export default class CreateInvoiceLineItem extends LightningElement {
     }
 
     handleDeleteLineItem = (event) => {
-        const rowIndex = event.target.dataset.id;
-        if (this.currentPageReference.type.includes("recordPage")) {
+            const rowIndex = event.target.dataset.id;
             let itemDeleted = this.lineItems[rowIndex];
-            if (itemDeleted['Id'] === undefined) {
-                this.lineItems.splice(rowIndex, 1);
-                this.lineItems = [...this.lineItems];
+            if (this.currentPageReference.type.includes("recordPage")) { // Delete is working on Invoice Page!
+                this.DeleteLineItem(itemDeleted, rowIndex);
             } else {
-                this.DeleteLineItem(itemDeleted.Id);
-                this.lineItems.splice(rowIndex, 1);
-                this.lineItems = [...this.lineItems];
-            }
-        } else {
-            if (this.lineItems.length > 1) {
-                this.lineItems.splice(rowIndex, 1);
-                this.lineItems = [...this.lineItems];
-            } else {
-                this.showNoficiation('Warning', "Cannot delete all rows", "Warning");
-            }
-        }
-    }
-
-    DeleteLineItem(itemid) {
-        console.log('I am running!!!');
-        const itemTobeDeleted = itemid;
-        deleteRecord(itemTobeDeleted).then(() => {
-            this.showNoficiation("Success", "Line Item Deleted!", "Success");
-        }).catch((error) => {
-            this.showNoficiation("Error", String(error), "Error");
-        });
-    }
-
-    /*--------- Adding a new lineItem   ------------ */
-    AddLineItem = () => {
-        if (this.currentPageReference.type.includes("recordPage")) {
-            this.hideSaveButton = true;
-            const newItem = {
-                ProductName: '',
-                Quantity: '',
-                UnitAmount: '',
-                TaxPercent: '',
-                TaxType: ''
-            };
-            this.lineItems = [...this.lineItems, newItem];
-        } else {
-            const newItem = {
-                ProductName: '',
-                Quantity: '',
-                UnitAmount: '',
-                TaxPercent: '',
-                TaxType: ''
-            };
-            this.lineItems = [...this.lineItems, newItem];
-        }
-    }
-
-    /* ----------- Inserting the LineItems into Database ----------------*/
-    SaveLineItem = (event) => {
-        event.preventDefault();
-        const currentPageRef = this.currentPageReference;
-        if (currentPageRef.type.includes('quickAction')) {
-            if (!this.isinvoicecreated && !this.invoicerecid) {
-                this.showNoficiation("Error", "Please Save the Invoice First", "Error");
-                return;
-            } else {
-                if (!this.validateLineItemInput(this.lineItems)) {
-                    this.showNoficiation("Error", "Please Enter proper Data", "Error");
-                    return;
+                if (this.lineItems.length > 1) {
+                    this.DeleteLineItem(itemDeleted, rowIndex);
+                    this.lineItems.splice(rowIndex, 1);
+                    this.lineItems = [...this.lineItems];
+                } else {
+                    this.showNoficiation('Warning', "Cannot delete all rows", "Warning");
                 }
-                this.CreateLineItems(this.lineItems, this.invoicerecid);
             }
         }
-        if (currentPageRef.type.includes('recordPage')) {
-            const invoiceId = currentPageRef.attributes.recordId;
-            if (!this.validateLineItemInput(this.lineItems)) {
-                this.showNoficiation("Error", "Please Enter proper Data ", "Error");
-                return;
-            }
-            this.CreateLineItems(this.lineItems, invoiceId);
-        }
+        /*----------------------- Utility Methods---------------------*/
+        /* Displaying Toast Message */
+    showNoficiation(title, message, variant) {
+        const showToast = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(showToast);
     }
 
+    /* Emiting the message:Payload: InvoiceLineItems , Invoice Status */
+    EmitInvoiceTotalMessage() {
+        const payload = {
+            invoicelines: this.lineItems,
+            invoiceStatus: this.invoiceStatus
+        };
+        publish(this.context, InvoiceTotalMC, payload);
+    }
+
+    /* Validating User Input Data */
     validateLineItemInput(data) {
         const validate = data.every((item) => {
             return (
@@ -217,31 +161,23 @@ export default class CreateInvoiceLineItem extends LightningElement {
         return validate;
     }
 
-    CalculateTaxAmount(row) {
-        const item = this.lineItems[row];
-        const unit = parseFloat(item["UnitAmount"]);
-        const quant = parseInt(item["Quantity"]);
-        const tax = parseFloat(item["TaxPercent"]);
-        if (!isNaN(unit) && !isNaN(quant) && !isNaN(tax)) {
-            item["totalAmount"] = unit * quant;
-            const taxAmount = (unit * (tax / 100) * quant);
-            item["taxAmount"] = taxAmount.toFixed(3);
+    /* Method to delete the LineItem from DataBase -> 
+    params : item(deleteitem) | rowIndex
+     */
+    DeleteLineItem(itemtoBedeleted, index) {
+        if (itemtoBedeleted["Id"] === undefined) {
+            this.lineItems.splice(index, 1);
             this.lineItems = [...this.lineItems];
-            this.EmitInvoiceTotalMessage();
+            this.showNoficiation("Message", "Item Removed", "Message");
         } else {
-            item["totalAmount"] = 0;
-            item["taxAmount"] = 0;
-            this.lineItems = [...this.lineItems];
-            this.EmitInvoiceTotalMessage();
+            deleteRecord(itemtoBedeleted["Id"]).then(() => {
+                this.showNoficiation("Sucsess", "Line Item Deleted", "Success");
+                this.lineItems.splice(index, 1);
+                this.lineItems = [...this.lineItems];
+            }).catch((error) => {
+                this.showNoficiation("Error", String(error), "Error");
+            });
         }
-    }
-
-    EmitInvoiceTotalMessage() {
-        const payload = {
-            invoicelines: this.lineItems,
-            invoiceStatus: this.invoiceStatus
-        };
-        publish(this.context, InvoiceTotalMC, payload);
     }
 
     /* Method to Insert LineItems into Database */
@@ -272,6 +208,69 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 console.log(error);
                 this.showNoficiation("Error", error.message, "Error");
             }
+        }
+    }
+
+
+
+    /*--------- Adding a new lineItem   ------------ */
+    AddLineItem = () => {
+        const newItem = {
+            ProductName: '',
+            Quantity: '',
+            UnitAmount: '',
+            TaxPercent: '',
+            TaxType: ''
+        };
+        if (this.currentPageReference.type.includes("recordPage")) {
+            this.hideSaveButton = true;
+            this.lineItems = [...this.lineItems, newItem];
+        } else {
+            this.lineItems = [...this.lineItems, newItem];
+        }
+    }
+
+    /* ----------- Inserting the LineItems into Database ----------------*/
+    SaveLineItem = (event) => {
+        event.preventDefault();
+        const currentPageRef = this.currentPageReference;
+        if (currentPageRef.type.includes('quickAction')) {
+            if (!this.isinvoicecreated && !this.invoicerecid) {
+                this.showNoficiation("Error", "Please Save the Invoice First", "Error");
+                return;
+            } else {
+                if (!this.validateLineItemInput(this.lineItems)) {
+                    this.showNoficiation("Error", "Please Enter proper Data", "Error");
+                    return;
+                }
+                this.CreateLineItems(this.lineItems, this.invoicerecid);
+            }
+        }
+        if (currentPageRef.type.includes('recordPage')) {
+            const invoiceId = currentPageRef.attributes.recordId;
+            if (!this.validateLineItemInput(this.lineItems)) {
+                this.showNoficiation("Error", "Please Enter proper Data ", "Error");
+                return;
+            }
+            this.CreateLineItems(this.lineItems, invoiceId);
+        }
+    }
+    CalculateTaxAmount(row) {
+        const item = this.lineItems[row];
+        const unit = parseFloat(item["UnitAmount"]);
+        const quant = parseInt(item["Quantity"]);
+        const tax = parseFloat(item["TaxPercent"]);
+        if (!isNaN(unit) && !isNaN(quant) && !isNaN(tax)) {
+            item["totalAmount"] = unit * quant;
+            const taxAmount = (unit * (tax / 100) * quant);
+            item["taxAmount"] = taxAmount.toFixed(3);
+            this.lineItems = [...this.lineItems];
+            this.EmitInvoiceTotalMessage();
+        } else {
+            item["totalAmount"] = 0;
+            item["taxAmount"] = 0;
+            this.lineItems = [...this.lineItems];
+            this.EmitInvoiceTotalMessage();
         }
     }
 }
