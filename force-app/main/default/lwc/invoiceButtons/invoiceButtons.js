@@ -1,6 +1,7 @@
 import { LightningElement, wire, api } from 'lwc';
 import { MessageContext, subscribe } from 'lightning/messageService';
 import { getRecord } from 'lightning/uiRecordApi';
+import { createRecord } from 'lightning/uiRecordApi';
 import Status_field from '@salesforce/schema/Invoice__c.Status__c';
 import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
 import PaymentModal from 'c/paymentModal';
@@ -8,6 +9,7 @@ export default class InvoiceButtons extends LightningElement {
     @api recordId;
     trueVal;
     paymentRec;
+    totalLinePrice;
 
     connectedCallback() {
         this.LineItemReciever();
@@ -36,8 +38,11 @@ export default class InvoiceButtons extends LightningElement {
             if (fireOrigin.includes("Related")) {
                 console.log('Items from wired !');
                 console.log('Calculating the Total Amount');
+                console.log('Also the invoiceId-->');
+                console.log(this.recordId);
                 const maxAmnt = data.invoicelines.reduce((total, lineitem) => total + lineitem.totalAmount, 0.0);
-                console.log('Max Amount0-->', maxAmnt);
+                const totalTax = data.invoicelines.reduce((taxtotal, lineitem) => taxtotal + lineitem.taxAmount, 0.0);
+                this.totalLinePrice = maxAmnt + totalTax;
             }
         }
     }
@@ -45,17 +50,33 @@ export default class InvoiceButtons extends LightningElement {
     ProcessPayment = (paymentData) => {
         const AmounttoPaid = paymentData["Amount__c"];
         console.log('You enter this amount-->', AmounttoPaid);
+        this.createpaymentRecord(paymentData);
     }
-
+    createpaymentRecord(paymentrec) {
+        paymentrec.Invoice__c = this.recordId;
+        console.log('I will create the payment!');
+        const recordInput = {
+            apiName: 'Payment__c ',
+            fields: paymentrec
+        };
+        createRecord(recordInput).then((result) => {
+            console.log('Payment rec created!!');
+            console.log(result);
+        }).catch((error) => {
+            console.log('No Done!');
+            console.log(error);
+        });
+    }
     async RecordPayment() {
         this.trueVal = true;
         await PaymentModal.open({
             size: 'Small'
         }).then((result) => {
-            console.log('_+_+_+_+_');
-            console.log(result);
-            console.log('_+_+_+_+_');
-            this.paymentRec = result;
+            // console.log(result);
+            if (result.paymentData) {
+                this.paymentRec = result.paymentData;
+                console.log(this.paymentRec);
+            }
         });
         if (!this.paymentRec) {
             console.log('Undefined or not Created!!');
