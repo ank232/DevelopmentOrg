@@ -124,3 +124,17 @@ Another Solution ===> Platform Event?
 How to get two properties in Sync??
 Prop1: lineItemsData (Coming from Related Records or user input data)
 Prop2: InvoiceStatus (Coming from Wire Method)
+
+                >>> Update<<
+CreateInvoiceLineItem fires LMS containg the lineItems -=> Messsage Distribution
+                                                                     |-> invoice buttons 
+                                                                     |-> invoice total 
+Invoice total LWC -> when user add a lineitem but which is to be inserted in DB!
+                                                                      |->                                                          
+
+Record Payment Button Behaviour-> 1. WHEN there are lineitems present
+                                  2. When user perform some modifications in lineitems and didnt save those and then clicks on payment button 
+
+Payment will be made only against lineItems that are already present or user created them! 
+                                 >>>>Update <<<<<<
+Need to change the insertLineItems Controller 

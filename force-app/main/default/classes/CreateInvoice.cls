@@ -48,15 +48,24 @@ public with sharing class CreateInvoice {
             System.debug(line);
             System.debug('0000');
         }
+        Set<Id> insertedlines = new Set<Id>();
         try{
-           Database.UpsertResult [] upsertLineItems = Database.upsert(LineItems);
+           Database.UpsertResult [] upsertLineItems = Database.upsert(LineItems,false);
            for(Database.UpsertResult res : upsertLineItems)
            {
             if(res.isSuccess())
             {
-                System.debug(res.isCreated());
+                if(res.isCreated()){
+                    System.debug('----|');
+                 insertedlines.add(res.getId());
+                    System.debug('----');
+                }
                 count++;
             }
+           }
+           System.debug('Records Created are-->'+ insertedlines);
+           if(!insertedlines.isEmpty()){
+            // GetInsertedLines(insertedlines);
            }
             return count;
         }catch(Exception e){

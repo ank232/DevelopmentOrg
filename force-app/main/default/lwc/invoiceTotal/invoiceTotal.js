@@ -14,7 +14,8 @@ export default class InvoiceTotal extends LightningElement {
     }
     MessageReciever() {
         subscribe(this.messageContext, InvoiceTotalMC, (message) => {
-            // console.log('Recieved in Invoice Total!!');
+            console.log("Message recieved in Inv Total!!");
+            console.log(message);
             this.InvoiceTotal(message);
         });
     }

@@ -7,9 +7,9 @@ import PaymentModal from 'c/paymentModal';
 export default class InvoiceButtons extends LightningElement {
     @api recordId;
     trueVal;
-    // invoiceStatus;
+    paymentRec;
+
     connectedCallback() {
-        console.log('Connected Callback(Buttons) Ran!');
         this.LineItemReciever();
     }
 
@@ -19,7 +19,6 @@ export default class InvoiceButtons extends LightningElement {
     /* Recieving the LMS for LineItems */
     LineItemReciever() {
         subscribe(this.messageContext, InvoiceTotalMC, (message) => {
-            console.log('Recieved for Buttons');
             this.InvoiceButtonVisibility(message);
         });
     }
@@ -27,37 +26,44 @@ export default class InvoiceButtons extends LightningElement {
     /* Defining the Payment Button Visibility 
     Condition: if Invoice is Approved and has LineItems ?
      */
-    InvoiceButtonVisibility(data) {
-        console.log(data);
-        // console.log('Invoice Status---> ', this.invoiceStatus);
-        // console.log(data.invoicelines);
+    InvoiceButtonVisibility = (data) => {
         const button = this.template.querySelector(".paymentButton");
         if (data.invoicelines.length == 0) {
             console.log('data has no lineItems');
             button.classList.add('slds-hide');
         } else {
-            console.log('Something else...');
+            const fireOrigin = data.fireOrigin;
+            if (fireOrigin.includes("Related")) {
+                console.log('Items from wired !');
+                console.log('Calculating the Total Amount');
+                const maxAmnt = data.invoicelines.reduce((total, lineitem) => total + lineitem.totalAmount, 0.0);
+                console.log('Max Amount0-->', maxAmnt);
+            }
         }
-        // else {
-        //     if (this.invoiceStatus == 'Approved' && data.invoicelines) {
-        //         console.log('Invoice status is pending and has Line Items');
-        //         button.classList.remove("slds-hide");
-        //     } else {
-        //         console.log('Status is not Approved');
-        //         console.log(this.invoiceStatus);
-        //         button.classList.add('slds-hide');
-        //     }
-        // }
+    }
+
+    ProcessPayment = (paymentData) => {
+        const AmounttoPaid = paymentData["Amount__c"];
+        console.log('You enter this amount-->', AmounttoPaid);
     }
 
     async RecordPayment() {
         this.trueVal = true;
-        console.log("I will record the payment");
-        const res = await PaymentModal.open({
-
+        await PaymentModal.open({
+            size: 'Small'
+        }).then((result) => {
+            console.log('_+_+_+_+_');
+            console.log(result);
+            console.log('_+_+_+_+_');
+            this.paymentRec = result;
         });
-        console.log(res);
-
+        if (!this.paymentRec) {
+            console.log('Undefined or not Created!!');
+            return;
+        } else {
+            console.log('Payment Rec Recieved!');
+            this.ProcessPayment(this.paymentRec);
+        }
     }
 
     RecordRefund = () => {

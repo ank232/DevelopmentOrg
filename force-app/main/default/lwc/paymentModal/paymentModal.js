@@ -1,13 +1,11 @@
-import { LightningElement } from 'lwc';
 import LightningModal from 'lightning/modal';
 export default class PaymentModal extends LightningModal {
-
+    paymentData;
     closePaymentModal = () => {
-        this.close("close");
+        this.close(this.paymentData);
     }
     createPaymentRecord = (event) => {
         event.preventDefault();
-        console.log('Save Event occured!');
-        console.log(event.detail.fields);
+        this.paymentData = event.detail.fields;
     }
 }
