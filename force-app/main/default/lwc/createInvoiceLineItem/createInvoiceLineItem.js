@@ -9,6 +9,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { deleteRecord, getRecord } from 'lightning/uiRecordApi';
 import { MessageContext, createMessageContext, publish } from 'lightning/messageService';
 import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
+import { refreshApex } from '@salesforce/apex';
 export default class CreateInvoiceLineItem extends LightningElement {
     // Properties
     @api isinvoicecreated;
@@ -17,6 +18,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
     @track lineItems = [];
     hideSaveButton;
     invoiceStatus; //  status value
+    datatoRefresh; // fresh data!
     /* Wire Methods: */
     @wire(getObjectInfo, { objectApiName: INVOICE_LINE_ITEM })
     objectInfo;
@@ -37,21 +39,24 @@ export default class CreateInvoiceLineItem extends LightningElement {
 
     /* Wire Method to fetch Related LineItems */
     @wire(RelatedLineItems, { invoiceId: '$recordId' })
-    LineItemData({ data, error }) {
-        if (data) {
-            if (data.length == 0) {
+    LineItemData(result) {
+        this.datatoRefresh = result;
+        if (result.data) {
+            console.log('---====---');
+            console.log(this.datatoRefresh.data);
+            if (result.data.length == 0) {
                 console.log('Your line items are 0');
-                this.EmitInvoiceTotalMessage();
+                this.EmitInvoiceTotalMessage(result.data, this.invoiceStatus, 'WireMethod');
             } else {
-                this.RelatedLineItemData(data);
+                console.log('Wire got data(RelatedLines!)');
+                this.RelatedLineItemData(this.datatoRefresh.data);
             }
         }
-        if (error) {
+        if (result.error) {
             console.log(error);
         }
     }
-    @wire(CurrentPageReference)
-    currentPageReference;
+    @wire(CurrentPageReference) currentPageReference;
 
     context = createMessageContext();
 
@@ -65,6 +70,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
 
     /*-------------   Method to Prepare the related Data and pushing it into lineItems --------------*/
     RelatedLineItemData(data) {
+        const lineData = [];
         for (let item of data) {
             const reLItem = {
                 Id: item.Id,
@@ -77,14 +83,19 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 totalAmount: item.Total_Amount__c,
                 taxAmount: item.Tax_Amount__c
             };
-            this.lineItems = [...this.lineItems, reLItem];
+            lineData.push(reLItem);
         }
-        this.EmitInvoiceTotalMessage();
+        this.lineItems = lineData;
+        console.log("Curent Length", this.lineItems.length);
+        this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, 'RelatedLineItemData');
     }
 
     /* ---------- Event Handlers ------------*/
     handleProductName = (event) => {
         const rowId = event.target.dataset.id;
+        if (!event.target.value) {
+            this.showNoficiation("Message", "You left a field Blank!", "Message");
+        }
         this.lineItems[rowId]['ProductName'] = event.target.value;
     }
 
@@ -141,10 +152,11 @@ export default class CreateInvoiceLineItem extends LightningElement {
     }
 
     /* Emiting the message:Payload: InvoiceLineItems , Invoice Status */
-    EmitInvoiceTotalMessage() {
+    EmitInvoiceTotalMessage(invoiceProds, invStatus, origin) {
         const payload = {
-            invoicelines: this.lineItems,
-            invoiceStatus: this.invoiceStatus
+            invoicelines: invoiceProds,
+            invoiceStatus: invStatus,
+            fireOrigin: origin
         };
         publish(this.context, InvoiceTotalMC, payload);
     }
@@ -154,7 +166,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         const validate = data.every((item) => {
             return (
                 item.Description && item.ProductName &&
-                item.TaxPercent >= 0 && item.UnitAmount &&
+                item.TaxPercent >= 0 && item.UnitAmount > 0 &&
                 item.Quantity && item.TaxType
             );
         });
@@ -168,12 +180,14 @@ export default class CreateInvoiceLineItem extends LightningElement {
         if (itemtoBedeleted["Id"] === undefined) {
             this.lineItems.splice(index, 1);
             this.lineItems = [...this.lineItems];
+            this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, 'DeleteEvent');
             this.showNoficiation("Message", "Item Removed", "Message");
         } else {
             deleteRecord(itemtoBedeleted["Id"]).then(() => {
                 this.showNoficiation("Sucsess", "Line Item Deleted", "Success");
                 this.lineItems.splice(index, 1);
                 this.lineItems = [...this.lineItems];
+                this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, 'DeleteEvent');
             }).catch((error) => {
                 this.showNoficiation("Error", String(error), "Error");
             });
@@ -200,6 +214,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
             const createLineItems = await InsertLineItems({ LineItems: lineItemsdata });
             if (createLineItems) {
                 this.showNoficiation("Success", createLineItems + " Line Item saved", "Success");
+                this.UpdateWire();
             }
         } catch (error) {
             if (error.body.message.includes("Invoice is paid, you cannot edit anything")) {
@@ -211,26 +226,31 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
     }
 
-
+    /* Updating wire Method to provision new data without page refresh */
+    UpdateWire() {
+        refreshApex(this.datatoRefresh).then(() => {
+            this.showNoficiation('Message', "Data refreshed?", "Message");
+        }).catch((error) => {
+            console.log(error);
+            this.showNoficiation("Warning", error, "Warning");
+        });
+    }
 
     /*--------- Adding a new lineItem   ------------ */
     AddLineItem = () => {
-        const newItem = {
-            ProductName: '',
-            Quantity: '',
-            UnitAmount: '',
-            TaxPercent: '',
-            TaxType: ''
-        };
-        if (this.currentPageReference.type.includes("recordPage")) {
-            this.hideSaveButton = true;
+            const newItem = {
+                ProductName: '',
+                Quantity: '',
+                UnitAmount: '',
+                TaxPercent: '',
+                TaxType: ''
+            };
             this.lineItems = [...this.lineItems, newItem];
-        } else {
-            this.lineItems = [...this.lineItems, newItem];
+            if (this.currentPageReference.type.includes("recordPage")) {
+                this.hideSaveButton = true;
+            }
         }
-    }
-
-    /* ----------- Inserting the LineItems into Database ----------------*/
+        /* ----------- Inserting the LineItems into Database ----------------*/
     SaveLineItem = (event) => {
         event.preventDefault();
         const currentPageRef = this.currentPageReference;
@@ -265,12 +285,12 @@ export default class CreateInvoiceLineItem extends LightningElement {
             const taxAmount = (unit * (tax / 100) * quant);
             item["taxAmount"] = taxAmount.toFixed(3);
             this.lineItems = [...this.lineItems];
-            this.EmitInvoiceTotalMessage();
+            this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, "Recalculation");
         } else {
             item["totalAmount"] = 0;
             item["taxAmount"] = 0;
             this.lineItems = [...this.lineItems];
-            this.EmitInvoiceTotalMessage();
+            this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, "Recalculation");
         }
     }
 }
