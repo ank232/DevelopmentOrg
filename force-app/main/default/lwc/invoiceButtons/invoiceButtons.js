@@ -1,10 +1,10 @@
 import { LightningElement, wire, api } from 'lwc';
 import { MessageContext, subscribe } from 'lightning/messageService';
-import { getRecord } from 'lightning/uiRecordApi';
 import { createRecord } from 'lightning/uiRecordApi';
 import Status_field from '@salesforce/schema/Invoice__c.Status__c';
 import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
 import PaymentModal from 'c/paymentModal';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class InvoiceButtons extends LightningElement {
     @api recordId;
     trueVal;
@@ -36,10 +36,6 @@ export default class InvoiceButtons extends LightningElement {
         } else {
             const fireOrigin = data.fireOrigin;
             if (fireOrigin.includes("Related")) {
-                console.log('Items from wired !');
-                console.log('Calculating the Total Amount');
-                console.log('Also the invoiceId-->');
-                console.log(this.recordId);
                 const maxAmnt = data.invoicelines.reduce((total, lineitem) => total + lineitem.totalAmount, 0.0);
                 const totalTax = data.invoicelines.reduce((taxtotal, lineitem) => taxtotal + lineitem.taxAmount, 0.0);
                 this.totalLinePrice = maxAmnt + totalTax;
@@ -49,16 +45,19 @@ export default class InvoiceButtons extends LightningElement {
 
     ProcessPayment = (paymentData) => {
         const AmounttoPaid = paymentData["Amount__c"];
-        console.log('You enter this amount-->', AmounttoPaid);
         this.createpaymentRecord(paymentData);
     }
+
     createpaymentRecord(paymentrec) {
         paymentrec.Invoice__c = this.recordId;
+        paymentrec.Name = "";
         console.log('I will create the payment!');
         const recordInput = {
-            apiName: 'Payment__c ',
+            apiName: 'Payment__c',
             fields: paymentrec
         };
+        console.log('&&&&');
+        console.log(JSON.stringify(recordInput));
         createRecord(recordInput).then((result) => {
             console.log('Payment rec created!!');
             console.log(result);
@@ -67,6 +66,7 @@ export default class InvoiceButtons extends LightningElement {
             console.log(error);
         });
     }
+
     async RecordPayment() {
         this.trueVal = true;
         await PaymentModal.open({
@@ -77,6 +77,9 @@ export default class InvoiceButtons extends LightningElement {
                 this.paymentRec = result.paymentData;
                 console.log(this.paymentRec);
             }
+        }).catch((error) => {
+            console.log('Error in Modal!!');
+            console.log(error);
         });
         if (!this.paymentRec) {
             console.log('Undefined or not Created!!');
