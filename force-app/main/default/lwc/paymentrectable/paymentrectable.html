@@ -1,3 +1,4 @@
+<!-- sldsValidatorIgnore -->
 <template>
     <lightning-card icon-name="utility:contract_payment" title="Payments">
         <table class="slds-table slds-table_cell-buffer slds-table_bordered">
@@ -13,14 +14,15 @@
             </thead>
             <tbody>
                 <template for:each={paymentrecs} for:item="rec" for:index="index">
-                    <tr key={rec.Name}>
+                    <tr key={rec.Name} data-row-index="index">
                         <td>{rec.Reference}</td>
                         <td>{rec.Date}</td>
                         <td>{rec.Amount__c}</td>
                         <td>{rec.Status__c}</td>
                         <td>{rec.Comments}</td>
                         <td>
-                            <lightning-button-icon  label="Delete" icon-name="standard:record_delete" title="Delete"></lightning-button-icon >
+                            <lightning-button-icon data-id={index} label="Delete" icon-name="standard:record_delete"
+                                onclick={deletePaymentRecord} title="Delete"></lightning-button-icon>
                         </td>
                     </tr>
                 </template>
