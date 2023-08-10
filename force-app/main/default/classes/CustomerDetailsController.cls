@@ -127,7 +127,7 @@ public with sharing class CustomerDetailsController {
         try{
             List<Invoice_line_Items__c> LineItems = [
                 SELECT 
-                product__c,product__r.Name, description__c ,
+                product__c,product__r.Name, description__c ,Invoice__r.Status__c,
                 tax__c ,tax_type__c, Tax_Amount__c, unit_Amount__c, Total_Amount__c,Quantity__c
                 FROM INVOICE_LINE_ITEMS__c 
                 WHERE invoice__c=:invoiceId With SECURITY_ENFORCED];

@@ -29,8 +29,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
         if (data) {
             console.log('WIre method got the data!');
             console.log('Presenting data--');
-            console.log(data);
-            this.invoiceStatus = data.fields.Status__c.value;
+            console.log(data.fields.Status__c.value);
+            // this.invoiceStatus = data.fields.Status__c.value;
         } else if (error) {
             console.log('Error in WIre Method!!!');
             console.log(error);
@@ -43,6 +43,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         this.datatoRefresh = result;
         if (result.data) {
             console.log('---====---');
+            // console.log(data);
             console.log(this.datatoRefresh.data);
             if (result.data.length == 0) {
                 console.log('Your line items are 0');
@@ -184,7 +185,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
             this.showNoficiation("Message", "Item Removed", "Message");
         } else {
             deleteRecord(itemtoBedeleted["Id"]).then(() => {
-                this.showNoficiation("Sucsess", "Line Item Deleted", "Success");
+                this.showNoficiation("Success", "Line Item Deleted", "Success");
                 this.lineItems.splice(index, 1);
                 this.lineItems = [...this.lineItems];
                 this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, 'DeleteEvent');

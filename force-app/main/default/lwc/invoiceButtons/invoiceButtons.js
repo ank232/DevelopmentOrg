@@ -1,7 +1,6 @@
 import { LightningElement, wire, api } from 'lwc';
 import { MessageContext, subscribe } from 'lightning/messageService';
 import { createRecord } from 'lightning/uiRecordApi';
-import Status_field from '@salesforce/schema/Invoice__c.Status__c';
 import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
 import PaymentModal from 'c/paymentModal';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -12,11 +11,21 @@ export default class InvoiceButtons extends LightningElement {
     totalLinePrice;
 
     connectedCallback() {
+        console.log('Connected Callback Ran(InvoiceButtons LWC)');
         this.LineItemReciever();
     }
 
     @wire(MessageContext)
     messageContext;
+
+    showNoficiation(title, message, variant) {
+        const showToast = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(showToast);
+    }
 
     /* Recieving the LMS for LineItems */
     LineItemReciever() {
@@ -45,6 +54,10 @@ export default class InvoiceButtons extends LightningElement {
 
     ProcessPayment = (paymentData) => {
         const AmounttoPaid = paymentData["Amount__c"];
+        if (AmounttoPaid > this.totalLinePrice) {
+            this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Message");
+            return;
+        }
         this.createpaymentRecord(paymentData);
     }
 
@@ -61,8 +74,9 @@ export default class InvoiceButtons extends LightningElement {
         createRecord(recordInput).then((result) => {
             console.log('Payment rec created!!');
             console.log(result);
+            window.location.reload();
         }).catch((error) => {
-            console.log('No Done!');
+            this.showNoficiation("Error", error.errorType, "Error");
             console.log(error);
         });
     }
@@ -72,7 +86,6 @@ export default class InvoiceButtons extends LightningElement {
         await PaymentModal.open({
             size: 'Small'
         }).then((result) => {
-            // console.log(result);
             if (result.paymentData) {
                 this.paymentRec = result.paymentData;
                 console.log(this.paymentRec);

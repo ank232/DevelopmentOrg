@@ -5,7 +5,7 @@ import { deleteRecord } from 'lightning/uiRecordApi';
 export default class Paymentrectable extends LightningElement {
     @api recordId;
     paymentrecs;
-
+    totalPaidAmount;
     showNoficiation(title, message, variant) {
         const showToast = new ShowToastEvent({
             title: title,
@@ -14,7 +14,10 @@ export default class Paymentrectable extends LightningElement {
         });
         this.dispatchEvent(showToast);
     }
-
+    CalculatePaidAmount(data) {
+        const paidAmount = data.reduce((item, paymentrec) => item + paymentrec.Amount__c, 0.0);
+        return paidAmount;
+    }
     @wire(getRelatedListRecords, {
         parentRecordId: '$recordId',
         relatedListId: 'Payments__r',
@@ -40,6 +43,7 @@ export default class Paymentrectable extends LightningElement {
                 temprecs.push(record);
             });
             this.paymentrecs = temprecs;
+            this.totalPaidAmount = this.CalculatePaidAmount(this.paymentrecs);
         }
         if (error) {
             console.log("Error at relatedRecs!!");
