@@ -1,0 +1,24 @@
+<template>
+    <lightning-modal-header label="Record Payment"></lightning-modal-header>
+    <lightning-modal-body>
+        <lightning-record-edit-form object-api-name="Refund__c" onsubmit={createRefund}>
+            <div class="slds-grid slds-wrap">
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input-field field-name="Amount__c"></lightning-input-field>
+                    <lightning-input-field field-name="Status__c"></lightning-input-field>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-input-field field-name="Date__c"></lightning-input-field>
+                    <lightning-input-field field-name="Reference_Number__c"></lightning-input-field>
+                </div>
+            </div>
+            <div class="slds-grid  slds-var-m-top_medium">
+                <lightning-button type="submit" label="Save" variant="brand"
+                    class="slds-var-m-right_medium"></lightning-button>
+                <lightning-button label="Close" variant="brand" onclick={closeRefundModal}></lightning-button>
+            </div>
+            <!-- <lightning-modal-footer> -->
+        </lightning-record-edit-form>
+    </lightning-modal-body>
+    <!-- </lightning-modal-footer> -->
+</template>

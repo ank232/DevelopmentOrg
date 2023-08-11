@@ -3,6 +3,7 @@ import { MessageContext, subscribe } from 'lightning/messageService';
 import { createRecord } from 'lightning/uiRecordApi';
 import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
 import PaymentModal from 'c/paymentModal';
+import RefundModal from 'c/refundModal';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class InvoiceButtons extends LightningElement {
     @api recordId;
@@ -103,7 +104,15 @@ export default class InvoiceButtons extends LightningElement {
         }
     }
 
-    RecordRefund = () => {
-        console.log('I will record the refund if any!!');
+    async RecordRefund() {
+        await RefundModal.open({
+            size: 'small'
+        }).then((result) => {
+            console.log('Recieved refund!');
+            console.log(result);
+        }).catch((error) => {
+            console.log("Error in RefundModal")
+            console.log(error);
+        });
     }
 }
