@@ -1,15 +1,15 @@
-import { LightningElement } from 'lwc';
-
-export default class RefundModal extends LightningElement {
+import LightningModal from 'lightning/modal';
+export default class RefundModal extends LightningModal {
     refundData;
+
     closeRefundModal = () => {
         if (typeof this.refundData !== undefined) {
             this.close({
-                "refundData": 'Nothing captured'
+                "refundData": this.refundData
             });
         } else {
             this.close({
-                "refundData": this.refundData
+                "refundData": null
             });
         }
     }

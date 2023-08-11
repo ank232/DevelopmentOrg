@@ -9,6 +9,7 @@ export default class InvoiceButtons extends LightningElement {
     @api recordId;
     trueVal;
     paymentRec;
+    refundRec;
     totalLinePrice;
 
     connectedCallback() {
@@ -106,13 +107,25 @@ export default class InvoiceButtons extends LightningElement {
 
     async RecordRefund() {
         await RefundModal.open({
-            size: 'small'
+            size: 'Small'
         }).then((result) => {
             console.log('Recieved refund!');
-            console.log(result);
+            if (result.refundData) {
+                this.refundRec = result.refundData;
+            }
         }).catch((error) => {
             console.log("Error in RefundModal")
             console.log(error);
         });
+        if (!this.refundRec) {
+            console.log('Undefined or not Created(refund)');
+            return;
+        } else {
+            this.ProcessRefund(this.refundRec);
+        }
+    }
+    ProcessRefund(refundData) {
+        console.log('I will create the refund!');
+        console.log(refundData);
     }
 }
