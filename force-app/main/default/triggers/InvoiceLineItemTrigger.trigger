@@ -1,6 +1,7 @@
 trigger InvoiceLineItemTrigger on Invoice_Line_Items__c (before delete, before update) {
     if(trigger.isBefore && trigger.isDelete)
     {
+        // Preventing deletion of lineItems on paid Invoices
         InvoiceLineItemsHandler.PreventDeleteOnPaidInvoice(trigger.oldMap);
     }
 

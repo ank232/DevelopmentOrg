@@ -213,6 +213,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         try {
             const createLineItems = await InsertLineItems({ LineItems: lineItemsdata });
+            console.log('is created??');
+            console.log(createLineItems);
             if (createLineItems) {
                 this.showNoficiation("Success", createLineItems + " Line Item saved", "Success");
                 this.UpdateWire();
@@ -269,6 +271,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         if (currentPageRef.type.includes('recordPage')) {
             const invoiceId = currentPageRef.attributes.recordId;
+            console.log('Save button is clicked');
             if (!this.validateLineItemInput(this.lineItems)) {
                 this.showNoficiation("Error", "Please Enter proper Data ", "Error");
                 return;
