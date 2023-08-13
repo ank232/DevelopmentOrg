@@ -190,6 +190,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 this.lineItems = [...this.lineItems];
                 this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, 'DeleteEvent');
             }).catch((error) => {
+                console.log(error);
                 this.showNoficiation("Error", String(error), "Error");
             });
         }
@@ -213,10 +214,11 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         try {
             const createLineItems = await InsertLineItems({ LineItems: lineItemsdata });
-            if (createLineItems) {
-                this.showNoficiation("Success", createLineItems + " Line Item saved", "Success");
-                this.UpdateWire();
-            }
+            console.log(createLineItems);
+            // if (createLineItems) {
+            this.showNoficiation("Success", lineItemsdata.length + " Line Item saved", "Success");
+            this.UpdateWire();
+            // }
         } catch (error) {
             if (error.body.message.includes("Invoice is paid, you cannot edit anything")) {
                 this.showNoficiation("Error", "Invoice is paid, you cannot edit LineItems", "Error");
@@ -269,6 +271,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         }
         if (currentPageRef.type.includes('recordPage')) {
             const invoiceId = currentPageRef.attributes.recordId;
+            console.log('Save button is clicked');
             if (!this.validateLineItemInput(this.lineItems)) {
                 this.showNoficiation("Error", "Please Enter proper Data ", "Error");
                 return;
