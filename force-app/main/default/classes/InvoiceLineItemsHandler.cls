@@ -31,9 +31,26 @@ public class InvoiceLineItemsHandler {
              {
                 System.debug(' I am satisfied');
              lines.addError('Invoice is paid, you cannot edit anything');
-              throw new AuraHandledException('Invoice is paid, you cannot edit anything');
+            //   throw new AuraHandledException('Invoice is paid, you cannot edit anything');
             }
         }
     }
+    }
+    // Method to prevent addition of invoice lines when invoice status is Paid
+    public static void PreventInsertofLinesOnPaidInvoice(List<Invoice_Line_Items__c> lineItems){
+        Set<Id> invoiceIds = new Set<Id>();
+        for(Invoice_Line_Items__c line: lineItems)
+        {
+            invoiceIds.add(line.Invoice__c);
+        }
+        // Querying the related invoices WHERE STATUS IS MARKED AS PAID 
+        List<Invoice__c> relatedInvoices = [SELECT Id,Name FROM Invoice__c WHERE status__c ='Paid' AND Id IN: invoiceIds];
+        if(!relatedInvoices.isEmpty())
+        {
+            for(Invoice__c invoice: relatedInvoices)
+            {
+                invoice.addError('Cannot add any line Items on Paid Invoice');
+            }
+        }     
     }
 }

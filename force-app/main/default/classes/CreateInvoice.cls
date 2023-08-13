@@ -37,39 +37,17 @@ public with sharing class CreateInvoice {
     }
     // Method to insert LineItems: 
     @AuraEnabled
-    public static Integer  InsertLineItems(List<Invoice_Line_Items__c> LineItems){
-        System.debug('This method will take list of lineiTems and then insert them');
-        System.debug('Values are-----');
-        // System.debug(LineItems);
+    public static void  InsertLineItems(List<Invoice_Line_Items__c> LineItems){
+        System.debug('This method will take list of lineiTems and then insert them');        
         Integer count=0;
-        for(Invoice_Line_items__c line: LineItems)
-        {
-            System.debug('----');
-            System.debug(line);
-            System.debug('0000');
-        }
         Set<Id> insertedlines = new Set<Id>();
         try{
-           Database.UpsertResult [] upsertLineItems = Database.upsert(LineItems,false);
-           for(Database.UpsertResult res : upsertLineItems)
-           {
-            if(res.isSuccess())
-            {
-                if(res.isCreated()){
-                    System.debug('----|');
-                 insertedlines.add(res.getId());
-                    System.debug('----');
-                }
-                count++;
-            }
-           }
-           System.debug('Records Created are-->'+ insertedlines);
-           if(!insertedlines.isEmpty()){
-            // GetInsertedLines(insertedlines);
-           }
-            return count;
+            upsert LineItems;           
         }catch(Exception e){
-             throw new AuraHandledException('Problem!!' + e.getMessage());
+            System.debug('Exception Caught!!');
+            System.debug('Cause: '+e.getCause());
+            System.debug('Message: '+ e.getMessage());
+            throw new AuraHandledException(e.getMessage());
         }
     }
 }
