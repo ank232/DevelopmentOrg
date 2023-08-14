@@ -2,6 +2,8 @@ import InsertLineItems from '@salesforce/apex/CreateInvoice.InsertLineItems';
 import RelatedLineItems from '@salesforce/apex/CustomerDetailsController.RelatedLineItems';
 import INVOICE_LINE_ITEM from '@salesforce/schema/Invoice_Line_Items__c';
 import Status_field from '@salesforce/schema/Invoice__c.Status__c';
+import Invoice_Description from '@salesforce/schema/Invoice__c.Comments__c';
+import Quantity_field from '@salesforce/schema/Invoice__c.Quantity__c';
 import { CurrentPageReference } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
@@ -24,13 +26,11 @@ export default class CreateInvoiceLineItem extends LightningElement {
     objectInfo;
 
     /* Wire method to get the Invoice Status */
-    @wire(getRecord, { recordId: '$recordId', fields: Status_field })
+    @wire(getRecord, { recordId: '$recordId', fields: [Status_field] })
     getInvoiceDetails({ data, error }) {
         if (data) {
-            console.log('WIre method got the data!');
-            console.log('Presenting data--');
             console.log(data.fields.Status__c.value);
-            // this.invoiceStatus = data.fields.Status__c.value;
+            this.invoiceStatus = data.fields.Status__c.value;
         } else if (error) {
             console.log('Error in WIre Method!!!');
             console.log(error);
@@ -42,11 +42,9 @@ export default class CreateInvoiceLineItem extends LightningElement {
     LineItemData(result) {
         this.datatoRefresh = result;
         if (result.data) {
-            console.log('---====---');
-            // console.log(data);
-            console.log(this.datatoRefresh.data);
+            // console.log(this.datatoRefresh.data);
             if (result.data.length == 0) {
-                console.log('Your line items are 0');
+                // console.log('Your line items are 0');
                 this.EmitInvoiceTotalMessage(result.data, this.invoiceStatus, 'WireMethod');
             } else {
                 console.log('Wire got data(RelatedLines!)');

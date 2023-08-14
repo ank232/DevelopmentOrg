@@ -12,6 +12,7 @@ export default class InvoiceButtons extends LightningElement {
     paymentRec;
     refundRec;
     totalLinePrice;
+    paidAmount;
     @wire(getRelatedListRecords, {
         parentRecordId: '$recordId',
         relatedListId: 'Payments__r',
@@ -24,13 +25,15 @@ export default class InvoiceButtons extends LightningElement {
     PaymentRecords({ data, error }) {
         const refButton = this.template.querySelector(".refundButton");
         if (data) {
-            // console.log(data);
             if (!data.count) {
-                console.log(refButton);
                 refButton.classList.add("slds-hide");
-                console.log('No Records found!');
+                this.paidAmount = 0;
             } else {
-                console.log('Records found!');
+                let amnt = 0;
+                data.records.map((item) => {
+                    amnt += item.fields.Amount__c.value;
+                });
+                this.paidAmount = amnt;
             }
         }
         if (error) {
@@ -66,7 +69,6 @@ export default class InvoiceButtons extends LightningElement {
     InvoiceButtonVisibility = (data) => {
         const button = this.template.querySelector(".paymentButton");
         if (data.invoicelines.length == 0) {
-            console.log('data has no lineItems');
             button.classList.add('slds-hide');
         } else {
             const fireOrigin = data.fireOrigin;
@@ -80,8 +82,8 @@ export default class InvoiceButtons extends LightningElement {
 
     ProcessPayment = (paymentData) => {
         const AmounttoPaid = paymentData["Amount__c"];
-        if (AmounttoPaid > this.totalLinePrice) {
-            this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Message");
+        if (AmounttoPaid > this.totalLinePrice || AmounttoPaid > this.totalLinePrice - this.paidAmount) {
+            this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Warning");
             return;
         }
         this.createpaymentRecord(paymentData);
@@ -90,15 +92,11 @@ export default class InvoiceButtons extends LightningElement {
     createpaymentRecord(paymentrec) {
         paymentrec.Invoice__c = this.recordId;
         paymentrec.Name = "";
-        console.log('I will create the payment!');
         const recordInput = {
             apiName: 'Payment__c',
             fields: paymentrec
         };
-        console.log('&&&&');
-        console.log(JSON.stringify(recordInput));
         createRecord(recordInput).then((result) => {
-            console.log('Payment rec created!!');
             console.log(result);
             window.location.reload();
         }).catch((error) => {
@@ -114,19 +112,11 @@ export default class InvoiceButtons extends LightningElement {
         }).then((result) => {
             if (result.paymentData) {
                 this.paymentRec = result.paymentData;
-                console.log(this.paymentRec);
+                this.ProcessPayment(this.paymentRec);
             }
         }).catch((error) => {
             console.log('Error in Modal!!');
-            console.log(error);
         });
-        if (!this.paymentRec) {
-            console.log('Undefined or not Created!!');
-            return;
-        } else {
-            console.log('Payment Rec Recieved!');
-            this.ProcessPayment(this.paymentRec);
-        }
     }
 
     async RecordRefund() {
@@ -136,37 +126,44 @@ export default class InvoiceButtons extends LightningElement {
             console.log('Recieved refund!');
             if (result.refundData) {
                 this.refundRec = result.refundData;
+                this.ProcessRefund(this.refundRec);
             }
         }).catch((error) => {
             console.log("Error in RefundModal")
             console.log(error);
         });
-        if (!this.refundRec) {
-            console.log('Undefined or not Created(refund)');
-            return;
-        } else {
-            this.ProcessRefund(this.refundRec);
-        }
+        // if (!this.refundRec) {
+        //     console.log('Undefined or not Created(refund)');
+        //     return;
+        // } else {
+        //     this.ProcessRefund(this.refundRec);
+        // }
     }
 
     ProcessRefund(refundData) {
         console.log('I will create the refund!');
         console.log(refundData);
-        // this.createRefundRecord(refundData);
+        if (refundData.Amount__c > this.paidAmount) {
+            this.showNoficiation("Warning", "Refunded amount should not exceed the paid Amount");
+            return;
+        } else {
+            this.createRefundRecord(refundData);
+        }
     }
 
     createRefundRecord(refundrec) {
         refundrec.Invoice__c = this.recordId;
-        refundrec.Name = "";
-        console.log('I will create the payment!');
         const recordInput = {
-            apiName: 'Payment__c',
-            fields: ref
+            apiName: 'Refund__c',
+            fields: refundrec
         };
         createRecord(recordInput).then((result) => {
-
+            this.showNoficiation("Success", "Refund recorded Successfully", "Success");
+            console.log("*** ", result);
+            window.location.reload();
         }).catch((error) => {
-
+            console.log(error);
+            this.showNoficiation("Error", error.message, "Error");
         });
     }
 }
