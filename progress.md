@@ -138,3 +138,111 @@ Record Payment Button Behaviour-> 1. WHEN there are lineitems present
 Payment will be made only against lineItems that are already present or user created them! 
                                  >>>>Update <<<<<<
 Need to change the insertLineItems Controller 
+
+
+Certainly! Below is a simple markdown checklist for your invoice management project. You can customize and expand this checklist based on your project's specific requirements and tasks.
+
+# Invoice Management Project Checklist
+
+## Setup and Configuration
+
+- [ ] Create Salesforce Custom Objects:
+  - [ ] Invoice
+  - [ ] Payment
+  - [ ] Line Item
+
+- [ ] Define Custom Fields on Objects:
+  - [ ] Invoice: Status, Total Amount, Due Date, Customer, etc.
+  - [ ] Payment: Amount, Date, Invoice Reference, etc.
+  - [ ] Line Item: Product, Quantity, Unit Price, Tax, etc.
+
+- [ ] Set Up Record Relationships:
+  - [ ] Create Lookup or Master-Detail relationships between objects.
+  
+- [ ] Create Lightning Web Components:
+  - [ ] Create LWC for Invoice Creation and Editing.
+  - [ ] Create LWC for Payment Recording.
+  - [ ] Create LWC for Line Item Management.
+
+- [ ] Implement Apex Classes:
+  - [ ] Create Apex Controller for LWCs.
+  - [ ] Implement Apex methods for CRUD operations.
+  
+## User Interface
+
+- [ ] Design Lightning App Pages:
+  - [ ] Create App Pages for Invoice List and Detail View.
+  - [ ] Create App Page for Payment Recording.
+  - [ ] Customize page layouts for each object.
+
+- [ ] Configure Lightning Path:
+  - [ ] Set up Lightning Path for Invoice Status tracking.
+
+- [ ] Customize Page Components:
+  - [ ] Add Lightning Components to display invoices, payments, and line items.
+  - [ ] Implement modal dialogs for payment recording and line item editing.
+
+## Functionality
+
+- [ ] Invoice Management:
+  - [ ] Implement creation and editing of invoices.
+  - [ ] Track invoice status changes using Lightning Path.
+  - [ ] Display related line items and payments.
+
+- [ ] Line Item Management:
+  - [ ] Allow adding, editing, and deleting line items.
+  - [ ] Calculate line item totals and taxes dynamically.
+  
+- [ ] Payment Recording:
+  - [ ] Create payment records associated with invoices.
+  - [ ] Calculate total payments and outstanding amounts.
+
+## Testing
+
+- [ ] Test Scenarios:
+  - [ ] Create and edit invoices.
+  - [ ] Add, edit, and delete line items.
+  - [ ] Record payments and calculate outstanding amounts.
+
+- [ ] Test Lightning Components:
+  - [ ] Verify component behavior, data retrieval, and rendering.
+
+- [ ] Test Apex Methods:
+  - [ ] Ensure CRUD operations work correctly.
+
+## Deployment
+
+- [ ] Deploy to Development Environment:
+  - [ ] Test the application in a development environment.
+
+- [ ] Deploy to Production Environment:
+  - [ ] Migrate the application to the production environment.
+
+- [ ] User Training:
+  - [ ] Provide training to end users on using the invoice management system.
+
+## Documentation
+
+- [ ] User Guide:
+  - [ ] Prepare a user guide explaining how to use the application.
+
+- [ ] Technical Documentation:
+  - [ ] Document the data model, component structure, and customization details.
+
+## Additional Enhancements (Optional)
+
+- [ ] Email Notifications:
+  - [ ] Implement email notifications for invoice status changes or payment updates.
+
+- [ ] Reporting and Analytics:
+  - [ ] Create reports and dashboards to analyze invoice and payment data.
+
+- [ ] Integration:
+  - [ ] Integrate with other systems for data synchronization.
+
+- [ ] Mobile Access:
+  - [ ] Enhance the application for mobile access using Salesforce mobile app or custom mobile solution.
+
+## Conclusion
+
+This checklist provides a starting point for managing your invoice management project. Customize and expand it as needed to fit your project's scope and requirements. Remember to continuously test, iterate, and involve stakeholders throughout the development process.
