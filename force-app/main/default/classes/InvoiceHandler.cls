@@ -43,15 +43,19 @@ public with sharing class InvoiceHandler {
         return TotalAmntOnAccount;
     }
     /*
-This method used to prevent prevent any update on paid Invoice
+This method used to prevent prevent any update on paid Invoice, if that's already paid=> new copy->paid, old copy->paid
 */
     public static void restrictUpdate(List<Invoice__c> newInvoices , Map<Id, Invoice__c> oldInvoices)
     {
         for(Invoice__c inv: newInvoices)
         {
-            if(inv.Status__c == 'Paid')
+            System.debug('Collected Inv Status----' + inv.Status__c);
+            System.debug('old Inv Status-----' + oldInvoices.get(inv.Id).Status__c);
+            if(oldInvoices.get(inv.Id).Status__c == 'Paid' && inv.Status__c!='Paid')
             {
-                inv.AddError('Cannot update any paid invoice');
+                System.debug('-=-=-=-=-=-=-=-==-=');
+                System.debug('New Status is '+ inv.Status__c);
+                inv.AddError('Paid Invoices cannot be edited/updated');
             }
         }
     }

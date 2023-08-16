@@ -1,6 +1,7 @@
 public class InvoiceLineItemsHandler {
     public static void PreventDeleteOnPaidInvoice(Map<Id, Invoice_Line_Items__c> delLineItems){
-   System.debug('I will prevent the delete of lines on paid invoices');
+   System.debug('Delete LineItems are-> ');
+   System.debug(delLineItems.keyset());
     }
     /* Method to Prevent Modification on LineiTem if the invoice is Paid */    
     public static void PreventEditOnLineItem(Map<Id, Invoice_line_Items__c> lineItems)
