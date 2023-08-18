@@ -200,6 +200,8 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
 ## Testing
 
 - [ ] Test Scenarios:
+  - [ ] Bulk Record Test
+  - [ ] Negative Test Cases Testing
   - [ ] Create and edit invoices.
   - [ ] Add, edit, and delete line items.
   - [ ] Record payments and calculate outstanding amounts.

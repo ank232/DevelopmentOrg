@@ -12,14 +12,13 @@ trigger TriggerOnCustomInvoice on Invoice__c (before insert,before delete,before
     }
     // After Insert
     if(Trigger.IsAfter && Trigger.IsInsert)
-    {
-        System.debug('Trigger on Invoice is running(Insert)');
-       // InvoiceHandler.UpdateInvoice(Trigger.New, Null);
+    {       
+       InvoiceHandler.UpdateInvoice(Trigger.New, Null);
     }
     // After Update
     if(Trigger.IsAfter && Trigger.IsUpdate)
     {
-        System.debug('Trigger on Invoice is running(Update)');
+        // System.debug('Trigger on Invoice is running(Update)');
         //CustomInvoicesTriggerhandler.CalculateGrandTotalOnAccount(Trigger.New);
         InvoiceHandler.UpdateInvoice(Trigger.New, Trigger.Oldmap);
         //InvoiceHandler.PerformInvoiceTotal(Trigger.New, Trigger.Oldmap);

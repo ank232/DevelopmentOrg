@@ -18,10 +18,7 @@ public with sharing class CreateInvoice {
                                            invoiceRecord.Comments__c = comment;
                                            invoiceRecord.Status__c = 'Draft';                                          
                                            try {
-                                               insert invoiceRecord;
-                                               System.debug('I am creating the invoice!!!');
-                                               System.debug('Invoice is created!!');
-                                               System.debug('---===>'+invoiceRecord.Name);
+                                               insert invoiceRecord;                                           
                                                string invoiceId =String.valueOf(invoiceRecord.Id);
                                                Invoice__c  createdInv =[SELECT NAME FROM Invoice__c WHERE ID =: invoiceId limit 1];
                                                List<String> insertedInvoice = New List<String> {invoiceId,createdInv.Name};
@@ -38,15 +35,14 @@ public with sharing class CreateInvoice {
     // Method to insert LineItems: 
     @AuraEnabled
     public static void  InsertLineItems(List<Invoice_Line_Items__c> LineItems){
-        System.debug('This method will take list of lineiTems and then insert them');        
+        // System.debug('This method will take list of lineiTems and then insert them');        
         Integer count=0;
         Set<Id> insertedlines = new Set<Id>();
         try{
             upsert LineItems;           
         }catch(Exception e){
-            System.debug('Exception Caught!!');
-            System.debug('Cause: '+e.getCause());
-            System.debug('Message: '+ e.getMessage());
+            // System.debug('Exception Caught!!');
+            // System.debug('Cause: '+e.getCause());
             throw new AuraHandledException(e.getMessage());
         }
     }
