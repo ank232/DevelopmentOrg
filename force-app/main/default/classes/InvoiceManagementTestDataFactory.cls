@@ -1,6 +1,6 @@
 @isTest()
 public  class InvoiceManagementTestDataFactory {
-    
+
     public static Account createCompanyRecord(Boolean isInsert)
     {
         return createCompanyRecord('InvAcc1',isInsert);
@@ -40,7 +40,8 @@ public  class InvoiceManagementTestDataFactory {
             company__c = companyId,
             status__c = 'Draft',
             Invoice_date__c = Date.today(),
-            Due_date__c = Date.today().addDays(6)
+            Due_date__c = Date.today().addDays(6),
+            Comments__c = 'Description '+ i
         );
         invoices.add(inv);
     }

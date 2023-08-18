@@ -1,17 +1,7 @@
 public class OpportunityHandler {
     public static void populatehighestOpp(Map<id, Opportunity> newOpps, Map<id, Opportunity> oldOpMap){
-        Map<Id, List<Opportunity>> OpportunityMap = New map<Id, List<Opportunity>>();// related opp map
-        for(Opportunity op: newOpps.values())
-        {
-            if(! OpportunityMap.containsKey(op.AccountId))
-            {
-                OpportunityMap.put(op.AccountId, New List<Opportunity>());
-            }
-            OpportunityMap.get(op.AccountId).add(op);
-        }
-
         Map<Id,Decimal> OppAccIdmaxAmnt = New Map<Id, Decimal>(); // acId -highest amnt map
-
+system.debug(newOpps.size());
         List<AggregateResult> res = [
             SELECT
             AccountId ,
@@ -25,18 +15,27 @@ public class OpportunityHandler {
 
         for(AggregateResult maxAmountAgr : res)
         {
+            System.debug(maxAmountAgr);
             Id acountId = (Id) maxAmountAgr.get('AccountId');
             Decimal maxAmount  = (Decimal) maxAmountAgr.get('expr0');
             OppAccIdmaxAmnt.put(acountId, maxAmount);
         }
 
-        List<Account> accounts=[SELECT ID, DESCRIPTION FROM ACCOUNT WHERE ID iN: OppAccIdmaxAmnt.keySet()];// accounts to update
+        List<Account> accounts=[SELECT ID, Name,DESCRIPTION FROM ACCOUNT where Id IN: OppAccIdmaxAmnt.keyset() ];// accounts to update
         
         for(Account ac: accounts)
         {
-            System.debug('This account-> '+ac.Name);
-            System.debug('Opportunity having Highest amount->');
-
+                for(Opportunity o: newOpps.values())
+                {
+                    if(OppAccIdmaxAmnt.get(ac.Id)== o.Amount)
+                    {
+                        System.debug('Amount Matched');
+                        System.debug(o.Name);
+                        String maxOppname = o.Name + ' --- ' + OppAccIdmaxAmnt.get(ac.Id);
+                        ac.Description = maxOppname;
+                    }
+                }
         }
+        Update accounts;
     }
 }
