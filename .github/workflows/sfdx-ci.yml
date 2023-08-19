@@ -3,8 +3,7 @@ name: Salesforce CI
 on:
     push:
         branches:
-            -main
-            -ApexTriggers
+            -master            
 jobs:
     test:
         runs-on: ubuntu-latest
