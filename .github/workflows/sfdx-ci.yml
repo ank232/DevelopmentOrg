@@ -22,7 +22,7 @@ jobs:
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
-               sfdx: auth:password:generate --setalias  myCompanyOrg --username ankur@hope.com --password ${{ secrets.SALESFORCE_PASSWORD }}
+               sfdx force: auth:password:generate --setalias  myCompanyOrg --username ankur@hope.com --password ${{ secrets.SALESFORCE_PASSWORD }}
 
           - name: Org Lists
             run: |
