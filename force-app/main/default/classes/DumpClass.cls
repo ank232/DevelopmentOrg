@@ -33,5 +33,6 @@ public with sharing class DumpClass {
         {
             System.debug(red);
         }
+        System.debug('Added a debug!!');
     }
 }
