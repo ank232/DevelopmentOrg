@@ -25,7 +25,7 @@ jobs:
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
-               sfdx force:auth:web:login -a myCompanyOrg --setalias myCompanyOrg
+               sfdx force:auth:web:login -a myCompanyOrg --setalias myCompanyOrg --instanceurl https://login.salesforce.com
 
           - name: Org Lists
             run: |
