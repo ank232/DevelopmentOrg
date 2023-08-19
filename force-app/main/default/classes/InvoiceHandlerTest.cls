@@ -119,6 +119,5 @@ static void DeleteInvoiceTest()
             System.assertEquals('This Invoice cannot be deleted since it is saved as Draft', e.getDmlMessage(0));
         }
     }
-    System.debug('Apex tests Ran! and also addded Actions');
 }
 }
