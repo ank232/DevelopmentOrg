@@ -27,7 +27,7 @@ jobs:
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
-               sfdx force:user:password:generate --setalias myCompanyOrg --targetusername ankur@hope.com --password ${{secrets.SALESFORCE_PASSWORD}}
+               sf org login web --alias devOrg --instance-url https://hope70-dev-ed.my.salesforce.com
 
           - name: Org Lists
             run: |
