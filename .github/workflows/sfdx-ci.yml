@@ -27,7 +27,7 @@ jobs:
           - name: Org Lists
             run: |
                  echo "sfdx org list"
-                 sfdx: org list     
+                 sfdx force: org list     
 
           - name: Run Apex Tests
             run: |
