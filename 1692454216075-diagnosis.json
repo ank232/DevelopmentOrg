@@ -1,0 +1,147 @@
+{
+  "versionDetail": {
+    "cliVersion": "sfdx-cli/7.209.6",
+    "architecture": "win32-x64",
+    "nodeVersion": "node-v18.15.0",
+    "osVersion": "Windows_NT 10.0.22621",
+    "shell": "cmd.exe",
+    "rootPath": "C:\\Users\\anktr\\AppData\\Local\\sfdx\\client\\7.209.6-8ba3197",
+    "pluginVersions": [
+      "@oclif/plugin-autocomplete 2.3.1 (core)",
+      "@oclif/plugin-commands 2.2.17 (core)",
+      "@oclif/plugin-help 5.2.11 (core)",
+      "@oclif/plugin-not-found 2.3.26 (core)",
+      "@oclif/plugin-plugins 3.1.6 (core)",
+      "@oclif/plugin-search 0.0.18 (core)",
+      "@oclif/plugin-update 3.1.22 (core)",
+      "@oclif/plugin-version 1.3.6 (core)",
+      "@oclif/plugin-warn-if-update-available 2.0.41 (core)",
+      "@oclif/plugin-which 2.2.22 (core)",
+      "apex 2.3.4 (core)",
+      "auth 2.8.4 (core)",
+      "community 2.3.5 (core)",
+      "custom-metadata 2.1.30 (core)",
+      "data 2.4.5 (core)",
+      "deploy-retrieve 1.13.5 (core)",
+      "info 2.6.30 (core)",
+      "limits 2.3.23 (core)",
+      "org 2.9.19 (core)",
+      "packaging 1.20.1 (core)",
+      "schema 2.3.17 (core)",
+      "settings 1.4.17 (core)",
+      "signups 1.4.22 (core)",
+      "source 2.10.22 (core)",
+      "telemetry 2.2.1 (core)",
+      "templates 55.5.2 (core)",
+      "trust 2.4.27 (core)",
+      "user 2.3.20 (core)",
+      "sfdx-cli 7.209.6 (core)"
+    ]
+  },
+  "sfdxEnvVars": [
+    [
+      "SFDX_BINPATH",
+      "C:\\Users\\anktr\\AppData\\Local\\sfdx\\client\\bin\\sfdx"
+    ],
+    [
+      "SFDX_REDIRECTED",
+      "1"
+    ],
+    [
+      "SFDX_UPDATE_INSTRUCTIONS",
+      "Use \"npm update --global sfdx-cli\" to update npm-based installations."
+    ]
+  ],
+  "sfEnvVars": [
+    [
+      "SF_AUTOUPDATE_DISABLE",
+      "true"
+    ],
+    [
+      "SF_DISABLE_AUTOUPDATE",
+      "true"
+    ]
+  ],
+  "cliConfig": {
+    "_base": "@oclif/core@2.8.11",
+    "debug": 0,
+    "topicSeparator": " ",
+    "warned": false,
+    "commandPermutations": {
+      "validPermutations": {}
+    },
+    "topicPermutations": {
+      "validPermutations": {}
+    },
+    "_commands": {},
+    "_topics": {},
+    "root": "C:\\Users\\anktr\\AppData\\Local\\sfdx\\client\\7.209.6-8ba3197",
+    "name": "sfdx-cli",
+    "version": "7.209.6",
+    "channel": "stable",
+    "valid": true,
+    "arch": "x64",
+    "platform": "win32",
+    "windows": true,
+    "bin": "sfdx",
+    "dirname": "sfdx",
+    "flexibleTaxonomy": true,
+    "userAgent": "sfdx-cli/7.209.6 win32-x64 node-v18.15.0",
+    "shell": "cmd.exe",
+    "home": "C:\\Users\\anktr",
+    "cacheDir": "C:\\Users\\anktr\\AppData\\Local\\sfdx",
+    "configDir": "C:\\Users\\anktr\\AppData\\Local\\sfdx",
+    "dataDir": "C:\\Users\\anktr\\AppData\\Local\\sfdx",
+    "errlog": "C:\\Users\\anktr\\AppData\\Local\\sfdx\\error.log",
+    "binPath": "C:\\Users\\anktr\\AppData\\Local\\sfdx\\client\\bin\\sfdx",
+    "nodeEngine": ">=16.0.0"
+  },
+  "pluginSpecificData": {
+    "@salesforce/plugin-source": [
+      {
+        "apiVersion": "56.0",
+        "sourceApiVersion": "56.0",
+        "targetOrgApiVersion": "58.0"
+      }
+    ]
+  },
+  "diagnosticResults": [
+    {
+      "testName": "using sfdx-cli version 7",
+      "status": "fail"
+    },
+    {
+      "testName": "salesforcedx plugin not installed",
+      "status": "pass"
+    },
+    {
+      "testName": "no linked plugins",
+      "status": "pass"
+    },
+    {
+      "testName": "[@salesforce/plugin-source] sourceApiVersion matches apiVersion",
+      "status": "pass"
+    },
+    {
+      "testName": "[@salesforce/plugin-source] sourceApiVersion matches default target org max apiVersion",
+      "status": "warn"
+    },
+    {
+      "testName": "[@salesforce/plugin-source] apiVersion matches default target org max apiVersion",
+      "status": "warn"
+    },
+    {
+      "testName": "using latest or latest-rc CLI version",
+      "status": "pass"
+    }
+  ],
+  "suggestions": [
+    "Check https://github.com/forcedotcom/cli/issues for CLI issues posted by the community.",
+    "Check http://status.salesforce.com for general Salesforce availability and performance.",
+    "Uninstall the deprecated Salesforce CLI (sfdx-cli) version 7.209.6 and install the @salesforce/cli version 2. See https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_uninstall.htm for uninstall instructions.",
+    "The sourceApiVersion in sfdx-project.json doesn't match the max apiVersion of the default target org. As a result, you're not using the latest features available in API version 58.0. The version mismatch isn't a problem, as long as it's the behavior you actually want.",
+    "The apiVersion doesn't match the max apiVersion of the default target org. As a result, you're not using the latest features available in API version 58.0. The version mismatch isn't a problem, as long as it's the behavior you actually want."
+  ],
+  "logFilePaths": [],
+  "commandExitCode": 0
+}
