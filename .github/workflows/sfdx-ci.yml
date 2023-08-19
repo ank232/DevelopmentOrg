@@ -25,4 +25,4 @@ jobs:
 
           - name: Run Apex Tests
             run: |     
-              sfdx force:apex:test:run
+              sfdx force:apex:test:run --targetusername myCompanyOrg -c -r human
