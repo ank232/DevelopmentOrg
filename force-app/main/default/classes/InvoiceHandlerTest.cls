@@ -116,7 +116,7 @@ static void DeleteInvoiceTest()
     catch(Exception e) {        
         for(invoice__c inv: insertedInvoices)
         {
-            System.assertEquals('This Invoice cannot be deleted since it is saved as Paid', e.getDmlMessage(0));
+            System.assertEquals('This Invoice cannot be deleted since it is saved as Draft', e.getDmlMessage(0));
         }
     }
     System.debug('Apex tests Ran! and also addded Actions');
