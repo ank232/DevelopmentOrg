@@ -21,8 +21,14 @@ jobs:
 
           - name: Authenticate to Salesforce
             run: |
+               echo "Salesforce Authentication Running"
                sfdx force: auth:password:generate --setalias  myCompanyOrg --username ankur@hope.com --password ${{ secrets.SALESFORCE_PASSWORD }}
 
-          - name: Run Apex Tests
+          - name: Org Lists
             run: |     
+                 sfdx org list
+
+          - name: Run Apex Tests
+            run: |
+               echo "Running apex run test command"     
                sfdx apex run test -u myCompanyOrg -c -r human
