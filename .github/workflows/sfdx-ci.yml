@@ -21,8 +21,8 @@ jobs:
 
           - name: Authenticate to Salesforce
             run: |
-               sfdx force: auth:password:generate --setalias  myCompanyOrg --username ankur@hope.com --password ${{ secrets.SALESFORCE_PASSWORD }}
+               sfdx force: auth:password:generate --setalias  vsCodeOrg --username ankur@hope.com --password ${{ secrets.SALESFORCE_PASSWORD }}
 
           - name: Run Apex Tests
             run: |     
-               sfdx apex:run:test -u myCompanyOrg -c -r human
+               sfdx apex:run:test -u vscodeOrg -c -r human
