@@ -1,0 +1,30 @@
+name: Salesforce CI
+
+on:
+    push:
+        branches:
+            -main
+            -ApexTriggers
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v2    
+
+          - name: Set up Salesforce CLI
+            uses: actions/setup-node@v2
+            with:
+              node-version: 14
+
+          - name: Install Salesforce CLI
+            run: npm install -g sfdx-cli
+
+          - name: Authenticate to Salesforce
+            run: |
+               sfdx force: auth:password:generate --setalias  myCompanyOrg --username ankur@hope.com --password ${{ secrets.SALESFORCE_PASSWORD }}
+
+          - name: Run Apex Tests
+            run: |     
+              sfdx force:apex:test:run-u myCompanyOrg -c -r human
