@@ -25,4 +25,4 @@ jobs:
 
           - name: Run Apex Tests
             run: |     
-              sfdx apex run test
+               sfdx apex:run:tests -u myCompanyOrg -c -r human
