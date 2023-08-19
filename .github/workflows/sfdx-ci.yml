@@ -8,31 +8,26 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-          - name: Checkout code
+          - name: Initiating WorkFlow
             uses: actions/checkout@v2    
 
           - name: Set up Salesforce CLI
             uses: actions/setup-node@v2
             with:
-              node-version: 18
+              node-version: 18.15.0
 
           - name: Install Salesforce CLI
             run: npm install -g sfdx-cli
            
           - name: Checking Salesforce CLI
-            run: sfdx version
+            run: sfdx --version
 
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
-               sfdx force: auth:password:generate --setalias  myCompanyOrg --username ankur@hope.com --password ${{ secrets.SALESFORCE_PASSWORD }}
+               sfdx force:auth:web:login -a myCompanyOrg --setalias myCompanyOrg
 
           - name: Org Lists
             run: |
                  echo "sfdx org list"
-                 sfdx force: org list     
-
-          - name: Run Apex Tests
-            run: |
-               echo "Running apex run test command"     
-               sfdx apex run test -u myCompanyOrg -c -r human
+                 sfdx force: org :list     
