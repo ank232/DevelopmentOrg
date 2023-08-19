@@ -21,6 +21,8 @@ jobs:
            
           - name: Checking Salesforce CLI
             run: sfdx --version
+          - name: Log out of Salesforce
+            run: sfdx force:auth:logout
 
           - name: Authenticate to Salesforce
             run: |
