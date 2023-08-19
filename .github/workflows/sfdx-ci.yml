@@ -18,6 +18,9 @@ jobs:
 
           - name: Install Salesforce CLI
             run: npm install -g sfdx-cli
+           
+          - name: Checking Salesforce CLI
+            run: sfdx version
 
           - name: Authenticate to Salesforce
             run: |
