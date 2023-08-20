@@ -1,7 +1,40 @@
 public class InvoiceLineItemsHandler {
     public static void PreventDeleteOnPaidInvoice(Map<Id, Invoice_Line_Items__c> delLineItems){
-//    System.debug('Delete LineItems are-> ');
-//    System.debug(delLineItems.keyset());
+      System.debug('I will prevent Delete Op on LineItem if they have invoice as Paid');
+      System.debug('DeleteLineItems are-> ' +delLineItems.size());
+      Set<Id> invoiceIds = new Set<Id>();
+      for(Invoice_Line_Items__c lineItem: delLineItems.values())
+      {
+        invoiceIds.add(lineItem.Invoice__c);
+      }
+      Map<Id, Invoice__c> invoices = new Map<Id,Invoice__c>([
+        SELECT 
+        Id, 
+        Status__c 
+        FROM 
+        Invoice__c 
+        WHERE 
+        Id IN: invoiceIds
+        AND 
+        Status__c ='Paid'
+      ]);
+      for(Invoice_Line_items__c item: delLineItems.values())
+      {
+        if(invoices.containskey(item.Invoice__c))
+        {
+            item.addError('This Line Item is related to a paid invoice and cannot be deleted');
+        }
+      }
+    //   List<Invoice_Line_Items__c> lineItemstobeDeleted = [SELECT ID, INVOICE__R.STATUS__C from Invoice_Line_Items__c where Id IN: delLineItems.keyset()];
+    //  if(! lineItemstobeDeleted.isEmpty())
+    //  {
+    //     for(Invoice_Line_Items__c item: lineItemstobeDeleted)
+    //     {
+    //         if(item.Invoice__r.Status__c =='Paid'){
+    //             item.addError('This LineItem is related to a paid invoice and cannot be deleted');
+    //         }
+    //     }
+    //  }
     }
     /* Method to Prevent Modification on LineiTem if the invoice is Paid */    
     public static void PreventEditOnLineItem(Map<Id, Invoice_line_Items__c> lineItems)

@@ -110,6 +110,11 @@ static void DeleteInvoiceTest()
      }
      /* Performing Delete on Invoice*/
      List<Invoice__c> insertedInvoices = [SELECT Id FROM Invoice__c WHERE Id IN: invoiceLineMap.keyset()];
+     Set<id> invoiceIds = new Set<Id>();
+     for(invoice__c inv: insertedInvoices)
+     {
+        invoiceIds.add(inv.Id);
+     }
      try {
         delete insertedInvoices;
     } 
@@ -118,6 +123,25 @@ static void DeleteInvoiceTest()
         {
             System.assertEquals('This Invoice cannot be deleted since it is saved as Draft', e.getDmlMessage(0));
         }
+    }
+
+    /*
+    Performing Deletion of LineItems when Invoice is Paid
+    */ 
+    LIST<INVOICE__C> updateInvoice = [SELECT ID,Status__c FROM INVOICE__C WHERE INVOICE_NUMBER__C ='TestInvoice 2' And Invoice_Number__c ='TestInvoice 1'];
+    for(invoice__c inv: updateInvoice)
+    {
+        inv.Status__c = 'Paid';
+    }
+    update updateInvoice;
+
+    List<invoice_Line_Items__c> lineItems = [SELECT ID, NAME FROM INVOICE_LINE_ITEMS__C where Invoice__r.Invoice_Number__c ='TestInvoice 2'];
+    try{
+        delete lineItems;
+    }catch(Exception e)
+    {
+        System.debug('DElete DML failed');
+        System.assertEquals('This Line Item is related to a paid invoice and cannot be deleted', e.getDmlMessage(0));
     }
 }
 }

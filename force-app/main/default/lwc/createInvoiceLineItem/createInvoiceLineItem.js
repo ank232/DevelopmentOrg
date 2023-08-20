@@ -189,7 +189,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
                 this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, 'DeleteEvent');
             }).catch((error) => {
                 console.log(error);
-                this.showNoficiation("Error", String(error), "Error");
+                this.showNoficiation("Error", error.body.output.errors[0].message, "Error");
             });
         }
     }
