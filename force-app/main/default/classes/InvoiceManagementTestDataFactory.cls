@@ -70,7 +70,7 @@ public  class InvoiceManagementTestDataFactory {
     public static List<Product2> createProductRecord(List<String> prodName)
         {
             List<Product2> products = new List<Product2>();
-            for(integer i=0;i<=2;i++)
+            for(integer i=0;i<prodName.size();i++)
             {
                 Product2 product = new Product2(
                     Name= prodName[i]

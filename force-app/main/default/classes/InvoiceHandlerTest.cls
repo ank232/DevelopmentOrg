@@ -144,4 +144,68 @@ static void DeleteInvoiceTest()
         System.assertEquals('This Line Item is related to a paid invoice and cannot be deleted', e.getDmlMessage(0));
     }
 }
+
+@isTest
+static void TestBatchDelete(){
+    Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('InvAcc1',true);
+    Contact con = InvoiceManagementTestDataFactory.createContactRecord(true);
+    List<Invoice__c> invoices = new List<Invoice__c>();
+    Date oneYearAgo = Date.today().addYears(-1);
+    for (Integer i = 0; i < 30; i++) {
+            invoices.add(new Invoice__c(
+                Invoice_Number__c = 'Invoice ' + i,
+                Customer__c = con.Id,
+                Company__c = acc.Id,
+                Status__c ='Paid',
+                Invoice_date__c = Date.today(),
+                Due_date__c = Date.today().addDays(6),
+                Comments__c = 'Description '+ i
+            ));
+        }
+        insert invoices;
+        for(Invoice__c inv: invoices)
+        {
+            Test.setCreatedDate(inv.Id, oneYearAgo);
+        }
+
+        insert new InvoiceHandler__c(
+    SetupOwnerId = UserInfo.getProfileId(),
+    bypassTrigger__c = true
+);
+        // Start the batch job
+        Test.startTest();
+       DeleteInvoicesBatchProcess batchDelete = new DeleteInvoicesBatchProcess();
+       Id batchId =Database.executeBatch(batchDelete);
+       Test.stopTest();
+       System.assert(batchId!= Null,'Batch has failed');
+        
+        // Verify that the invoices were deleted
+        List<Invoice__c> remainingInvoices = [SELECT Id FROM Invoice__c];
+        System.assertEquals(0, remainingInvoices.size(), 'All invoices should have been deleted.');
+    }
 }
+
+
+//     Map<Id, List<Invoice_Line_Items__c>> invoiceLineMap = new Map<Id,List<Invoice_Line_Items__c>>();
+//     List<String> prodNames = new List<String>{'Prod1','Prod2', 'Prod3'};
+
+//     List<product2> products =InvoiceManagementTestDataFactory.createProductRecord(prodNames);
+//     Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('InvAcc1',true);
+//     Contact con = InvoiceManagementTestDataFactory.createContactRecord(true);
+//     List<Invoice__c> invoice = InvoiceManagementTestDataFactory.createInvoiceRecord(acc.Id, con.Id,30);
+
+//     for(Integer i=0;i<invoice.size();i++)
+//     {
+//         for(Integer j=0;j<products.size();j++){
+//             List<Invoice_Line_Items__c> items = InvoiceManagementTestDataFactory.createLinesItemsRecord(invoice[i].Id,3,products[j].Id);
+//             invoiceLineMap.put(invoice[i].Id, items);
+//         }
+//      }
+//     Test.startTest();
+//     DeleteInvoicesBatchProcess deletebatch =new DeleteInvoicesBatchProcess();
+//     Id batchId =Database.executeBatch(deletebatch);
+//     Test.stopTest();
+//     System.assert(batchId!=Null);
+//     List<Invoice__c> deletedInvoices = [SELECT ID FROM INVOICE__C];
+//     System.assertEquals(0, deletedInvoices.size());
+// }

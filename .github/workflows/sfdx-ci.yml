@@ -27,7 +27,6 @@ jobs:
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
-               sfdx org login web --alias devOrg --instance-url https://hope70-dev-ed.develop.my.salesforce.com
 
           - name: Org Lists
             run: |

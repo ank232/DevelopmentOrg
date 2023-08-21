@@ -4,7 +4,15 @@ trigger TriggerOnCustomInvoice on Invoice__c (before insert,before delete,before
     // Before Delete
     if(Trigger.IsBefore && Trigger.IsDelete)
     {
-        InvoiceHandler.restrictDeleteInvoices(Trigger.OldMap);
+        System.debug('Before Delete Running');
+        InvoiceHandler__c triggerSwitch = InvoiceHandler__c.getInstance(UserInfo.getProfileId());
+        if(triggerSwitch.bypassTrigger__c && System.isBatch())
+        {
+            System.debug('Batch Process will run and trigger will be prevented');
+        }
+        else{
+            InvoiceHandler.restrictDeleteInvoices(Trigger.OldMap);
+        }
     }
     if(Trigger.IsBefore && Trigger.IsUpdate)
     {

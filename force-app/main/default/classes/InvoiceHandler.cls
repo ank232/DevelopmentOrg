@@ -87,22 +87,6 @@ Method to restrict invoices which having status as Draft
         }
     }
     /*
-This method is used to Calulate the open, closed and overdue invoices on insert.
-*/ 
-    public static void InsertInvoice(List<Invoice__c> NewInvoices ){
-        Set<Id> invoiceRecIds = new Set<Id>();
-        for(Invoice__c invoiceRec: NewInvoices){
-            invoiceRecIds.add(invoiceRec.Company__c);
-        }
-        // System.debug('Invoices to Insert...');
-        // System.debug(invoiceRecIds);
-        List<Account> RelatedCompany = [SELECT Id, Name From Account where Id in: invoiceRecIds];
-        for(Account acc: RelatedCompany)
-        {
-            System.debug(acc);
-        }
-    }
-    /*
 This method used calucate open, closed and overdue invoices on update
 */ 
     public static void UpdateInvoice(List<Invoice__c> newInvoices, Map<id,Invoice__c> oldInvoices)
@@ -148,9 +132,7 @@ This method used calucate open, closed and overdue invoices on update
                         AccsToUpdate.add(acc);
                     }
                     if(! AccsToUpdate.isEmpty())
-                    {
-                        // System.debug('Accounts Ready to Update');
-                        // System.debug(AccsToUpdate);
+                    {                        
                         Update AccsToUpdate;
                     }
                 }
