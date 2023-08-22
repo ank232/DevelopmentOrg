@@ -81,7 +81,7 @@ Method to restrict invoices which having status as Draft
             for(Invoice__c invoice: deletedInvoices)
             {
                 InvoicesToDelete.get(invoice.Id).addError(
-                    'This Invoice cannot be deleted since it is saved as Paid'
+                    'This Invoice cannot be deleted since it is saved as Paid1'
                 );
             }
         }
