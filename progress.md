@@ -147,9 +147,9 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
 ## Setup and Configuration
 
 - [ ] Create Salesforce Custom Objects:
-  - [ ] Invoice
-  - [ ] Payment
-  - [ ] Line Item
+  - [X] Invoice
+  - [X] Payment
+  - [X] Line Item
 
 - [ ] Define Custom Fields on Objects:
   - [ ] Invoice: Status, Total Amount, Due Date, Customer, etc.
@@ -165,8 +165,8 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
   - [ ] Create LWC for Line Item Management.
 
 - [ ] Implement Apex Classes:
-  - [ ] Create Apex Controller for LWCs.
-  - [ ] Implement Apex methods for CRUD operations.
+  - [X] Create Apex Controller for LWCs.
+  - [X]  Implement Apex methods for CRUD operations.
   
 ## User Interface
 
@@ -176,22 +176,22 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
   - [ ] Customize page layouts for each object.
 
 - [ ] Configure Lightning Path:
-  - [ ] Set up Lightning Path for Invoice Status tracking.
+  - [X] Set up Lightning Path for Invoice Status tracking.
 
 - [ ] Customize Page Components:
-  - [ ] Add Lightning Components to display invoices, payments, and line items.
-  - [ ] Implement modal dialogs for payment recording and line item editing.
+  - [X] Add Lightning Components to display invoices, payments, and line items.
+  - [X] Implement modal dialogs for payment recording and line item editing.
 
 ## Functionality
 
 - [ ] Invoice Management:
-  - [ ] Implement creation and editing of invoices.
-  - [ ] Track invoice status changes using Lightning Path.
-  - [ ] Display related line items and payments.
+  - [X] Implement creation and editing of invoices.
+  - [X] Track invoice status changes using Lightning Path.
+  - [X] Display related line items and payments.
 
 - [ ] Line Item Management:
-  - [ ] Allow adding, editing, and deleting line items.
-  - [ ] Calculate line item totals and taxes dynamically.
+  - [X] Allow adding, editing, and deleting line items.
+  - [X] Calculate line item totals and taxes dynamically.
   
 - [ ] Payment Recording:
   - [ ] Create payment records associated with invoices.
@@ -199,11 +199,11 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
 
 ## Testing
 
-- [ ] Test Scenarios:
-  - [ ] Bulk Record Test
+- Test Scenarios:
+  - [X] Bulk Record Test
   - [ ] Negative Test Cases Testing
-  - [ ] Create and edit invoices.
-  - [ ] Add, edit, and delete line items.
+  - [X] Create and edit invoices.
+  - [X] Add, edit, and delete line items.
   - [ ] Record payments and calculate outstanding amounts.
 
 - [ ] Test Lightning Components:

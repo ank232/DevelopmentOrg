@@ -1,4 +1,4 @@
-name: Salesforce CI
+name: Production Org Deployment
 
 on:
     push:
@@ -13,31 +13,26 @@ jobs:
           - name: Initiating WorkFlow
             uses: actions/checkout@v2    
 
-          - name: Set up Salesforce CLI
+          - name: Setting up Salesforce CLI
             uses: actions/setup-node@v2
             with:
               node-version: 18.15.0
 
-          - name: Install Salesforce CLI
+          - name: Installing Salesforce CLI
             run: npm install -g sfdx-cli
            
           - name: Checking Salesforce CLI
             run: sfdx --version         
 
-          - name: Authenticate to Salesforce
-            run: |
-               echo "Salesforce Authentication Running"
-               echo "Auth URL: ${{secrets.SFDX_PROD_AUTH_URL}}"
-               sfdx org login sfdx-url --set-default --sfdx-url-file <(echo "${{ secrets.SFDX_PROD_AUTH_URL }}")
-              #  sfdx force:auth:sfdxurl:store -f ${{secrets.SFDX_PROD_AUTH_URL}} -d -a ProdOrg
+          - name: Authorizing Salesforce Org
+            run: | 
+               echo "Salesforce Authentication Running"               
+               sfdx org login sfdx-url --set-default --sfdx-url-file <(echo "${{ secrets.SFDX_PROD_AUTH_URL }}")              
 
-          - name: Org Lists
-            run: |
-                 echo "sfdx org list"
-                 sfdx org list
           - name : Running Apex Tests
             run: |
                   sfdx apex run test -l RunLocalTests -w 15
-          - name : Deploying Apex Class to Target Org
+
+          - name : Deploying Apex Class to Production Org
             run: |
                  sfdx project deploy start      
