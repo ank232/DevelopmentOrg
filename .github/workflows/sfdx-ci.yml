@@ -2,7 +2,9 @@ name: Salesforce CI
 
 on:
     push:
-        branches: master            
+        branches: master
+        paths:
+          - force-app/**
 jobs:
     test:
         runs-on: ubuntu-latest
@@ -20,13 +22,12 @@ jobs:
             run: npm install -g sfdx-cli
            
           - name: Checking Salesforce CLI
-            run: sfdx --version
-          - name: Log out of Salesforce
-            run: sfdx force:auth:logout
+            run: sfdx --version         
 
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
+               sfdx org login sfdx-url --set-default --${{secrets.SFDX_PROD_AUTH_URL}}
 
           - name: Org Lists
             run: |
