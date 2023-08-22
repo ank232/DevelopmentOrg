@@ -27,7 +27,7 @@ jobs:
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
-               sfdx org login sfdx-url --set-default ${{secrets.SFDX_PROD_AUTH_URL}}
+               sfdx org login sfdx-url --set-default --sfdx-url-file ${{ secrets.SFDX_PROD_AUTH_URL }}
 
           - name: Org Lists
             run: |
