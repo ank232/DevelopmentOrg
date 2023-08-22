@@ -34,8 +34,5 @@ public with sharing class DumpClass {
             System.debug(red);
         }
         System.debug('Added a debug!!');
-           System.debug('Added a 2nd debug!!');
-           System.debug('Added 3rd debug?');
-           System.debug('Added debug statement to test action');
     }
 }
