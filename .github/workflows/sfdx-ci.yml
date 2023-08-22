@@ -37,4 +37,4 @@ jobs:
                  sfdx org list
           - name : Running Apex Tests
             run: |
-                  sfdx apex run test -l --json RunLocalTests -w 15
+                  sfdx apex run test -l RunLocalTests -w 15
