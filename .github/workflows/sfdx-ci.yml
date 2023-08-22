@@ -27,7 +27,8 @@ jobs:
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
-               sfdx force:auth:sfdxurl:store -f ${{secrets.SFDX_PROD_AUTH_URL}} -d -a ProdOrg
+               echo "Auth URL: ${{secrets.SFDX_PROD_AUTH_URL}}"
+              #  sfdx force:auth:sfdxurl:store -f ${{secrets.SFDX_PROD_AUTH_URL}} -d -a ProdOrg
 
           - name: Org Lists
             run: |
