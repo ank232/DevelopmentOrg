@@ -80,4 +80,15 @@ public  class InvoiceManagementTestDataFactory {
             insert products;
             return products;
     }
+    public static  Payment__c createPaymentRecord(Id invoiceId,double Amount, string paymentStatus,integer maxPaymentRec)
+    {
+        Payment__c newPayment= new Payment__c(
+            Invoice__c = invoiceId,
+            Status__c = paymentStatus,
+            Amount__c = Amount,
+            Date__c = System.today()
+        );
+        insert newPayment;
+        return newPayment;
+    }
 }

@@ -150,23 +150,24 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
   - [X] Invoice
   - [X] Payment
   - [X] Line Item
-
-- [ ] Define Custom Fields on Objects:
-  - [ ] Invoice: Status, Total Amount, Due Date, Customer, etc.
-  - [ ] Payment: Amount, Date, Invoice Reference, etc.
-  - [ ] Line Item: Product, Quantity, Unit Price, Tax, etc.
-
-- [ ] Set Up Record Relationships:
-  - [ ] Create Lookup or Master-Detail relationships between objects.
   
 - [ ] Create Lightning Web Components:
-  - [ ] Create LWC for Invoice Creation and Editing.
-  - [ ] Create LWC for Payment Recording.
-  - [ ] Create LWC for Line Item Management.
+  - [x] Create LWC for Invoice Creation.
+  - [x] Create LWC for Payment Recording.
+  - [x] Create LWC for Line Item Creation.
+  - [x] Create LWC for Refund Recording.
+  - [ ] Utility Buttons on Invoice to Delete or void any invoice
+  - [x] Overriding Invoice Record Page with LWC (Related Lists)
 
 - [ ] Implement Apex Classes:
   - [X] Create Apex Controller for LWCs.
-  - [X]  Implement Apex methods for CRUD operations.
+  - [X] Implement Apex methods for CRUD operations.
+
+- [ ] Triggers:
+  -[x] Trigger to prevent Deletion of any account that has draft Invoices.
+  -[ ] Trigger to prevent deletion of any invoice which is pending or paid
+  -[x] Trigger to restrict update on any invoice and on related LineItems when its paid
+  -[ ] When a Payment is Recorded Update the Payment Date on the Invoice Object with the Current Date.
   
 ## User Interface
 
@@ -184,12 +185,12 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
 
 ## Functionality
 
-- [ ] Invoice Management:
+- [x] Invoice Management:
   - [X] Implement creation and editing of invoices.
   - [X] Track invoice status changes using Lightning Path.
   - [X] Display related line items and payments.
 
-- [ ] Line Item Management:
+- [x] Line Item Management:
   - [X] Allow adding, editing, and deleting line items.
   - [X] Calculate line item totals and taxes dynamically.
   
@@ -229,7 +230,7 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
   - [ ] Prepare a user guide explaining how to use the application.
 
 - [ ] Technical Documentation:
-  - [ ] Document the data model, component structure, and customization details.
+  - [X] Document the data model, component structure, and customization details.
 
 ## Additional Enhancements (Optional)
 
@@ -244,7 +245,3 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
 
 - [ ] Mobile Access:
   - [ ] Enhance the application for mobile access using Salesforce mobile app or custom mobile solution.
-
-## Conclusion
-
-This checklist provides a starting point for managing your invoice management project. Customize and expand it as needed to fit your project's scope and requirements. Remember to continuously test, iterate, and involve stakeholders throughout the development process.

@@ -2,7 +2,7 @@
 public class InvoiceHandlerTest {
 
     @isTest
- static void RecordsCreationTest()
+ static void recordsCreationTest()
 { 
     Map<Id, List<Invoice_Line_Items__c>> invoiceLineMap = new Map<Id,List<Invoice_Line_Items__c>>();
     List<String> prodNames = new List<String>{'Prod1','Prod2', 'Prod3'};
@@ -93,7 +93,7 @@ static void updateInvoiceTest()
 }
 
 @isTest 
-static void DeleteInvoiceTest()
+static void deleteInvoiceTest()
 {
     Map<Id, List<Invoice_Line_Items__c>> invoiceLineMap = new Map<Id,List<Invoice_Line_Items__c>>();
     List<String> prodNames = new List<String>{'Prod1','Prod2', 'Prod3'};
@@ -146,7 +146,8 @@ static void DeleteInvoiceTest()
 }
 
 @isTest
-static void TestBatchDelete(){
+static void testBatchDelete()
+{
     Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('InvAcc1',true);
     Contact con = InvoiceManagementTestDataFactory.createContactRecord(true);
     List<Invoice__c> invoices = new List<Invoice__c>();
@@ -169,9 +170,9 @@ static void TestBatchDelete(){
         }
 
         insert new InvoiceHandler__c(
-    SetupOwnerId = UserInfo.getProfileId(),
-    bypassTrigger__c = true
-);
+            SetupOwnerId = UserInfo.getProfileId(),
+            bypassTrigger__c = true
+            );
         // Start the batch job
         Test.startTest();
        DeleteInvoicesBatchProcess batchDelete = new DeleteInvoicesBatchProcess();
@@ -182,6 +183,31 @@ static void TestBatchDelete(){
         // Verify that the invoices were deleted
         List<Invoice__c> remainingInvoices = [SELECT Id FROM Invoice__c];
         System.assertEquals(0, remainingInvoices.size(), 'All invoices should have been deleted.');
+}
+
+    @isTest 
+    static void testPayment()
+    {
+        Map<Id, List<Invoice_Line_Items__c>> invoiceLineMap = new Map<Id,List<Invoice_Line_Items__c>>();
+        Map<Id,Payment__c> invoicePaymentMap = new Map<Id,Payment__c>();
+        List<String> prodNames = new List<String>{'Prod1','Prod2', 'Prod3'};
+
+        List<product2> products =InvoiceManagementTestDataFactory.createProductRecord(prodNames);
+        Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('InvAcc1',true);
+        Contact con = InvoiceManagementTestDataFactory.createContactRecord(true);
+        List<Invoice__c> invoice = InvoiceManagementTestDataFactory.createInvoiceRecord(acc.Id, con.Id,3);
+
+    for(Integer i=0;i<invoice.size();i++)
+    {
+        List<Invoice_Line_Items__c> items = InvoiceManagementTestDataFactory.createLinesItemsRecord(invoice[i].Id,3,products[i].Id);
+        Payment__c recordPayment = InvoiceManagementTestDataFactory.createPaymentRecord(invoice[i].Id, 4000, 'Draft', 1);
+        invoiceLineMap.put(invoice[i].Id, items);
+        invoicePaymentMap.put(invoice[i].Id, recordPayment);
+     }
+     for(Id invId : invoicePaymentMap.keyset())
+     {
+        System.assertEquals(4000.0, invoicePaymentMap.get(invId).Amount__c, 'Payment should be 4000');
+     }
     }
 }
 
