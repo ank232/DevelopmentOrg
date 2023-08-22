@@ -3,8 +3,8 @@ name: Salesforce CI
 on:
     push:
         branches: master
-        paths:
-          - force-app/**
+        # paths:
+        #   - force-app/**
 jobs:
     test:
         runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
           - name: Authenticate to Salesforce
             run: |
                echo "Salesforce Authentication Running"
-               sfdx org login sfdx-url --set-default --${{secrets.SFDX_PROD_AUTH_URL}}
+               sfdx org login sfdx-url --set-default ${{secrets.SFDX_PROD_AUTH_URL}}
 
           - name: Org Lists
             run: |
