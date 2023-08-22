@@ -40,4 +40,4 @@ jobs:
                   sfdx apex run test -l RunLocalTests -w 15
           - name : Deploying Apex Class to Target Org
             run: |
-                 sf project deploy start      
+                 sfdx project deploy start      

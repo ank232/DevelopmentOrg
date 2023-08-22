@@ -26,13 +26,4 @@ public with sharing class DumpClass {
     }
         Update invoices;
     }
-    public static void aggrRes(){
-        Id ac1 = '0012w00001cWKxTAAW';
-      List<AggregateResult> invoices = [SELECT Count(company__c), Status__c,Sum(GRAND_TOTAL__C) FROM INVOICE__C WHERE cOMPANY__C=: ac1 group by Status__c];
-        for(AggregateResult red: invoices)
-        {
-            System.debug(red);
-        }
-        System.debug('Added a debug!!');
-    }
 }
