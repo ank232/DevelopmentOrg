@@ -1,5 +1,6 @@
 public class InvoiceLineItemsHandler {
     public static void PreventDeleteOnPaidInvoice(Map<Id, Invoice_Line_Items__c> delLineItems){
+        System.debug('I will prevent delete of lineItem on Paid Invoices');
       Set<Id> invoiceIds = new Set<Id>();
       for(Invoice_Line_Items__c lineItem: delLineItems.values())
       {
@@ -20,6 +21,7 @@ public class InvoiceLineItemsHandler {
       {
         if(invoices.containskey(item.Invoice__c))
         {
+            System.debug('Invoice--=Status->'+ invoices.get(item.invoice__c).Status__c);
             item.addError('This Line Item is related to a paid invoice and cannot be deleted');
         }
       }
@@ -43,13 +45,10 @@ public class InvoiceLineItemsHandler {
                 INVOICE__c 
                 WHERE 
                 Id in: invoiceHavingLines]);
-                // System.debug('----');
          for(Invoice_Line_Items__c lines : lineItems.values())
          {
-            // System.debug(lines);
              if(inv.get(lines.Invoice__c)!=null && inv.get(lines.Invoice__c).Status__c=='Paid')
              {
-                // System.debug(' I am satisfied');
              lines.addError('Invoice is paid, you cannot edit anything');
             //   throw new AuraHandledException('Invoice is paid, you cannot edit anything');
             }
@@ -63,14 +62,26 @@ public class InvoiceLineItemsHandler {
         {
             invoiceIds.add(line.Invoice__c);
         }
-        // Querying the related invoices WHERE STATUS IS MARKED AS PAID 
-        List<Invoice__c> relatedInvoices = [SELECT Id,Name FROM Invoice__c WHERE Id IN: invoiceIds AND  status__c ='Paid'];
-        if(!relatedInvoices.isEmpty())
+        Map<Id, Invoice__c> invoices = new Map<Id, Invoice__c>([
+            SELECT
+            Id,
+            Status__c
+            FROM 
+            Invoice__c
+            WHERE
+            Status__c ='Paid'
+            AND 
+            ID IN:invoiceIds
+        ]);
+        if(!invoices.isEmpty())
         {
-            for(Invoice__c invoice: relatedInvoices)
+            for(Invoice_Line_Items__c lineItem: lineItems)
             {
-                invoice.addError('Cannot add any line Items on Paid Invoice');
+                if(invoices.containskey(lineItem.Invoice__c))
+                {
+                    lineItem.addError('Cannot add new lineItem on Paid Invoice');
+                }
             }
-        }     
+        }
     }
 }

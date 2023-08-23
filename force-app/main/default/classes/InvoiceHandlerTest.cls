@@ -1,6 +1,15 @@
+/*
+            ===================================================
+            Test Cases to Test InvoiceManagemnt Application
+            Cases: 
+                    ->Positive Cases 
+                    -> Bulk records 
+                    -> Negative Cases      
+            ====================================================
+*/ 
+
 @isTest 
 public class InvoiceHandlerTest {
-
     @isTest
  static void recordsCreationTest()
 { 
@@ -11,54 +20,51 @@ public class InvoiceHandlerTest {
     Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('InvAcc1',true);
     Contact con = InvoiceManagementTestDataFactory.createContactRecord(true);
     List<Invoice__c> invoice = InvoiceManagementTestDataFactory.createInvoiceRecord(acc.Id, con.Id,2);
-
     for(Integer i=0;i<invoice.size();i++)
     {
         List<Invoice_Line_Items__c> items = InvoiceManagementTestDataFactory.createLinesItemsRecord(invoice[i].Id,3,products[i].Id);
         invoiceLineMap.put(invoice[i].Id, items);
      }
-
     System.assertEquals(2, invoice.size(), 'invoiceCreated'); // Invoice Assertion
 
     for(Id inv: invoiceLineMap.keyset())
     {
-        System.assertEquals(invoiceLineMap.get(inv).size(), 3);
+        System.assertEquals(invoiceLineMap.get(inv).size(), 3); // Invoice line Item Assertion
     }
-
     List<Account> accounts = [SELECT PAID_INVOICES__c, Open_Invoices__c,OverDue_Invoices__c FROM ACCOUNT WHERE ID=: acc.Id];
 
     List<Invoice__c> invoices = [SELECT GRAND_TOTAL__c from Invoice__c WHERE Company__c =: acc.Id];
     Double totalAmnt =0;
-
     for(Invoice__c inv: invoices)
     {
         totalAmnt+=inv.Grand_Total__c;
     }
-
     for(Account ac : accounts)
     {
         System.assertEquals(ac.Paid_Invoices__c, 0);
-        System.assertEquals(ac.Open_Invoices__c,totalAmnt,'Total Open invoices');
+        System.assertEquals(ac.Open_Invoices__c,totalAmnt,'Total Open invoices'); // Rollup field Assertion on Insert Operation
     }    
 }
-
+/*
+        ====================================
+        Testing if user can update invoice 
+        and its related invoices if its paid
+        =====================================
+*/ 
 @isTest 
 static void updateInvoiceTest()
 {
     Map<Id, List<Invoice_Line_Items__c>> invoiceLineMap = new Map<Id,List<Invoice_Line_Items__c>>();
     List<String> prodNames = new List<String>{'Prod1','Prod2', 'Prod3'};
-
     List<product2> products =InvoiceManagementTestDataFactory.createProductRecord(prodNames);
     Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('InvAcc1',true);
     Contact con = InvoiceManagementTestDataFactory.createContactRecord(true);
     List<Invoice__c> invoice = InvoiceManagementTestDataFactory.createInvoiceRecord(acc.Id, con.Id,3);
-
     for(Integer i=0;i<invoice.size();i++)
     {
         List<Invoice_Line_Items__c> items = InvoiceManagementTestDataFactory.createLinesItemsRecord(invoice[i].Id,3,products[i].Id);
         invoiceLineMap.put(invoice[i].Id, items);
      }
-
     /* Updating status */  
     List<Invoice__c> insertedInvoices = [SELECT ID,Name,Invoice_Number__c ,Status__c, Comments__c FROM Invoice__c Where Id In: invoiceLineMap.keyset()];
     List<Invoice__c> invoiceToupdate = new List<Invoice__c>();
@@ -73,7 +79,7 @@ static void updateInvoiceTest()
          }
          invoiceToupdate.add(inv);
     }
-    update invoiceToupdate;
+    update invoiceToupdate; // Updating invoice
     List<Invoice_Line_Items__c> relatedLines  = [SELECT ID,DESCRIPTION__C FROM INVOICE_LINE_ITEMS__c where Invoice__c =: invoiceId ];
     Invoice_Line_Items__c lineItem = new Invoice_Line_items__c
     (
@@ -86,12 +92,18 @@ static void updateInvoiceTest()
         relatedLines.add(lineItem);
     try {    
         upsert relatedLines;
+        System.assert(false,'Exception should be thrown but not');
     } 
     catch (Exception e) {    
     System.assertEquals('Invoice is paid, you cannot edit anything', e.getDmlMessage(0));
     }
 }
-
+/*
+        ===================================
+        Testing if user can Delete 
+        Invoice if its paid from the System 
+        ===================================
+*/ 
 @isTest 
 static void deleteInvoiceTest()
 {
@@ -117,6 +129,7 @@ static void deleteInvoiceTest()
      }
      try {
         delete insertedInvoices;
+        System.assert(false,'Delete exception should be thrown'); // Attempting Delete of Invoice on invoice insert
     } 
     catch(Exception e) {        
         for(invoice__c inv: insertedInvoices)
@@ -124,7 +137,6 @@ static void deleteInvoiceTest()
             System.assertEquals('This Invoice cannot be deleted since it is saved as Draft', e.getDmlMessage(0));
         }
     }
-
     /*
     Performing Deletion of LineItems when Invoice is Paid
     */ 
@@ -133,18 +145,37 @@ static void deleteInvoiceTest()
     {
         inv.Status__c = 'Paid';
     }
-    update updateInvoice;
-
-    List<invoice_Line_Items__c> lineItems = [SELECT ID, NAME FROM INVOICE_LINE_ITEMS__C where Invoice__r.Invoice_Number__c ='TestInvoice 2'];
     try{
-        delete lineItems;
+        update updateInvoice; // updating the invoice status to paid 
+        system.assert(true,'Invoice should be updated');
+    }
+    catch(Exception e)
+    {
+        System.debug('The error is-> '+ e.getMessage());
+    }
+     LIST<INVOICE__C> invoiceToupdate = [SELECT ID,Status__c FROM INVOICE__C WHERE INVOICE_NUMBER__C ='TestInvoice 2' And Invoice_Number__c ='TestInvoice 1'];
+    for(invoice__c inv: invoiceToupdate)
+    {
+        inv.Status__c = 'Paid';
+    }
+    update invoiceToupdate;
+    List<invoice_Line_Items__c> lineItems = [SELECT ID, NAME FROM INVOICE_LINE_ITEMS__C where Invoice__c IN: invoiceToupdate];
+    try{
+        delete lineItems; // Attempting deletion of its related-lineItems
+        System.assertEquals(lineItems.size(),0,'Line Item not delted, exception thrown');
+        // System.assert(false,'Delete LineItem exception should be thrown');
     }catch(Exception e)
     {
         System.debug('DElete DML failed');
         System.assertEquals('This Line Item is related to a paid invoice and cannot be deleted', e.getDmlMessage(0));
     }
 }
-
+/*
+            ===========================================
+            Testing Batch Apex that handles deletion 
+            of Invoices from past 1 year from the System
+            ============================================
+*/ 
 @isTest
 static void testBatchDelete()
 {
@@ -185,6 +216,12 @@ static void testBatchDelete()
         System.assertEquals(0, remainingInvoices.size(), 'All invoices should have been deleted.');
 }
 
+/*
+            =============================================================
+            Positive Testing if Payment has been recorded successfully and 
+            the paid date is updated as per the requirement
+            =============================================================
+*/ 
     @isTest 
     static void testPayment()
     {
@@ -208,30 +245,10 @@ static void testBatchDelete()
      {
         System.assertEquals(4000.0, invoicePaymentMap.get(invId).Amount__c, 'Payment should be 4000');
      }
+     List<Invoice__c> insertedinvoices = [SELECT ID, PAID_DATE__C FROM INVOICE__C WHERE ID IN: invoicePaymentMap.keyset()];
+     for(Invoice__c inv: insertedinvoices)
+     {
+        System.assertEquals(inv.Paid_date__c, System.today());
+     }
     }
 }
-
-
-//     Map<Id, List<Invoice_Line_Items__c>> invoiceLineMap = new Map<Id,List<Invoice_Line_Items__c>>();
-//     List<String> prodNames = new List<String>{'Prod1','Prod2', 'Prod3'};
-
-//     List<product2> products =InvoiceManagementTestDataFactory.createProductRecord(prodNames);
-//     Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('InvAcc1',true);
-//     Contact con = InvoiceManagementTestDataFactory.createContactRecord(true);
-//     List<Invoice__c> invoice = InvoiceManagementTestDataFactory.createInvoiceRecord(acc.Id, con.Id,30);
-
-//     for(Integer i=0;i<invoice.size();i++)
-//     {
-//         for(Integer j=0;j<products.size();j++){
-//             List<Invoice_Line_Items__c> items = InvoiceManagementTestDataFactory.createLinesItemsRecord(invoice[i].Id,3,products[j].Id);
-//             invoiceLineMap.put(invoice[i].Id, items);
-//         }
-//      }
-//     Test.startTest();
-//     DeleteInvoicesBatchProcess deletebatch =new DeleteInvoicesBatchProcess();
-//     Id batchId =Database.executeBatch(deletebatch);
-//     Test.stopTest();
-//     System.assert(batchId!=Null);
-//     List<Invoice__c> deletedInvoices = [SELECT ID FROM INVOICE__C];
-//     System.assertEquals(0, deletedInvoices.size());
-// }

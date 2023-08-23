@@ -44,9 +44,9 @@ public  class InvoiceManagementTestDataFactory {
             Comments__c = 'Description '+ i
         );
         invoices.add(inv);
-    }
-    insert invoices;
-    return invoices;
+        }
+        insert invoices;
+        return invoices;
     }
 
     public static List<Invoice_Line_Items__c> createLinesItemsRecord(Id invoiceId,Integer totalLines, Id productId)
@@ -86,7 +86,7 @@ public  class InvoiceManagementTestDataFactory {
             Invoice__c = invoiceId,
             Status__c = paymentStatus,
             Amount__c = Amount,
-            Date__c = System.today()
+            Date__c = System.today()+2
         );
         insert newPayment;
         return newPayment;
