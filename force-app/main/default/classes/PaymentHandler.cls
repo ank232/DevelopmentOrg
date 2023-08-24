@@ -17,7 +17,7 @@ public with sharing class PaymentHandler
             {
                 inv.Paid_date__c = System.today();
             }
-        }
+        }        
         try{ 
             update relatedInvoicesforRefund;
         }catch(DmlException dmlExec)

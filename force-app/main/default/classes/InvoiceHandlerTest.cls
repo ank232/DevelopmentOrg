@@ -1,10 +1,10 @@
 /*
             ===================================================
             Test Cases to Test InvoiceManagemnt Application
-            Cases: 
-                    ->Positive Cases 
-                    -> Bulk records 
-                    -> Negative Cases      
+              Cases: 
+                    * Positive Cases 
+                    *  Bulk records 
+                    *  Negative Cases      
             ====================================================
 */ 
 
@@ -166,7 +166,7 @@ static void deleteInvoiceTest()
         // System.assert(false,'Delete LineItem exception should be thrown');
     }catch(Exception e)
     {
-        System.debug('DElete DML failed');
+        System.debug('Delete DML failed');
         System.assertEquals('This Line Item is related to a paid invoice and cannot be deleted', e.getDmlMessage(0));
     }
 }
@@ -199,7 +199,6 @@ static void testBatchDelete()
         {
             Test.setCreatedDate(inv.Id, oneYearAgo);
         }
-
         insert new InvoiceHandler__c(
             SetupOwnerId = UserInfo.getProfileId(),
             bypassTrigger__c = true
@@ -210,18 +209,18 @@ static void testBatchDelete()
        Id batchId =Database.executeBatch(batchDelete);
        Test.stopTest();
        System.assert(batchId!= Null,'Batch has failed');
-        
-        // Verify that the invoices were deleted
+       // Verify that the invoices were deleted
         List<Invoice__c> remainingInvoices = [SELECT Id FROM Invoice__c];
         System.assertEquals(0, remainingInvoices.size(), 'All invoices should have been deleted.');
 }
 
 /*
-            =============================================================
-            Positive Testing if Payment has been recorded successfully and 
-            the paid date is updated as per the requirement
-            =============================================================
-*/ 
+       =======================================================
+            Positive Testing if Payment has been recorded 
+            successfully and the paid date is updated 
+            as per the requirement
+      ========================================================
+*/  
     @isTest 
     static void testPayment()
     {
@@ -250,5 +249,75 @@ static void testBatchDelete()
      {
         System.assertEquals(inv.Paid_date__c, System.today());
      }
+    }
+
+    /*
+                ===========================================
+                        Negative Testing:
+                           Cases-> 
+                              * Inserting Invoice with 
+                                invoice date set in past.
+                              * More....
+                ===========================================
+    */ 
+    @isTest 
+    static void testNegativeTest()
+    {
+        //Test1: Creating a invoice with a past date
+        Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('NegativeTest Acc', true);
+        Contact con = InvoiceManagementTestDataFactory.createContactRecord(acc.Id, true);
+        Invoice__c invoicewithpastDate =new Invoice__c(
+        company__c = acc.Id,
+        customer__c = con.Id,
+        Status__c='Approved',
+        Invoice_Date__c = date.today().addDays(-10),
+        Due_date__c = date.today().addDays(-19),
+        Comments__c = 'Negative Test Desc'
+       );
+       try{
+           insert invoicewithpastDate;
+           System.assert(false, 'Invoice should not be inserted');
+       }catch(Exception e)
+       {
+        System.assert(true,e.getMessage());
+       }
+       // Test2: Performing it in bulk: 1.creating invoice with right data 2. creating invoice with past date
+       List<invoice__c> testingDateonInvoices  = new List<Invoice__c>();
+       Invoice__c inv1 = new Invoice__c(
+        Invoice_number__c = 'Inv1',
+        company__c = acc.Id,
+        customer__c  = con.Id,
+        Status__c = 'Voided',
+        Invoice_date__c =date.today().addDays(12),
+        Due_date__c = date.today().addDays(20),
+        Comments__c = 'Inserted'
+       );
+       testingDateonInvoices.add(inv1);
+       Invoice__c inv2 = new Invoice__c(
+        Invoice_number__c = 'Inv2',
+        company__c = acc.Id,
+        customer__c = con.Id,
+        Invoice_Date__c = date.today().addDays(-20),
+        Paid_date__c  = date.today().addDays(2),
+        Status__c = 'Voided',
+        Comments__c = 'Rejected'
+       );
+       testingDateonInvoices.add(inv2);
+       Database.saveResult[] res =Database.insert(testingDateonInvoices,false);
+       for(Database.SaveResult result: res)
+       {
+        if(result.isSuccess())
+        {
+            
+        }
+        if(!result.isSuccess())
+        {
+            for(Database.Error err: result.getErrors())
+            {
+                System.debug('Not inserted');
+                System.assertEquals(err.message,'Invoice Date should not be in past');
+            }
+        }
+       }
     }
 }

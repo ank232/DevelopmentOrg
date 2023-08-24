@@ -1,6 +1,10 @@
 trigger TriggerOnCustomInvoice on Invoice__c (before insert,before delete,before update,
                                               after insert, after update, after delete) 
 {
+    if(Trigger.isBefore && Trigger.isInsert)
+    {
+        InvoiceHandler.verifyInvoiceData(Trigger.new);
+    }
     // Before Delete
     if(Trigger.IsBefore && Trigger.IsDelete)
     {
