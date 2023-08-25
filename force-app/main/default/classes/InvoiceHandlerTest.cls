@@ -253,11 +253,11 @@ static void testBatchDelete()
 
     /*
                 ===========================================
-                        Negative Testing:
-                           Cases-> 
-                              * Inserting Invoice with 
-                                invoice date set in past.
-                              * More....
+                    Negative Testing:
+                        Cases-> 
+                            * Inserting Invoice with  
+                            invoice date set in past.
+                            * More....
                 ===========================================
     */ 
     @isTest 
@@ -306,10 +306,6 @@ static void testBatchDelete()
        Database.saveResult[] res =Database.insert(testingDateonInvoices,false);
        for(Database.SaveResult result: res)
        {
-        if(result.isSuccess())
-        {
-            
-        }
         if(!result.isSuccess())
         {
             for(Database.Error err: result.getErrors())
@@ -319,5 +315,7 @@ static void testBatchDelete()
             }
         }
        }
+       List<Invoice__c> deletedInvoices = [SELECT ID FROM INVOICE__c];
+       delete deletedInvoices;
     }
 }

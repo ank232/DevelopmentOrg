@@ -1,5 +1,35 @@
 public with sharing class PaymentHandler 
 {
+    public static void checkPaymentDate(List<Payment__c> paymentsToverfied)
+    {
+        Set<Id> payableinvoiceIds = new Set<Id>();
+        for(payment__c pay: paymentsToverfied)
+        {
+            payableinvoiceIds.add(pay.Invoice__c);
+        }
+        Map<Id,Invoice__c> invoiceHavingPayments = new Map<Id,Invoice__c>([
+            SELECT
+            Id,
+            Status__c,
+            Invoice_date__c
+            FROM 
+            INVOICE__c 
+            WHERE 
+            ID 
+            In: payableinvoiceIds 
+        ]);
+        if(! invoiceHavingPayments.isEmpty())
+        {
+            for(Payment__c payment: paymentsToverfied)
+            {
+                System.debug('+++');
+                if(invoiceHavingPayments.containskey(payment.Invoice__c) && payment.Date__c < invoiceHavingPayments.get(payment.Invoice__c).Invoice_date__c &&invoiceHavingPayments.get(Payment.Invoice__c).Status__c !='Approved' ){
+                    System.debug('Error should thrown');
+                    payment.addError('Payment date should be in future or should be greater than invoiceDate');
+                }
+            }
+        }
+    }
     public static void updatePaymentDateonInvoice(List<Payment__c> payments)
     {
         Set<Id> invoiceIds = new Set<Id>();

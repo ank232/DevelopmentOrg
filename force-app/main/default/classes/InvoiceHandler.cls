@@ -147,12 +147,12 @@ This method used calucate open, closed and overdue invoices on update
     {
        List<Invoice__c> invoicesToInsert= new List<Invoice__c>();
        List<Invoice__c> rejectedInvoices = new List<Invoice__c>();
-        for(invoice__c inv: invoiceToBeverified)
+       for(invoice__c inv: invoiceToBeverified)
+       {
+        if(inv.Invoice_Date__c < System.today())
         {
-            if(inv.Invoice_Date__c < System.today())
-            {
-                inv.Adderror('Invoice Date should not be in past');
+            inv.Adderror('Invoice Date should not be in past');
             }
+        }
     }
-}
 }
