@@ -138,12 +138,7 @@ Record Payment Button Behaviour-> 1. WHEN there are lineitems present
 Payment will be made only against lineItems that are already present or user created them! 
                                  >>>>Update <<<<<<
 Need to change the insertLineItems Controller 
-
-
-Certainly! Below is a simple markdown checklist for your invoice management project. You can customize and expand this checklist based on your project's specific requirements and tasks.
-
 # Invoice Management Project Checklist
-
 ## Setup and Configuration
 
 - [ ] Create Salesforce Custom Objects:
@@ -170,11 +165,15 @@ Certainly! Below is a simple markdown checklist for your invoice management proj
   -[ ] When a Payment is Recorded Update the Payment Date on the Invoice Object with the Current Date.
   
 ## User Interface
-
-- [ ] Design Lightning App Pages:
-  - [ ] Create App Pages for Invoice List and Detail View.
-  - [ ] Create App Page for Payment Recording.
-  - [ ] Customize page layouts for each object.
+### Web Components
+| Component name           | Usage                                                             | Component Location                        |
+|--------------------------|-------------------------------------------------------------------|-------------------------------------------|
+| CompanyInvoices          | to display the related invoices                                   | Account Record page                       |
+| AccountRelatedRecords    | Search Utility to search  related contacts                        | Account Record page                       |
+| createInvoiceFromAccount | create invoice record                                             | Account Record page                       |
+| createInvoiceLineItem    | create invoiceLineItems                                           | Account Record page ,Invoice Record page  |
+| invoiceByStatus          | display invoice-total in three categories                         | Account Record page                       |
+| invoiceTotal             | display the related lineItems total(total-tax,grand-total ,total) | Invoice Record page                       |
 
 - [ ] Configure Lightning Path:
   - [X] Set up Lightning Path for Invoice Status tracking.

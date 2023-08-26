@@ -4,6 +4,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { deleteRecord } from 'lightning/uiRecordApi';
 export default class Paymentrectable extends LightningElement {
     @api recordId;
+    loadingScreen;
     paymentrecs;
     totalPaidAmount;
     showNoficiation(title, message, variant) {
@@ -58,8 +59,12 @@ export default class Paymentrectable extends LightningElement {
     }
     deletePayment(paymentId, rowid) {
         deleteRecord(paymentId).then(() => {
-            this.paymentrecs.splice(rowid, 1);
-            this.paymentrecs = [...this.paymentrecs];
+            setTimeout(() => {
+                this.loadingScreen = true;
+                this.paymentrecs.splice(rowid, 1);
+                this.paymentrecs = [...this.paymentrecs];
+            }, 300);
+            this.loadingScreen = false;
             this.showNoficiation("Message", "Payment has been deleted", "Message");
         }).catch((error) => {
             this.showNoficiation("Error", error.message, "Error");

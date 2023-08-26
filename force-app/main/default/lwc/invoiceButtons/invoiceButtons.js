@@ -100,7 +100,7 @@ export default class InvoiceButtons extends LightningElement {
             console.log(result);
             window.location.reload();
         }).catch((error) => {
-            this.showNoficiation("Error", error.body.message, "Error");
+            this.showNoficiation("Error", error.body.output.errors[0].message, "Error");
             console.log(error);
         });
     }
@@ -157,7 +157,7 @@ export default class InvoiceButtons extends LightningElement {
             window.location.reload();
         }).catch((error) => {
             console.log(error);
-            // this.showNoficiation("Error", error.body.output.errors[0].message, "Error");
+            this.showNoficiation("Error", error.body.message, "Error");
         });
     }
 }
