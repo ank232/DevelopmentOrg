@@ -4,19 +4,19 @@
         <template if:true={loadingScreen}>
             <lightning-spinner alternative-text="Processing payments"></lightning-spinner>
         </template>
-<table class="slds-table slds-table_cell-buffer slds-table_bordered">
-    <thead>
-        <tr>
-            <th scope="col">Reference</th>
-            <th scope="col">Date</th>
-            <th scope="col">Amount</th>
-            <th scope="col">Status</th>
-            <th scope="col">Comments</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <template for:each={paymentrecs} for:item="rec" for:index="index">
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Reference</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Comments</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={paymentrecs} for:item="rec" for:index="index">
                     <tr key={rec.Name} data-row-index="index">
                         <td>{rec.Reference}</td>
                         <td>{rec.Date}</td>
@@ -29,8 +29,8 @@
                         </td>
                     </tr>
                 </template>
-    </tbody>
-</table>
-<p>Amount Paid: {totalPaidAmount}</p>
-</lightning-card>
+            </tbody>
+        </table>
+        <p>Amount Paid: {totalPaidAmount}</p>
+    </lightning-card>
 </template>
