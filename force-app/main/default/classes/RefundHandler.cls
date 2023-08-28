@@ -6,26 +6,96 @@ public with sharing class RefundHandler {
         {
             invoiceIds.add(ref.Invoice__c);
         }
-        // Step 2: 
-        // Fetching the invoice and it related paymentrecs
-        // checking if
-        Map<Id, Invoice__c> invoiceMap = new Map<Id, Invoice__c>([SELECT ID,(SELECT ID,Status__c,Date__c from Payments__r) FROM Invoice__c WHERE ID IN: invoiceIds]);
-        for(Id invId : invoiceMap.keyset())
+        Map<Id, Invoice__c> invoiceMap = new Map<Id, Invoice__c>([
+            SELECT 
+            ID,
+            Paid_date__c,
+            (
+                SELECT
+                ID,
+                Status__c,
+                Amount__c,
+                Date__c 
+                FROM 
+                Payments__r
+            ) ,
+            (
+                SELECT
+                ID ,
+                Date__c,
+                Amount__c,
+                LastModifiedDate
+                FROM 
+                Refunds__r
+                ORDER BY
+                LastModifiedDate
+                DESC
+            )
+            FROM 
+            Invoice__c 
+            WHERE 
+            ID IN: invoiceIds
+        ]);
+        if(!invoiceMap.isEmpty())
         {
-            if(invoiceMap.get(invId).Payments__r.isEmpty())
+            for(Refund__c refund: verifyRefunds)
+            {
+                validateRefund(refund,invoiceMap.get(refund.Invoice__c));
+            }
+        }                   
+    }
+
+    private static void validateRefund(Refund__c refundRec, Invoice__c invoiceRec)
+    {
+        // checking if the has any payment or not
+        if(invoiceRec.payments__r.isEmpty())
         {
-            invoiceMap.get(invId).addError('First record a payment');
+            refundRec.addError('Refund should have atleast one payment');
         }
-        else{
-            system.debug('I will check for the dates');
+        // checking ig user gave amnt greater than the payments amnt
+        if(refundRec.Amount__c > PaymentHandler.calculateTotalAmnt(invoiceRec.payments__r ))
+        {
+            refundRec.addError('Refund cannot be greater than paid amount');
         }
+        // if refunds been made already
+        if(!invoiceRec.Refunds__r.isEmpty())
+        {
+            // checking if the user given amnt + the existing ref amnt doesn't exceed the payments amnt
+            if(calculateRefundAmount(invoiceRec.Refunds__r) + refundRec.Amount__c > PaymentHandler.calculateTotalAmnt(invoiceRec.payments__r))
+            {
+                refundRec.addError('Refund amount exceeded');
+                return;
+            }
+            else{
+                system.debug('Latest Refund was made on: ');
+                System.debug(invoiceRec.Refunds__r[0].Date__c);
+                if(invoiceRec.Paid_date__c>invoiceRec.Refunds__r[0].Date__c)
+                {
+                    refundRec.addError('Refund Date should atleast one day after payment has been recorded');
+                }
+            }
         }
     }
-    private static void checkMaxDate(List<Payment__c> paymentsRecs)
+
+/*
+This method will find the latest payment Made against the invoice and 
+will compaere it to the paidDate On invoiceObj Record
+*/ 
+    private static Boolean setRefundDate(Date invoicePaidDate,List<Refund__c> refunds)
     {
-        for(payment__c paymentRec: paymentsRecs)
+        for(Refund__c ref: refunds)
         {
-            
+          
         }
+        return false;
+    }
+    private static double calculateRefundAmount(List<Refund__c> refundData)
+    {
+        double amnt =0;
+        for(refund__c ref: refundData)
+        {
+            amnt+= ref.Amount__c;
+        }
+        return amnt;
     }
 }

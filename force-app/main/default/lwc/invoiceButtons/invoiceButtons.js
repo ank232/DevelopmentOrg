@@ -82,10 +82,10 @@ export default class InvoiceButtons extends LightningElement {
 
     ProcessPayment = (paymentData) => {
         const AmounttoPaid = paymentData["Amount__c"];
-        if (AmounttoPaid > this.totalLinePrice || AmounttoPaid > this.totalLinePrice - this.paidAmount) {
-            this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Warning");
-            return;
-        }
+        // if (AmounttoPaid > this.totalLinePrice || AmounttoPaid > this.totalLinePrice - this.paidAmount) {
+        //     this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Warning");
+        //     return;
+        // }
         this.createpaymentRecord(paymentData);
     }
 

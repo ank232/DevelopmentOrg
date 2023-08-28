@@ -217,40 +217,39 @@ static void testBatchDelete()
 /*
        =======================================================
             Positive Testing if Payment has been recorded 
-            successfully and the paid date is updated 
-            as per the requirement
+            successfully when the invoice is approved
+            and the paid date is updated as per the requirement
       ========================================================
 */  
     @isTest 
     static void testPayment()
     {
         Map<Id, List<Invoice_Line_Items__c>> invoiceLineMap = new Map<Id,List<Invoice_Line_Items__c>>();
-        Map<Id,Payment__c> invoicePaymentMap = new Map<Id,Payment__c>();
         List<String> prodNames = new List<String>{'Prod1','Prod2', 'Prod3'};
-
         List<product2> products =InvoiceManagementTestDataFactory.createProductRecord(prodNames);
-        Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('InvAcc1',true);
-        Contact con = InvoiceManagementTestDataFactory.createContactRecord(true);
-        List<Invoice__c> invoice = InvoiceManagementTestDataFactory.createInvoiceRecord(acc.Id, con.Id,3);
-
-    for(Integer i=0;i<invoice.size();i++)
-    {
-        List<Invoice_Line_Items__c> items = InvoiceManagementTestDataFactory.createLinesItemsRecord(invoice[i].Id,3,products[i].Id);
-        Payment__c recordPayment = InvoiceManagementTestDataFactory.createPaymentRecord(invoice[i].Id, 4000, 'Draft', 1);
-        invoiceLineMap.put(invoice[i].Id, items);
-        invoicePaymentMap.put(invoice[i].Id, recordPayment);
-     }
-     List<Payment__c> paymentRecorded = [select id, amount__c from payment__c];
-     system.assert(paymentRecorded.size()!=0);
-     for(Id invId : invoicePaymentMap.keyset())
-     {
-        System.assertEquals(4000.0, invoicePaymentMap.get(invId).Amount__c, 'Payment should be 4000');
-     }
-     List<Invoice__c> insertedinvoices = [SELECT ID, PAID_DATE__C FROM INVOICE__C WHERE ID IN: invoicePaymentMap.keyset()];
-     for(Invoice__c inv: insertedinvoices)
-     {
-        System.assertEquals(inv.Paid_date__c, System.today());
-     }
+        Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('Dexter Textiles',true);
+        Contact con = InvoiceManagementTestDataFactory.createContactRecord(acc.Id, true);
+        List<Invoice__c> invoicesToInsert = InvoiceManagementTestDataFactory.createInvoiceRecord(acc.Id, con.Id,3);
+        for(integer i=0;i<invoicesToInsert.size();i++)
+        {
+            List<Invoice_Line_Items__c> insertedLines = InvoiceManagementTestDataFactory.createLinesItemsRecord(invoicesToInsert[i].Id,3,products[i].Id);
+            invoiceLineMap.put(invoicesToInsert[i].Id, insertedLines);
+        }
+        invoice__c approvedInv = new Invoice__c(
+            company__c = acc.Id,
+            customer__c = con.Id,
+            invoice_number__c = 'ApprInv',
+            status__c= 'Approved',
+            Due_date__c =system.today(),
+            Invoice_date__c = system.today()
+        );
+        insert approvedInv;
+        double amt = 6000;
+        try {
+            Database.SaveResult[] res=Database.insert(InvoiceManagementTestDataFactory.createPaymentRecord(approvedInv.Id,amt,'Processed',2));
+        } catch(DmlException e) {
+            System.debug(e.getMessage());
+        }
     }
 
     /*

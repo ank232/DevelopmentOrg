@@ -141,7 +141,7 @@ Need to change the insertLineItems Controller
 
                  <<<<<<<<<<<<<<<< New Update >>>>>>>>>>>>>>>>
 Trigger On Refund Object:
-                          purpose: -> refund can only be made if atleast one payment 
+                          purpose: -> refund can only be made if atleast one payment
                                       exists and the date logged in refund record should
                                       be greater than payment record date
 e.g: Inv243->totalprice->100
@@ -150,8 +150,10 @@ e.g: Inv243->totalprice->100
                           Payments made -> 50 ,50
                                            |    |
                                            V    V  
-                                         today yesterday 
-                                         
-refund record conditions: 
+                                         today yesterday
+
+### refund record conditions
+
 1. atleast one payment should be recorded
-2. then-> 
+2. if any prev refund is there then should check if the amnt has been settled.
+3. also need to check the refund date should be after the invoice paid date
