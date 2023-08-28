@@ -152,3 +152,6 @@ e.g: Inv243->totalprice->100
                                            V    V  
                                          today yesterday 
                                          
+refund record conditions: 
+1. atleast one payment should be recorded
+2. then-> 

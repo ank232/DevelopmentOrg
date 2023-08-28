@@ -21,11 +21,17 @@ public with sharing class PaymentHandler
         if(! invoiceHavingPayments.isEmpty())
         {
             for(Payment__c payment: paymentsToverfied)
-            {
-                System.debug('+++');
-                if(invoiceHavingPayments.containskey(payment.Invoice__c) && payment.Date__c < invoiceHavingPayments.get(payment.Invoice__c).Invoice_date__c &&invoiceHavingPayments.get(Payment.Invoice__c).Status__c !='Approved' ){
-                    System.debug('Error should thrown');
-                    payment.addError('Payment date should be in future or should be greater than invoiceDate');
+            {               
+                if(invoiceHavingPayments.containskey(payment.Invoice__c))
+                {
+                    if(invoiceHavingPayments.get(Payment.Invoice__c).Status__c !='Approved')
+                    {
+                        payment.addError('Payment must be verified first');
+                    }
+                    if(payment.Date__c < invoiceHavingPayments.get(payment.Invoice__c).Invoice_date__c)
+                    {
+                        payment.addError('Payment date should be in future or should be greater than invoiceDate');
+                    }                  
                 }
             }
         }

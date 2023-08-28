@@ -8,12 +8,24 @@ public with sharing class RefundHandler {
         }
         // Step 2: 
         // Fetching the invoice and it related paymentrecs
+        // checking if
         Map<Id, Invoice__c> invoiceMap = new Map<Id, Invoice__c>([SELECT ID,(SELECT ID,Status__c,Date__c from Payments__r) FROM Invoice__c WHERE ID IN: invoiceIds]);
-        System.debug('queried invoices');
         for(Id invId : invoiceMap.keyset())
         {
-            System.debug('Payments--');
-            System.debug(invoiceMap.get(invId).Payments__r);
+            if(invoiceMap.get(invId).Payments__r.isEmpty())
+        {
+            invoiceMap.get(invId).addError('First record a payment');
+        }
+        else{
+            system.debug('I will check for the dates');
+        }
+        }
+    }
+    private static void checkMaxDate(List<Payment__c> paymentsRecs)
+    {
+        for(payment__c paymentRec: paymentsRecs)
+        {
+            
         }
     }
 }

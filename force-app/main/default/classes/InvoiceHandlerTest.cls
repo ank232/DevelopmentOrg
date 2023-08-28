@@ -240,6 +240,8 @@ static void testBatchDelete()
         invoiceLineMap.put(invoice[i].Id, items);
         invoicePaymentMap.put(invoice[i].Id, recordPayment);
      }
+     List<Payment__c> paymentRecorded = [select id, amount__c from payment__c];
+     system.assert(paymentRecorded.size()!=0);
      for(Id invId : invoicePaymentMap.keyset())
      {
         System.assertEquals(4000.0, invoicePaymentMap.get(invId).Amount__c, 'Payment should be 4000');
@@ -317,5 +319,18 @@ static void testBatchDelete()
        }
        List<Invoice__c> deletedInvoices = [SELECT ID FROM INVOICE__c];
        delete deletedInvoices;
+    }
+
+    /*
+        =========================================
+           Checking if the system let the user
+           to create refund rec without having
+           any payment recorded
+        ==========================================
+    */ 
+    @istest
+    static void testrefund()
+    {
+
     }
 }
