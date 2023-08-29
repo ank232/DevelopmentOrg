@@ -137,12 +137,12 @@ export default class InvoiceButtons extends LightningElement {
     ProcessRefund(refundData) {
         console.log('I will create the refund!');
         console.log(refundData);
-        if (refundData.Amount__c > this.paidAmount) {
-            this.showNoficiation("Warning", "Refunded amount should not exceed the paid Amount");
-            return;
-        } else {
-            this.createRefundRecord(refundData);
-        }
+        // if (refundData.Amount__c > this.paidAmount) {
+        //     this.showNoficiation("Warning", "Refunded amount should not exceed the paid Amount");
+        //     return;
+        // } else {
+        this.createRefundRecord(refundData);
+        // }
     }
 
     createRefundRecord(refundrec) {
@@ -157,7 +157,7 @@ export default class InvoiceButtons extends LightningElement {
             window.location.reload();
         }).catch((error) => {
             console.log(error);
-            this.showNoficiation("Error", error.body.message, "Error");
+            this.showNoficiation("Error", error.body.output.errors[0].message, "Error");
         });
     }
 }

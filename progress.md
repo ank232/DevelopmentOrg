@@ -1,4 +1,5 @@
-  Data Flow:
+# Data Flow
+
  Component loads -> get all related contacts(Child Component)
      |
      V
@@ -152,8 +153,9 @@ e.g: Inv243->totalprice->100
                                            V    V  
                                          today yesterday
 
-### refund record conditions
+## refund record conditions
 
-1. atleast one payment should be recorded
+1. atleast one payment should be recorded.
 2. if any prev refund is there then should check if the amnt has been settled.
-3. also need to check the refund date should be after the invoice paid date
+3. also need to check the refund date should be after the invoice paid date.
+4. 3rd point should check irrespective of invoice has any past refs or not, it should be greater than the paidDate.

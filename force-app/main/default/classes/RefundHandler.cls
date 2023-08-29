@@ -47,32 +47,44 @@ public with sharing class RefundHandler {
 
     private static void validateRefund(Refund__c refundRec, Invoice__c invoiceRec)
     {
+        List<Payment__c> paymentsRecorded = invoiceRec.Payments__r;
+        List<Refund__c> existingRefunds = invoiceRec.Refunds__r;
+        System.debug('Amnt-:' + refundRec.Amount__c);
+        if(refundRec.Amount__c <= 0)
+        {
+            refundRec.addError('Amount cannot be null');
+            return;
+        }
         // checking if the has any payment or not
-        if(invoiceRec.payments__r.isEmpty())
+        if(paymentsRecorded.isEmpty())
         {
             refundRec.addError('Refund should have atleast one payment');
+            return;
         }
-        // checking ig user gave amnt greater than the payments amnt
-        if(refundRec.Amount__c > PaymentHandler.calculateTotalAmnt(invoiceRec.payments__r ))
+        if(refundRec.Date__c < invoiceRec.Paid_date__c)
+        {
+            refundRec.addError('Refund Date must be after the paid Date');
+        }
+        double maxRefundableAmnt = calculateRefundAmount(existingRefunds);
+        double payableAmnt= PaymentHandler.calculateTotalAmnt(paymentsRecorded);
+        // checking if user gave amnt greater than the payments amnt
+        if(refundRec.Amount__c > payableAmnt)
         {
             refundRec.addError('Refund cannot be greater than paid amount');
+            return;
+        }
+        if(refundRec.Amount__c + maxRefundableAmnt > payableAmnt)
+        {
+            refundRec.addError('Refund amount exceeded');
+            return;
         }
         // if refunds been made already
-        if(!invoiceRec.Refunds__r.isEmpty())
+        if(!existingRefunds.isEmpty())
         {
-            // checking if the user given amnt + the existing ref amnt doesn't exceed the payments amnt
-            if(calculateRefundAmount(invoiceRec.Refunds__r) + refundRec.Amount__c > PaymentHandler.calculateTotalAmnt(invoiceRec.payments__r))
+            Date latestrefundedDate = invoiceRec.Refunds__r[0].Date__c;
+            if(invoiceRec.Paid_date__c > latestrefundedDate)
             {
-                refundRec.addError('Refund amount exceeded');
-                return;
-            }
-            else{
-                system.debug('Latest Refund was made on: ');
-                System.debug(invoiceRec.Refunds__r[0].Date__c);
-                if(invoiceRec.Paid_date__c>invoiceRec.Refunds__r[0].Date__c)
-                {
-                    refundRec.addError('Refund Date should atleast one day after payment has been recorded');
-                }
+                refundRec.addError('Refund Date should atleast one day after the latest payment has been recorded');
             }
         }
     }

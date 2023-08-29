@@ -11,6 +11,11 @@ public with sharing class PaymentHandler
     }
     private static void validatePaymentrecord(Payment__c payment, Invoice__c invoice)
     {
+        if(payment.Amount__c<=0)
+        {
+            payment.addError('Amount cannot be null');
+            return;
+        }
         if(invoice.status__c!= 'Approved')
         {
             payment.addError('Please get your invoice approved');
@@ -23,7 +28,7 @@ public with sharing class PaymentHandler
         {
             if(payment.Amount__c > invoice.grand_total__c - calculateTotalAmnt(invoice.payments__r))
             {
-                payment.addError('Residual payment exceed the lineItem Amount ');
+                payment.addError('Residual payment exceed the lineItem Amount');
             }
         }
         else
