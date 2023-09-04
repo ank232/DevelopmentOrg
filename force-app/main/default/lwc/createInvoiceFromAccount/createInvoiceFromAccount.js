@@ -23,13 +23,13 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         this.isContactSelected = true;
     }
     handleNotSelected(event) {
-            const detail = event.detail;
-            this.showNoficiation('Waring', 'You Left the field blank ', 'Warning');
-            this.isContactSelected = false;
-        }
-        /*
-         Method to Validate Date: Date should be in proper timeline 
-         */
+        const detail = event.detail;
+        this.showNoficiation('Waring', 'Contact not found or not selected ', 'Warning');
+        this.isContactSelected = false;
+    }
+    /*
+     Method to Validate Date: Date should be in proper timeline 
+     */
     validateDates(duedate, invoicedate) {
         const dateFields = [duedate, invoicedate];
         if (dateFields.some(field => field === null)) {
@@ -94,14 +94,14 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     }
 
     ResetForm() {
-            const formfieldTorest = this.template.querySelectorAll('lightning-input-field');
-            formfieldTorest.forEach(formfield => {
-                formfield.reset();
-            })
-        }
-        /* 
-        Generate invoice =====>>> event-> onclick() 
-        */
+        const formfieldTorest = this.template.querySelectorAll('lightning-input-field');
+        formfieldTorest.forEach(formfield => {
+            formfield.reset();
+        })
+    }
+    /* 
+    Generate invoice =====>>> event-> onclick() 
+    */
     GenerateInvoice(event) {
         event.preventDefault();
         console.log('**** Event happened');
