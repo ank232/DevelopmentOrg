@@ -1,17 +1,23 @@
 public with sharing class AlphaVantageService {
     private static  string API_KEY;
+    private static string ORG_DEFAULT_CURRENCY_CODE;
     private static final string BASE_URL= 'https://www.alphavantage.co/query';
     public  AlphaVantageService()
     {
         AlphaVantage_API__mdt[] apiKey =[SELECT MasterLabel,api_key__c FROM AlphaVantage_API__mdt];
+        ORG_DEFAULT_CURRENCY_CODE  = UserInfo.getDefaultCurrency();
         API_KEY = apiKey[0].Api_key__c;
     }
     
-    public static Map<String,Object> latestRates(string fromCurency, string toCurrency)
+    public static Map<String,Object> latestRates(string fromCurrency, string toCurrency)
     {
+        if(fromCurrency== '')
+        {
+            fromCurrency= ORG_DEFAULT_CURRENCY_CODE;
+        }
         HttpRequest req = new HttpRequest();
         Map<String,Object> apiRes = new Map<String,Object>();
-        string endpoint = BASE_URL + '?function=CURRENCY_EXCHANGE_RATE&from_currency='+fromCurency+'&to_currency='+toCurrency+'&apikey='+ API_KEY;
+        string endpoint = BASE_URL + '?function=CURRENCY_EXCHANGE_RATE&from_currency='+fromCurrency+'&to_currency='+toCurrency+'&apikey='+ API_KEY;
         req.setEndpoint(endpoint);
         String responseFromAPI = null;
         req.setMethod('GET');
@@ -27,10 +33,14 @@ public with sharing class AlphaVantageService {
             throw new CalloutException();
         } 
 
-        if(String.isBlank(responseFromAPI))
+        if(String.isNotBlank(responseFromAPI))
         {
-            apiRes = (Map<String, Object>) JSON.deserializeUntyped(responseFromAPI);
+            apiRes = (Map<String, Object>) JSON.deserializeUntyped(responseFromAPI);            
         }
+        else{
+            apiRes=null;
+        }
+        // system.debug(responseFromAPI);
 
         return apiRes;         
     }

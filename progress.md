@@ -159,3 +159,27 @@ e.g: Inv243->totalprice->100
 2. if any prev refund is there then should check if the amnt has been settled.
 3. also need to check the refund date should be after the invoice paid date.
 4. 3rd point should check irrespective of invoice has any past refs or not, it should be greater than the paidDate.
+
+## invoice preview mode
+
+1. how to enable preview mode for invoice ?
+2.  
+
+## Multi-currency model
+
+1. How to implement the multi-currenct model?
+2. can integrate API to get the exchange rate.
+3. if my client is from different country-> before sending the amnt
+4. workflow-> get the latest amnt -> update all the amnt with latest rate
+5. Currency model will be implemented as follows:
+   - Currency exchange will be performed from "Account's Currency" - to - "Contact's Currency"
+   - Implementation:
+      - We are sending invoices from a company to its customers e.g=>
+        - companyA(from USA) customerX(from Asia) so customer would get invoice in its local currency
+        - at the time of invoice creation, we will check for currency types
+        - On creation of invoice-> fetch both currency from company and customer
+        - if exchange applies then,
+           - fetch the current rate (fufure method)
+           - when user add lineItems -> the currency should be of invoice's currency
+           - AFTER INSERT-> ASYNC JOB= TO GET THE LATEST EXCHANGE RATE THROUGH API
+           - API CALL SHOULD BE CALLED ONLY ONCE!

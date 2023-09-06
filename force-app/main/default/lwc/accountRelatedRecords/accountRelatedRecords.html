@@ -6,9 +6,9 @@
             <lightning-spinner size="medium" alternative-text="Loading Customers..."></lightning-spinner>
         </template>
         <template if:true={nocontactFound}>
-          <div class="slds-text-color_destructive">
-              No contact was found!, 
-              please search for something else
+            <div class="slds-text-color_destructive">
+                No contact was found!,
+                please search for something else
             </div>
         </template>
         <template if:true={hascontacts}>
@@ -29,7 +29,7 @@
                     <span>
                         Name:
                     </span>
-                    <a href="#">{showDetails.Name}</a>
+                    <a href="javascript:void(0)">{showDetails.Name}</a>
                 </li>
                 <li class="slds-item">
                     <span>
@@ -48,6 +48,14 @@
                     <template if:false={showDetails.Email}>
                         <p>Email Not Found</p>
                     </template>
+                </li>
+                <li class="slds-item">
+                    <span>
+                        Currency Iso Code:
+                    </span>
+                    <a href="javascript:void(0)">
+                        {showDetails.Customer_s_Currency_Code__c}
+                    </a>
                 </li>
                 <li class="slds-item">
                     <span>

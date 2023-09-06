@@ -69,7 +69,8 @@ public with sharing class CustomerDetailsController {
                 MailingStreet,
                 MailingCity,
                 MailingState,
-                MailingCountry
+                MailingCountry,
+                Customer_s_Currency_Code__c
                 FROM 
                 CONTACT 
                 WHERE
