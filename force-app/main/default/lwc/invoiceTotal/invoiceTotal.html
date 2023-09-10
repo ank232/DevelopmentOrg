@@ -1,24 +1,27 @@
 <template>
     <lightning-card title="Invoice Totals">
-        <div class="slds-grid slds-wrap slds-gutters">
-            <div class="slds-col slds-size_1-of-3">
-                <div class="slds-box slds-box_x-small slds-text-align_center">
-                    <div class="slds-text-heading_medium">SUBTOTAL: </div>
-                    <div class="slds-text-heading_large">{invsubtotal}</div>                   
-                </div>
-            </div>
-            <div class="slds-col slds-size_1-of-3">
-                <div class="slds-box slds-box_x-small slds-text-align_center">
-                    <div class="slds-text-heading_medium">TOTAL TAX: </div>
-                    <div class="slds-text-heading_large">{invtax}</div>
-                </div>
-            </div>
-            <div class="slds-col slds-size_1-of-3">
-                <div class="slds-box slds-box_x-small slds-text-align_center">
-                    <div class="slds-text-heading_medium ">GRAND TOTAL: </div>
-                    <div class="slds-text-heading_large">{invgrandtotal}</div>
-                </div>
-            </div>
-        </div>
+        <ul class="slds-has-dividers_around_space">
+            <li class="slds-item">
+                <span class="slds-text-title_bold slds-var-m-right_x-small">
+                    Subtotal
+                </span>
+                <lightning-formatted-number value={invsubtotal} format-style="currency"
+                    currency-code={currencytype}></lightning-formatted-number>
+            </li>
+            <li class="slds-item">
+                <span class="slds-text-title_bold slds-var-m-right_x-small">
+                    Tax Total
+                </span>
+                <lightning-formatted-number value={invtax} format-style="currency"
+                    currency-code={currencytype}></lightning-formatted-number>
+            </li>
+            <li class="slds-item">
+                <span class="slds-text-title_bold slds-var-m-right_x-small">
+                    Grand Total
+                </span>
+                <lightning-formatted-number value={invgrandtotal} format-style="currency"
+                    currency-code={currencytype}></lightning-formatted-number>
+            </li>
+        </ul>
     </lightning-card>
 </template>

@@ -60,8 +60,10 @@
                                     onchange={handleQuantity} data-id={index}></lightning-input-field>
                             </td>
                             <td>
-                                <lightning-input-field field-name="Unit_Amount__c" value={item.UnitAmount}
-                                    onchange={handleunitAmount} data-id={index}></lightning-input-field>
+                                <!-- <lightning-input-field field-name="Unit_Amount__c" value={item.UnitAmount}
+                                    onchange={handleunitAmount} data-id={index}></lightning-input-field> -->
+                                <lightning-input type="text" value={item.UnitAmount} onchange={handleunitAmount}
+                                    onblur={formatAmount} onfocus={handleFocus} data-id={index}></lightning-input>
                             </td>
                             <td>
                                 <lightning-input-field field-name="Tax_Type__c" data-id={index} onchange={handleTaxType}
@@ -72,12 +74,16 @@
                                     value={item.TaxPercent}></lightning-input-field>
                             </td>
                             <td>
-                                <lightning-input value={item.taxAmount} read-only="true" type="number"
-                                    formatter="currency"></lightning-input>
+                                <lightning-formatted-number value={item.taxAmount} format-style="currency"
+                                    currency-display-as="symbol"
+                                    currency-code={_invoiceCurrency}></lightning-formatted-number>
+                                <!-- <lightning-input value={item.taxAmount} read-only="true" type="text"></lightning-input> -->
                             </td>
                             <td data-label="Total Amount">
-                                <lightning-input value={item.totalAmount} read-only="true" type="number"
-                                    formatter="currency"></lightning-input>
+                                <!-- <lightning-input value={item.totalAmount} read-only="true"
+                                    type="text"></lightning-input> -->
+                                <lightning-formatted-number format-style="currency" value={item.totalAmount}
+                                    currency-code={_invoiceCurrency}></lightning-formatted-number>
                             </td>
                             <td data-label="Delete Item">
                                 <lightning-button-icon label="Delete" onclick={handleDeleteLineItem} data-id={index}

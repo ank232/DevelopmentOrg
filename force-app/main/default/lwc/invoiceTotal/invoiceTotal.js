@@ -5,7 +5,7 @@ export default class InvoiceTotal extends LightningElement {
     invtax;
     invsubtotal;
     invgrandtotal;
-
+    currencytype;
     @wire(MessageContext)
     messageContext;
 
@@ -17,6 +17,7 @@ export default class InvoiceTotal extends LightningElement {
             console.log("Message recieved in Inv Total!!");
             console.log(message);
             this.InvoiceTotal(message);
+            this.currencytype = message.invoiceCurrencyCode;
         });
     }
 
@@ -26,6 +27,6 @@ export default class InvoiceTotal extends LightningElement {
         const subtotal = invoiceLineItems.reduce((total, lineItems) => total + parseFloat(lineItems.totalAmount), 0.0);
         this.invtax = taxTotal;
         this.invsubtotal = subtotal;
-        this.invgrandtotal = taxTotal + subtotal;
+        this.invgrandtotal = taxTotal + subtotal;        
     }
 }

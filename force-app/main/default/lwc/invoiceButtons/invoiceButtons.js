@@ -4,6 +4,8 @@ import { createRecord } from 'lightning/uiRecordApi';
 import InvoiceTotalMC from '@salesforce/messageChannel/InvoiceTotalMC__c';
 import PaymentModal from 'c/paymentModal';
 import RefundModal from 'c/refundModal';
+import PreviewInvoice from 'c/previewInvoice';
+import ExchangeRateModal from 'c/exchangeRateModal';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { getRelatedListRecords } from 'lightning/uiRelatedListApi';
 export default class InvoiceButtons extends LightningElement {
@@ -13,6 +15,7 @@ export default class InvoiceButtons extends LightningElement {
     refundRec;
     totalLinePrice;
     paidAmount;
+    @api invoicedata;
     @wire(getRelatedListRecords, {
         parentRecordId: '$recordId',
         relatedListId: 'Payments__r',
@@ -73,6 +76,7 @@ export default class InvoiceButtons extends LightningElement {
         } else {
             const fireOrigin = data.fireOrigin;
             if (fireOrigin.includes("Related")) {
+                this.invoicedata = data;
                 const maxAmnt = data.invoicelines.reduce((total, lineitem) => total + lineitem.totalAmount, 0.0);
                 const totalTax = data.invoicelines.reduce((taxtotal, lineitem) => taxtotal + lineitem.taxAmount, 0.0);
                 this.totalLinePrice = maxAmnt + totalTax;
@@ -160,4 +164,29 @@ export default class InvoiceButtons extends LightningElement {
             this.showNoficiation("Error", error.body.output.errors[0].message, "Error");
         });
     }
-}
+    async fetchExchangeRates() {
+        await ExchangeRateModal.open({
+            size: "small"
+        }).then((result) => {
+            if (result.data) {
+                console.log('Result arrived');
+                console.log(JSON.stringify(result));
+                this.showNoficiation('Message', "Current Exchange Rates are", "Message");
+            }
+        }).catch((error) => {
+            this.showNoficiation("Message", "Problem in Modal!", "Message");
+            console.error(error);
+        });
+    }
+
+    async previewInvoice() {
+        await PreviewInvoice.open({
+            size: "large",
+            decsciption: "invoice info",
+            message: this.invoicedata
+        }).catch((error) => {
+            console.log(error);
+            this.showNoficiation("Message", "modal closed", "Mesage");
+        });
+    }
+} 

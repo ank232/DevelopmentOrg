@@ -10,6 +10,11 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     customerInformation;
     isContactSelected = false;
     showSpinner = false;
+//     errorCallback(error,stack){
+//     console.log('Handling error');
+//     console.log(JSON.stringify(error));
+//     console.log(stack);
+//   }
     /*
     Getting values from child component (search contact)
      */
