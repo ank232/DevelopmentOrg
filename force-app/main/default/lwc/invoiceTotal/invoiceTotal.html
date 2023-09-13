@@ -5,22 +5,32 @@
                 <span class="slds-text-title_bold slds-var-m-right_x-small">
                     Subtotal
                 </span>
-                <lightning-formatted-number value={invsubtotal} format-style="currency"
-                    currency-code={currencytype}></lightning-formatted-number>
+                <lightning-formatted-number value={invsubtotal} format-style="currency"></lightning-formatted-number>
+                <span>
+                    <p>Client Currency: {currencytype}- {convertedsubtotal} </p>
+                </span>
             </li>
             <li class="slds-item">
                 <span class="slds-text-title_bold slds-var-m-right_x-small">
                     Tax Total
                 </span>
-                <lightning-formatted-number value={invtax} format-style="currency"
-                    currency-code={currencytype}></lightning-formatted-number>
+                <lightning-formatted-number value={invtax} format-style="currency"></lightning-formatted-number>
+                <span>
+                    <p>
+                        <i>
+                            Client Currency: {currencytype}- {convertedtax}
+                        </i>
+                    </p>
+                </span>
             </li>
             <li class="slds-item">
                 <span class="slds-text-title_bold slds-var-m-right_x-small">
                     Grand Total
                 </span>
-                <lightning-formatted-number value={invgrandtotal} format-style="currency"
-                    currency-code={currencytype}></lightning-formatted-number>
+                <lightning-formatted-number value={invgrandtotal} format-style="currency"></lightning-formatted-number>
+                <span>
+                    <p>Client Currency: {currencytype}- {convertedgrandtotal} </p>
+                </span>
             </li>
         </ul>
     </lightning-card>
