@@ -25,7 +25,7 @@ trigger TriggerOnCustomInvoice on Invoice__c (before insert,before delete,before
     // After Insert
     if(Trigger.IsAfter && Trigger.IsInsert)
     {       
-       InvoiceHandler.UpdateInvoice(Trigger.New, Null);
+        InvoiceHandler.UpdateInvoice(Trigger.New, Null);
     }
     // After Update
     if(Trigger.IsAfter && Trigger.IsUpdate)

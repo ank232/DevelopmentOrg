@@ -1,4 +1,8 @@
 public with sharing class InvoiceHandler {
+    private static string ORG_DEFAULT_CURRENCY_CODE;
+    InvoiceHandler(){
+        ORG_DEFAULT_CURRENCY_CODE = UserInfo.getDefaultCurrency();
+    }
     private static List<String> FetchAllStatusPicklistVals()
     {
         String strObjectName = 'Invoice__c';
@@ -92,22 +96,24 @@ This method used calucate open, closed and overdue invoices on update
     public static void UpdateInvoice(List<Invoice__c> newInvoices, Map<id,Invoice__c> oldInvoices)
     {
         System.debug('I will update the invoices(after)');
-        Set<Id>invoiceIds = new Set<Id>();
+        Set<Id> companyIds = new Set<Id>();
+        Set<Id> invoiceIds = new Set<Id>();
         Map<Id, AggregateResult> InvoiceMap = new Map<Id,AggregateResult>();
         for(Invoice__c inv: newInvoices)
         {
-            invoiceIds.add(inv.Company__c);
+            companyIds.add(inv.Company__c);
+            invoiceIds.add(inv.Id);    
         }
         Map<id, List<Invoice__c>> companyInvoicemap = new Map<id, List<invoice__c>>();
         if(!invoiceIds.isEmpty()){
             List<Account> relatedCompanyList = new List<Account>([SELECT id,
-                                                                  (Select customer__c, 
+                                                                  (Select customer__c,
                                                                    status__c ,
-                                                                   grand_total__c 
+                                                                   grand_total__c                                                                   
                                                                    from 
                                                                    Invoices__r) 
                                                                   From Account
-                                                                  Where Id in: invoiceIds]);
+                                                                  Where Id in: companyIds]);
             if(!relatedCompanyList.isEmpty()){
                 for(Account a: relatedCompanyList)
                 {
@@ -118,7 +124,7 @@ This method used calucate open, closed and overdue invoices on update
                 {
                     List<Account> AccsToUpdate = New List<Account>();
                     for(Id AccId: CompanyInvoicesTotal.keyset())
-                    { 
+                    {                        
                         Map<String,Decimal> invtotal = CompanyInvoicesTotal.get(AccId);
                         Decimal PaidInvoiceTotal = invtotal.get('Paid');
                         Decimal OverDueInvoiceTotal = invTotal.get('Pending');
@@ -135,23 +141,89 @@ This method used calucate open, closed and overdue invoices on update
                     {                        
                         Update AccsToUpdate;
                     }
-                }
+                }                
             }
         }
         else{
             System.debug('Ids are null');
         }
+        // if(! System.isFuture())
+        // {
+        //     makeCalltoExchangeRateAPI(invoiceIds);
+        // }
     }
     // Method to validae invoiceDate before Commiting to the system
     public static void verifyInvoiceData(List<Invoice__c> invoiceToBeverified)
-    {
-       List<Invoice__c> invoicesToInsert= new List<Invoice__c>();
-       List<Invoice__c> rejectedInvoices = new List<Invoice__c>();
-       for(invoice__c inv: invoiceToBeverified)
-       {
-        if(inv.Invoice_Date__c < System.today())
+    {     
+        set<id> customerIds = new Set<id>();
+        for(Invoice__c inv: invoiceToBeverified)
         {
-            inv.Adderror('Invoice Date should not be in past');
+            customerIds.add(inv.Customer__c);
+        }                
+        List<Invoice__c> rejectedInvoices = new List<Invoice__c>();
+        for(invoice__c inv: invoiceToBeverified)
+        {
+            if(inv.Invoice_Date__c < System.today())
+            {
+                inv.Adderror('Invoice Date should not be in past');
+            }                                 
+        }       
+    }
+/*
+Future method callout to external API to fetch lates exchange rates
+*/
+    @future(callout = true)
+    public static void makeCalltoExchangeRateAPI(Set<Id> invoiceIds)
+    {        
+        List<Invoice__c> preferredCurrencyonInvoice= new List<Invoice__c>();
+        System.debug('Making callout to external API to set the exchange rates');
+        List<Invoice__c> customerInvoices = new List<Invoice__c>([
+            SELECT
+            company__r.Currency_Type__c,
+            customer__r.Customer_s_Currency_Code__c,            
+            Invoice_Currency_Type__c
+            FROM 
+            Invoice__c 
+            WHERE
+            Id 
+            IN:
+            invoiceIds
+        ]);
+        System.debug(customerInvoices.size());
+        if( !customerInvoices.isEmpty())
+        {
+            for(invoice__c inv: customerInvoices)
+            { 
+                String companyCurrency = inv.company__r.Currency_Type__c;
+                String customerCurrency = inv.customer__r.Customer_s_Currency_Code__c;
+                if((companyCurrency!= null && customerCurrency!= null) || (companyCurrency != customerCurrency)) // callout will only be made when both currencies are not null and not identical
+                {                    
+                    String companyISocode= companyCurrency.split(',')[0];
+                    String customerISocode= customerCurrency.split(',')[0];
+                    // Map<String, Object> exchangeRateResponse =AlphaVantageService.latestRates(companyISocode, customerISocode);                          
+                    // Map<String,Object> obj =(Map<String,Object>) (exchangeRateResponse.get('Realtime Currency Exchange Rate'));                   
+                    // Double exchangeRate =(Double) obj.get('5. Exchange Rate');
+                    preferredCurrencyonInvoice.add(new Invoice__c(
+                        Id = inv.Id,
+                        Invoice_Currency_Type__c = customerISocode
+                    )
+                    );
+                }
+                else{
+                    System.debug('using the system default');
+                    system.debug('Acc- '+inv.company__r.Currency_Type__c);
+                    system.debug('Con- '+inv.customer__r.Customer_s_Currency_Code__c);
+                    preferredCurrencyonInvoice.add(new Invoice__c(
+                        Id = inv.Id,
+                        Invoice_Currency_Type__c = ORG_DEFAULT_CURRENCY_CODE //setting it to ORG DEFAULT 
+                    ));
+                }
+            }
+            try {
+                update preferredCurrencyonInvoice;
+            } catch(Exception e) {
+                System.debug(e.getMessage());
+                System.debug('Line->'+ e.getLineNumber());
             }
         }
     }

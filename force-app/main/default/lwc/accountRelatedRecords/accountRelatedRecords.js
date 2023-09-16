@@ -16,7 +16,10 @@ export default class AccountRelatedRecords extends LightningElement {
     CustomerInfoMap = {}; // contact data map
     showDetails = {}; // to render the selected contactDetail
     showSpinner = false; //spinner value
-
+    malingstreet;
+    mailingcountry;
+    mailingcity;
+    nocontactFound;
     // Connected Callback -> invoking allContacts apex method to fetch all related contacts by providing accountId
     connectedCallback() {
         // Inside a method or connectedCallback
@@ -66,16 +69,17 @@ export default class AccountRelatedRecords extends LightningElement {
             });
             this.dispatchEvent(fireEvent);
             return;
+        } else {
+            this.showSpinner = true;
+            this.searchTimeout = setTimeout(() => {
+                // If searchQuery is not empty and also the account has contacts; perform search operation
+                if (this.hascontacts && this.searchQuery) {
+                    this.searchResults = [];
+                    this.searchContact(this.searchQuery);
+                    this.showSpinner = false;
+                }
+            }, 300);
         }
-        this.showSpinner = true;
-        this.searchTimeout = setTimeout(() => {
-            // If searchQuery is not empty and also the account has contacts; perform search operation
-            if (this.hascontacts && this.searchQuery) {
-                this.searchResults = [];
-                this.searchContact(this.searchQuery);
-                this.showSpinner = false;
-            }
-        }, 300);
     }
 
     /*
@@ -87,9 +91,27 @@ export default class AccountRelatedRecords extends LightningElement {
             const con = this.CustomerInfoMap[contactId];
             const contactName = con.Name.toLowerCase();
             if (contactName.includes(searchterm)) {
-                this.searchResults.push({...con, isLoading: false });
-                console.log(this.searchResults);
+                this.searchResults.push({ ...con, isLoading: false });
             }
+        }
+        if (this.searchResults.length == 0) {
+            console.log('No contact found with' + searchterm);
+            this.nocontactFound = true;
+            this.showDetails = null;
+            this.selectedcontactId = null;
+            console.log(this.selectedcontactId);
+            const fireEvent = new CustomEvent('customernotselected', {
+                detail: {
+                    customerId: null,
+                    customerdetail: null
+                }
+            });
+            this.dispatchEvent(fireEvent);
+            return;
+        }
+        else {
+            console.log('Total Cons found-> ' + this.searchResults.length);
+            this.nocontactFound = false;
         }
     }
 
@@ -97,10 +119,21 @@ export default class AccountRelatedRecords extends LightningElement {
     Destructuring CustomerInfomap to generate address to rnder on UI
      */
     MakeAddress({ MailingStreet, MailingState, MailingCountry, MailingCity }) {
+        this.malingstreet = MailingStreet;
+        this.mailingcountry = MailingCountry;
+        this.mailingcity = MailingCity;
         return MailingStreet + ',' +
             MailingCity + ',' + MailingState + ',' + MailingCountry;
     }
-
+    get streetName() {
+        return this.malingstreet;
+    }
+    get city() {
+        return this.mailingcity;
+    }
+    get country() {
+        return this.mailingcountry;
+    }
     /*
     This event handler will give me the selected contactId and will dispatch an event containing contactDetails 
     */
@@ -122,6 +155,8 @@ export default class AccountRelatedRecords extends LightningElement {
                 }
             });
             this.dispatchEvent(customEvent);
+            this.searchQuery=this.CustomerInfoMap[conid].Name;
+            this.searchResults = null;
         } else {
             this.showDetails = {};
         }

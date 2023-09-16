@@ -69,7 +69,8 @@ public with sharing class CustomerDetailsController {
                 MailingStreet,
                 MailingCity,
                 MailingState,
-                MailingCountry
+                MailingCountry,
+                CurrencyIsoCode
                 FROM 
                 CONTACT 
                 WHERE
@@ -127,7 +128,7 @@ public with sharing class CustomerDetailsController {
         try{
             List<Invoice_line_Items__c> LineItems = [
                 SELECT 
-                product__c,product__r.Name, description__c ,Invoice__r.Status__c,
+                product__c,product__r.Name, description__c ,Invoice__r.Status__c,currencyIsoCode,
                 tax__c ,tax_type__c, Tax_Amount__c, unit_Amount__c, Total_Amount__c,Quantity__c
                 FROM INVOICE_LINE_ITEMS__c 
                 WHERE invoice__c=:invoiceId With SECURITY_ENFORCED];
@@ -135,5 +136,32 @@ public with sharing class CustomerDetailsController {
         }catch(Exception e){
             throw new AuraHandledException(e.getMessage());
         }
+    }
+    @AuraEnabled(cacheable=true)
+    public static CurrencyType currencyType(string currencyCode){
+        string code = currencyCode;
+        if(code == null)
+        {
+            currencyCode ='USD';
+        }
+        code = currencyCode;
+        try {          
+            string query = 'SELECT ISoCode, ConversionRate from CurrencyType where isoCode=: code';
+            CurrencyType latestRate = Database.query(query);
+            return latestRate;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+    public static decimal currencyConvertor(Decimal amount, String fromCurrencyCode, String toCurrencyCode)
+    {
+        CurrencyType fromCurrency = [SELECT ConversionRate FROM CurrencyType WHERE IsoCode = :fromCurrencyCode LIMIT 1];
+        CurrencyType toCurrency = [SELECT ConversionRate FROM CurrencyType WHERE IsoCode = :toCurrencyCode LIMIT 1];
+          if (fromCurrency != null && toCurrency != null) {
+        // Calculate the converted amount
+        Decimal convertedAmount = amount * (toCurrency.ConversionRate / fromCurrency.ConversionRate);
+        return convertedAmount;
+    }
+    return amount;
     }
 }

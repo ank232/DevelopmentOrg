@@ -1,47 +1,51 @@
+<!-- sldsValidatorIgnore -->
 <template>
     <lightning-card title="Invoice Line Item">
         <lightning-record-edit-form object-api-name="Invoice_Line_Items__c" onsubmit={SaveLineItem}>
-            <lightning-button label="Add Line Item" variant="brand" onclick={AddLineItem}></lightning-button>
-            <template if:true={hideSaveButton}>
-                <lightning-button class="saveLine" label="Save Line Item" variant="brand" onclick={SaveLineItem}>
-                </lightning-button>
-            </template>
-<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-label="Example table of Opportunities with vertical borders">
-    <thead>
-        <tr class="slds-line-height_reset">
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Product Name">Product Name</div>
-            </th>
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Description">Description</div>
-            </th>
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Quantity">Quanity</div>
-            </th>
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Unit Amount">Unit Amount</div>
-            </th>
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Tax Type">Tax</div>
-            </th>
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Tax %">Tax % </div>
-            </th>
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Total Tax">Total Tax </div>
-            </th>
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Total Amount">Total Amount </div>
-            </th>
-            <th class="" scope="col">
-                <div class="slds-truncate" title="Delete Line Item">
-                    Actions
-                </div>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <template for:each={lineItems} for:item="item" for:index="index">
+            <div class="slds-float_right">
+                <lightning-button label="Add Line Item" onclick={AddLineItem}></lightning-button>
+                <template if:true={hideSaveButton}>
+                    <lightning-button class="saveLine" label="Save Line Item" variant="brand" onclick={SaveLineItem}>
+                    </lightning-button>
+                </template>
+            </div>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered"
+                aria-label="Example table of Opportunities with vertical borders">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Product">Product</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Description">Description</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Quantity">Quanity</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Amount">Amount</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Tax Type">Tax</div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Tax %">Tax % </div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Total Tax">Total Tax </div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Total Amount">Total Amount </div>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Delete Line Item">
+                                Actions
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={lineItems} for:item="item" for:index="index">
                         <tr key={item.Id} data-row-index="index">
                             <td data-label="ProductName">
                                 <lightning-input-field field-name="Product__c" data-id={index} required="true"
@@ -56,8 +60,10 @@
                                     onchange={handleQuantity} data-id={index}></lightning-input-field>
                             </td>
                             <td>
-                                <lightning-input-field field-name="Unit_Amount__c" value={item.UnitAmount}
-                                    onchange={handleunitAmount} data-id={index}></lightning-input-field>
+                                <!-- <lightning-input-field field-name="Unit_Amount__c" value={item.UnitAmount}
+                                    onchange={handleunitAmount} data-id={index}></lightning-input-field> -->
+                                <lightning-input type="text" value={item.UnitAmount} onchange={handleunitAmount}
+                                    onblur={formatAmount} onfocus={handleFocus} data-id={index}></lightning-input>
                             </td>
                             <td>
                                 <lightning-input-field field-name="Tax_Type__c" data-id={index} onchange={handleTaxType}
@@ -68,21 +74,26 @@
                                     value={item.TaxPercent}></lightning-input-field>
                             </td>
                             <td>
-                                <lightning-input value={item.taxAmount} read-only="true" type="number"
-                                    formatter="currency"></lightning-input>
+                                <lightning-formatted-number value={item.taxAmount} format-style="currency"
+                                    currency-code={_invoiceCurrency}
+                                    currency-display-as="symbol"></lightning-formatted-number>
+                                <!-- <lightning-input value={item.taxAmount} read-only="true" type="text"></lightning-input> -->
                             </td>
                             <td data-label="Total Amount">
-                                <lightning-input value={item.totalAmount} read-only="true" type="number"
-                                    formatter="currency"></lightning-input>
+                                <!-- <lightning-input value={item.totalAmount} read-only="true"
+                                    type="text"></lightning-input> -->
+                                <lightning-formatted-number format-style="currency" value={item.totalAmount}
+                                    currency-code={_invoiceCurrency}
+                                    currency-display-as="symbol"></lightning-formatted-number>
                             </td>
                             <td data-label="Delete Item">
-                                <lightning-button label="Delete" onclick={handleDeleteLineItem} data-id={index}
-                                    variant="brand"></lightning-button>
+                                <lightning-button-icon label="Delete" onclick={handleDeleteLineItem} data-id={index}
+                                    title="delete" icon-name="standard:record_delete"></lightning-button-icon>
                             </td>
                         </tr>
                     </template>
-    </tbody>
-</table>
-</lightning-record-edit-form>
-</lightning-card>
+                </tbody>
+            </table>
+        </lightning-record-edit-form>
+    </lightning-card>
 </template>

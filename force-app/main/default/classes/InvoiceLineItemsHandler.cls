@@ -38,6 +38,7 @@ public class InvoiceLineItemsHandler {
          Map<Id,Invoice__c> inv= new Map<Id,Invoice__c>( 
             [
                 SELECT 
+                currencyIsoCode,
                 ID ,
                 NAME, 
                 Status__c 
@@ -51,7 +52,8 @@ public class InvoiceLineItemsHandler {
              {
              lines.addError('Invoice is paid, you cannot edit anything');
             //   throw new AuraHandledException('Invoice is paid, you cannot edit anything');
-            }
+            }                           
+                // lines.CurrencyIsoCode = inv.get(lines.Invoice__c).currencyISOcode;                
         }
     }
     }
@@ -65,21 +67,24 @@ public class InvoiceLineItemsHandler {
         Map<Id, Invoice__c> invoices = new Map<Id, Invoice__c>([
             SELECT
             Id,
-            Status__c
+            Status__c,
+            CurrencyIsoCode
             FROM 
-            Invoice__c
+            Invoice__c            
             WHERE
-            Status__c ='Paid'
-            AND 
             ID IN:invoiceIds
         ]);
         if(!invoices.isEmpty())
         {
             for(Invoice_Line_Items__c lineItem: lineItems)
             {
-                if(invoices.containskey(lineItem.Invoice__c))
+                if(invoices.containskey(lineItem.Invoice__c)) 
                 {
-                    lineItem.addError('Cannot add new lineItem on Paid Invoice');
+                    if((invoices.get(lineItem.Invoice__c).Status__c =='Paid'))
+                    {
+                        lineItem.addError('Cannot add new lineItem on Paid Invoice');                    
+                    }                                      
+                    lineItem.CurrencyIsoCode = invoices.get(lineItem.Invoice__c).currencyISOcode;                    
                 }
             }
         }
