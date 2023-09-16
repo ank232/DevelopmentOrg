@@ -10,11 +10,6 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     customerInformation;
     isContactSelected = false;
     showSpinner = false;
-//     errorCallback(error,stack){
-//     console.log('Handling error');
-//     console.log(JSON.stringify(error));
-//     console.log(stack);
-//   }
     /*
     Getting values from child component (search contact)
      */
@@ -71,7 +66,8 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             Company__c,
             From_Address__c,
             Reference__c,
-            Comments__c
+            Comments__c,
+            CurrencyIsoCode
         } = userInput;
         GetInvoiceDetails({
             companyId: Company__c,
@@ -81,7 +77,8 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             fromAddress: From_Address__c,
             comment: Comments__c,
             invoiceno: Invoice_Number__c,
-            referenceno: Reference__c
+            referenceno: Reference__c,
+            currencyCode: CurrencyIsoCode
         }).then(
             result => {
                 console.log('Created ');
