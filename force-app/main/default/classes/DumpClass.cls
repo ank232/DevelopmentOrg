@@ -26,4 +26,42 @@ public with sharing class DumpClass {
     }
         Update invoices;
     }
+    public static void currencyModel()
+    {
+        Map<string, List<Invoice__c>> invoiceCurrencyMap  = new Map<string, List<Invoice__c>>();
+        List<invoice__c> invoices = [SELECT ID, CurrencyIsoCode,TOTAL_LINE_AMOUNT__C FROM INVOICE__C WHERE COMPANY__C ='0012w00001cWKxTAAW'];
+        for(Invoice__c inv: invoices)
+        {
+            if(invoiceCurrencyMap.containskey(inv.CurrencyIsoCode))
+            {
+                invoiceCurrencyMap.get(inv.CurrencyIsoCode).add(inv);
+            }
+            else{
+                invoiceCurrencyMap.put(inv.CurrencyIsoCode, new List<Invoice__c>());
+            }
+        }
+        system.debug('inv Map');
+        system.debug(invoiceCurrencyMap.keyset());
+        for(String code: invoiceCurrencyMap.keyset())
+        {
+            convertCurrency(invoiceCurrencyMap.get(code),code);
+        }
+    }
+    public static void convertCurrency(List<invoice__c> invs, string code)
+    {        
+        List<CurrencyType> ExchangeRates = [select isoCode, conversionRate from currencyType where isocode=: code];       
+        for(invoice__c inv: invs)
+        {
+            system.debug('Amounts');
+            system.debug(inv.Total_line_Amount__c);
+            system.debug('converting to'+ code);
+            decimal rate =ExchangeRates[0].conversionRate;
+            system.debug((Double) (rate *inv.total_Line_Amount__c));
+        }
+    }
+    public static void currencyConverter(string fromCurrency, string toCurrency, decimal amnt)
+    {
+        List<currencyType>  c1 = Database.query('SELECT IsoCode, ConversionRate from CurrencyType Where isoCode=:fromCurrency AND isoCode=: toCurrency');
+        system.debug(c1);
+    }
 }

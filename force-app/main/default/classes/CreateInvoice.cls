@@ -3,7 +3,7 @@ public with sharing class CreateInvoice {
     public static String[] GetInvoiceDetails(
         String customerId, String status, string invoicedate,
         String companyId, String duedate, string fromAddress,
-        String comment, String invoiceno, String referenceno) 
+        String comment, String invoiceno, String referenceno, string currencyCode) 
         {     
                                            Date convertedinvoiceDate = convertDate(invoicedate);
                                            Date convertduedate = convertDate(duedate);
@@ -16,9 +16,10 @@ public with sharing class CreateInvoice {
                                            invoiceRecord.Invoice_Date__c = convertedinvoiceDate;
                                            invoiceRecord.Reference__c = referenceno;
                                            invoiceRecord.Comments__c = comment;
-                                           invoiceRecord.Status__c = 'Draft';                                          
+                                           invoiceRecord.Status__c = 'Draft';      
+                                           invoiceRecord.CurrencyIsoCode= currencyCode; 
                                            try {
-                                               insert invoiceRecord;                                           
+                                               insert invoiceRecord;                                                                                          
                                                string invoiceId =String.valueOf(invoiceRecord.Id);
                                                Invoice__c  createdInv =[SELECT NAME FROM Invoice__c WHERE ID =: invoiceId limit 1];
                                                List<String> insertedInvoice = New List<String> {invoiceId,createdInv.Name};

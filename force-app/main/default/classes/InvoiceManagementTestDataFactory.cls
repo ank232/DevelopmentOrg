@@ -60,7 +60,8 @@ public  class InvoiceManagementTestDataFactory {
                 Quantity__c = 2,
                 Tax__c = 3,                
                 Description__c = 'LineItem '+ i,
-               product__c = productId
+               product__c = productId,
+               currencyIsoCode='USD'
             );
             lineItems.add(item);
         }
