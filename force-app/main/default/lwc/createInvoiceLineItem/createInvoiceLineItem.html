@@ -75,15 +75,16 @@
                             </td>
                             <td>
                                 <lightning-formatted-number value={item.taxAmount} format-style="currency"
-                                    currency-display-as="symbol"
-                                    currency-code={_invoiceCurrency}></lightning-formatted-number>
+                                    currency-code={_invoiceCurrency}
+                                    currency-display-as="symbol"></lightning-formatted-number>
                                 <!-- <lightning-input value={item.taxAmount} read-only="true" type="text"></lightning-input> -->
                             </td>
                             <td data-label="Total Amount">
                                 <!-- <lightning-input value={item.totalAmount} read-only="true"
                                     type="text"></lightning-input> -->
                                 <lightning-formatted-number format-style="currency" value={item.totalAmount}
-                                    currency-code={_invoiceCurrency}></lightning-formatted-number>
+                                    currency-code={_invoiceCurrency}
+                                    currency-display-as="symbol"></lightning-formatted-number>
                             </td>
                             <td data-label="Delete Item">
                                 <lightning-button-icon label="Delete" onclick={handleDeleteLineItem} data-id={index}

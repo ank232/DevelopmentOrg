@@ -3,20 +3,15 @@ import RelatedLineItems from "@salesforce/apex/CustomerDetailsController.Related
 import INVOICE_LINE_ITEM from "@salesforce/schema/Invoice_Line_Items__c";
 import Status_field from "@salesforce/schema/Invoice__c.Status__c";
 import INVOICE_CURRENCY from "@salesforce/schema/Invoice__c.CurrencyIsoCode";
-import Invoice_Description from "@salesforce/schema/Invoice__c.Comments__c";
-import Quantity_field from "@salesforce/schema/Invoice__c.Quantity__c";
 import { CurrentPageReference } from "lightning/navigation";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { getObjectInfo } from "lightning/uiObjectInfoApi";
 import { LightningElement, api, track, wire } from "lwc";
 import { deleteRecord, getRecord } from "lightning/uiRecordApi";
-import {
-  MessageContext,
-  createMessageContext,
-  publish
-} from "lightning/messageService";
+import { createMessageContext, publish } from "lightning/messageService";
 import InvoiceTotalMC from "@salesforce/messageChannel/InvoiceTotalMC__c";
 import { refreshApex } from "@salesforce/apex";
+import { makeCurrency, destructCurrency } from "./utility";
 export default class CreateInvoiceLineItem extends LightningElement {
   // Properties
   @api isinvoicecreated;
@@ -45,8 +40,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
    */
   getInvoiceDetails({ data, error }) {
     if (data) {
-      console.log(data.fields.Status__c.value);
-      console.log(data.fields.CurrencyIsoCode);
       this._invoiceCurrency = data.fields.CurrencyIsoCode.value;
       this.invoiceStatus = data.fields.Status__c.value;
     } else if (error) {
@@ -60,18 +53,14 @@ export default class CreateInvoiceLineItem extends LightningElement {
   LineItemData(result) {
     this.datatoRefresh = result;
     if (result.data) {
-      // console.log(this.datatoRefresh.data);
       if (result.data.length == 0) {
-        // console.log('Your line items are 0');
         this.EmitInvoiceTotalMessage(
           result.data,
           this.invoiceStatus,
-          "WireMethod",
+          "No Data Found",
           this._invoiceCurrency
         );
       } else {
-        console.log("Wire got data(RelatedLines!)");
-        console.log(this.datatoRefresh.data);
         this.RelatedLineItemData(this.datatoRefresh.data);
       }
     }
@@ -100,7 +89,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         ProductName: item.Product__c,
         Quantity: item.Quantity__c,
         Description: item.Description__c,
-        UnitAmount: this.makeCurrency(item.Unit_Amount__c,this._invoiceCurrency),
+        UnitAmount: makeCurrency(item.Unit_Amount__c, this._invoiceCurrency),
         TaxPercent: item.Tax__c,
         TaxType: item.Tax_Type__c,
         totalAmount: item.Total_Amount__c,
@@ -109,31 +98,21 @@ export default class CreateInvoiceLineItem extends LightningElement {
       lineData.push(reLItem);
     }
     this.lineItems = lineData;
-    console.log("Curent Length", this.lineItems.length);
-    this.EmitInvoiceTotalMessage(
-      this.lineItems,
-      this.invoiceStatus,
-      "RelatedLineItemData",
-      this._invoiceCurrency
+    this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, "RelatedLineItemData", this._invoiceCurrency // this.rate
     );
   }
   /* ---------- Event Handlers ------------*/
   handleFocus = event => {
-    const row =event.target.dataset.id;
-    console.log("Focus!!");
-    console.log('Should show a normal value!');
-    console.log(event.target.value);
-    const normalval = this.desctructcurrency(event.target.value);
-    console.log("Normal value== ", normalval);
-    this.lineItems[row]['UnitAmount'] =normalval;
+    const row = event.target.dataset.id;
+    const normalval = destructCurrency(event.target.value);
+    this.lineItems[row]['UnitAmount'] = normalval;
   };
   formatAmount = event => {
     const row = event.target.dataset.id;
     console.log("Focus Released!");
     console.log(event.target.value);
-    console.log("Formatted amount is: ");
-    this._invoiceCurrency = this._invoiceCurrency? this._invoiceCurrency:'USD';      
-    this.lineItems[row]['UnitAmount'] =this.makeCurrency(event.target.value,this._invoiceCurrency);
+    this._invoiceCurrency = this._invoiceCurrency ? this._invoiceCurrency : 'USD';
+    this.lineItems[row]['UnitAmount'] = makeCurrency(event.target.value, this._invoiceCurrency);
   };
   handleProductName = event => {
     const rowId = event.target.dataset.id;
@@ -171,44 +150,6 @@ export default class CreateInvoiceLineItem extends LightningElement {
     this.lineItems[row]["TaxPercent"] = event.target.value;
     this.CalculateTaxAmount(row);
   };
-
-  /**
-   * Description
-   * @param {any} value
-   * @param {any} currencyCode
-   * @returns {any}
-   */
-  makeCurrency(value, currencyCode) {
-    const code = currencyCode;
-    console.log('code---', code);
-    console.log('?---',this._invoiceCurrency);
-    if(!code){
-      console.log('Code is undefined');
-      code= '$';
-      this._invoiceCurrency= code;
-      console.log('?=>',this._invoiceCurrency);
-    }
-    let usd = new Intl.NumberFormat("en-us", {
-      style: "currency",
-      currency: code
-    });
-    return usd.format(value);
-  }
-  desctructcurrency(value) {
-    const hasCurrencySymbol = /[^\d.,]/.test(value);
-  if (hasCurrencySymbol) {
-    // Remove non-numeric characters except for periods and commas
-    const numericPart = value.replace(/[^\d.,]/g, '');
-    // Replace commas with empty strings
-    const numericValue = numericPart.replace(/,/g, '');
-    // Parse the numeric value as a floating-point number
-    return parseFloat(numericValue);
-  } else {
-    // The value does not contain a currency symbol, so it's a currency code
-    return parseFloat(value) || 0; // Convert the value to a number, or return 0 if it's not a valid number
-  }
-    // return parseFloat(value.replace(/[^0-9,-]/g, ""));
-  }
   handleDeleteLineItem = event => {
     const rowIndex = event.target.dataset.id;
     let itemDeleted = this.lineItems[rowIndex];
@@ -243,12 +184,13 @@ export default class CreateInvoiceLineItem extends LightningElement {
   }
 
   /* Emiting the message:Payload: InvoiceLineItems , Invoice Status */
-  EmitInvoiceTotalMessage(invoiceProds, invStatus, origin,invoiceCurrency) {
+  EmitInvoiceTotalMessage(invoiceProds, invStatus, origin, invoiceCurrency, exchangeRate) {
     const payload = {
       invoicelines: invoiceProds,
       invoiceStatus: invStatus,
       fireOrigin: origin,
-      invoiceCurrencyCode: invoiceCurrency
+      invoiceCurrencyCode: invoiceCurrency,
+      exchangeRate: exchangeRate
     };
     publish(this.context, InvoiceTotalMC, payload);
   }
@@ -256,7 +198,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
   /* Validating User Input Data */
   validateLineItemInput(data) {
     const validate = data.every(item => {
-      item.UnitAmount = this.desctructcurrency(item.UnitAmount);
+      item.UnitAmount = destructCurrency(item.UnitAmount);
       console.log(item.UnitAmount);
       return (
         item.Description &&
@@ -316,6 +258,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
    * @returns {any}
    */
   async CreateLineItems(data, invoiceId) {
+    console.log('Creating Items!');
     const lineItemsdata = [];
     for (let item of data) {
       const newItem = {
@@ -344,9 +287,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
       this.UpdateWire();
       // }
     } catch (error) {
-      if (
-        error.body.message.includes("Invoice is paid, you cannot edit anything")
-      ) {
+      if (error.body.message.includes("Invoice is paid, you cannot edit anything")) {
         this.showNoficiation(
           "Error",
           "Invoice is paid, you cannot edit LineItems",
@@ -363,7 +304,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
   UpdateWire() {
     refreshApex(this.datatoRefresh)
       .then(() => {
-        this.showNoficiation("Message", "Data refreshed?", "Message");
+        this.showNoficiation("Message", "Data has been refreshed", "Message");
       })
       .catch(error => {
         console.log(error);
@@ -379,7 +320,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
       UnitAmount: "",
       TaxPercent: "",
       TaxType: ""
-    };    
+    };
     this.lineItems = [...this.lineItems, newItem];
     if (this.currentPageReference.type.includes("recordPage")) {
       this.hideSaveButton = true;
@@ -419,8 +360,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
    */
   CalculateTaxAmount(row) {
     const item = this.lineItems[row];
-    const unit = this.desctructcurrency(item["UnitAmount"]);
-    // const unit = parseFloat(item["UnitAmount"]);
+    const unit = destructCurrency(item['UnitAmount']);
     const quant = parseInt(item["Quantity"]);
     const tax = parseFloat(item["TaxPercent"]);
     if (!isNaN(unit) && !isNaN(quant) && !isNaN(tax)) {
@@ -428,22 +368,11 @@ export default class CreateInvoiceLineItem extends LightningElement {
       const taxAmount = unit * (tax / 100) * quant;
       item["taxAmount"] = taxAmount.toFixed(3);
       this.lineItems = [...this.lineItems];
-      this.EmitInvoiceTotalMessage(
-        this.lineItems,
-        this.invoiceStatus,
-        "Recalculation",
-        this._invoiceCurrency
-      );
+      this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, "Recalculation", this._invoiceCurrency, this.rate);
     } else {
       item["totalAmount"] = 0;
       item["taxAmount"] = 0;
       this.lineItems = [...this.lineItems];
-      this.EmitInvoiceTotalMessage(
-        this.lineItems,
-        this.invoiceStatus,
-        "Recalculation",
-        this._invoiceCurrency
-      );
     }
   }
 }
