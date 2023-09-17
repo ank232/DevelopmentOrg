@@ -153,15 +153,19 @@ public with sharing class CustomerDetailsController {
             throw new AuraHandledException(e.getMessage());
         }
     }
-    public static decimal currencyConvertor(Decimal amount, String fromCurrencyCode, String toCurrencyCode)
+    public static decimal currencyConvertor(String fromCurrencyCode, String toCurrencyCode)
     {
-        CurrencyType fromCurrency = [SELECT ConversionRate FROM CurrencyType WHERE IsoCode = :fromCurrencyCode LIMIT 1];
-        CurrencyType toCurrency = [SELECT ConversionRate FROM CurrencyType WHERE IsoCode = :toCurrencyCode LIMIT 1];
+        System.debug('Converting '+ fromCurrencyCode + 'to '+ toCurrencyCode);
+        decimal rateConverted = 1;
+        CurrencyType fromCurrency = [SELECT ConversionRate,IsoCode FROM CurrencyType WHERE IsoCode = :fromCurrencyCode LIMIT 1];
+        CurrencyType toCurrency = [SELECT ConversionRate,IsoCode FROM CurrencyType WHERE IsoCode = :toCurrencyCode LIMIT 1];
           if (fromCurrency != null && toCurrency != null) {
         // Calculate the converted amount
-        Decimal convertedAmount = amount * (toCurrency.ConversionRate / fromCurrency.ConversionRate);
-        return convertedAmount;
+        system.debug('Converted Rate from '+fromCurrency.IsoCode+ ' to '+ toCurrency.IsoCode +' ==== '+(toCurrency.ConversionRate/fromCurrency.ConversionRate));
+         rateConverted = (toCurrency.ConversionRate / fromCurrency.ConversionRate);
+         system.debug('*** Conversion Rate is '+ rateConverted.setScale(4));
+        return rateConverted.setScale(3);
     }
-    return amount;
+    return rateConverted;
     }
 }
