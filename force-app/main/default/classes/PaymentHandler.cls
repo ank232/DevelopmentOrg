@@ -116,12 +116,13 @@ public with sharing class PaymentHandler
                 invoiceIds.add(payment.Invoice__c);
             }
         }
-        List<Invoice__c> relatedInvoicesforRefund = [SELECT ID,PAID_DATE__C FROM INVOICE__C WHERE ID IN: invoiceIds];
+        List<Invoice__c> relatedInvoicesforRefund = [SELECT ID,PAID_DATE__C ,Status__c FROM INVOICE__C WHERE ID IN: invoiceIds];
         if(!relatedInvoicesforRefund.isEmpty())
         {
             for(Invoice__c inv: relatedInvoicesforRefund)
             {
                 inv.Paid_date__c = System.today();
+                inv.Status__c = 'Paid';
             }
         }
         try{

@@ -12,41 +12,43 @@ const actions = [
     { label: 'Delete', name: 'delete' },
 ];
 const COLS = [{
-        label: 'Invoice No',
-        fieldName: 'InvoiceNO',
-        type: 'url',
-        typeAttributes: { label: { fieldName: INVOICE_NO_FIELD.fieldApiName }, target: '_blank' }
-    },
-    {
-        label: 'Customer Name',
-        fieldName: 'CustomerName',
-        type: 'text'
-    },
-    {
-        label: 'Status',
-        fieldName: Status_FIELD.fieldApiName,
-        type: 'picklist'
-    },
-    {
-        label: 'Total Line Amount',
-        fieldName: Line_AMOUNT_FIELD.fieldApiName,
-        type: 'currency'
-    },
-    {
-        label: 'Invoice Date',
-        fieldName: INVOICE_DATE.fieldApiName,
-        type: 'date'
-    }, {
-        label: 'Due Date',
-        fieldName: DUE_DATE.fieldApiName,
-        type: 'date'
-    },
-    {
-        // label: 'Action',
-        type: 'action',
-        initialWidth: '50px',
-        typeAttributes: { rowActions: actions },
-    }
+    label: 'Invoice No',
+    fieldName: 'InvoiceNO',
+    type: 'url',
+    typeAttributes: { label: { fieldName: INVOICE_NO_FIELD.fieldApiName }, target: '_blank' }
+},
+{
+    label: 'Customer Name',
+    fieldName: 'CustomerName',
+    type: 'text'
+},
+{
+    label: 'Status',
+    fieldName: Status_FIELD.fieldApiName,
+    type: 'text',
+    typeAttributes: '10px',
+    cellAttributes: { class: { fieldName: 'StatusBadgeClass' } }
+},
+{
+    label: 'Total Line Amount',
+    fieldName: Line_AMOUNT_FIELD.fieldApiName,
+    type: 'currency'
+},
+{
+    label: 'Invoice Date',
+    fieldName: INVOICE_DATE.fieldApiName,
+    type: 'date'
+}, {
+    label: 'Due Date',
+    fieldName: DUE_DATE.fieldApiName,
+    type: 'date'
+},
+{
+    // label: 'Action',
+    type: 'action',
+    initialWidth: '50px',
+    typeAttributes: { rowActions: actions },
+}
 ];
 /*
 This Component will show the related invoices for the company
@@ -62,14 +64,28 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
             if (data.length == 0) {
                 this.invoiceData = null;
             } else {
-
+                console.log(data);
                 this.invoiceData = data.map((invoice) => {
                     const customerName = invoice.Customer__r ? `${invoice.Customer__r.FirstName} ${invoice.Customer__r.LastName}` : 'N/A';
                     const InvoiceNO = `/${invoice.Id}`;
+                    let invoiceStatusbadge = 'slds-badge';
+                    let invoiceAmount;
+                    if (invoice.Status__c === 'Approved') {
+                        invoiceStatusbadge = 'slds-badge slds-theme_success';
+                    }
+                    if (invoice.Status__c === 'Cancelled') {
+                        invoiceStatusbadge = 'slds-badge slds-theme_error';
+                    }
+                    if (invoice.Status__c === 'Pending') {
+                        invoiceStatusbadge = 'slds-badge slds-theme_warning';
+                    }      
+                    console.log('Invoice Amount-> ',invoice.Total_Line_Amount__c);
                     return {
                         ...invoice,
                         InvoiceNO,
-                        CustomerName: customerName
+                        CustomerName: customerName,
+                        StatusBadgeClass: invoiceStatusbadge,
+                        InvAmount: invoiceAmount
                     }
                 });
             }

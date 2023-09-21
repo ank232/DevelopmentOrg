@@ -24,7 +24,7 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     }
     handleNotSelected(event) {
         const detail = event.detail;
-        this.showNoficiation('Waring', 'Contact not found or not selected ', 'Warning');
+        // this.showNoficiation('Waring', 'Contact not found or not selected ', 'Warning');
         this.isContactSelected = false;
     }
     /*
@@ -33,13 +33,13 @@ export default class CreateInvoiceFromAccount extends LightningElement {
     validateDates(duedate, invoicedate) {
         const dateFields = [duedate, invoicedate];
         if (dateFields.some(field => field === null)) {
-            this.showNoficiation('Error', 'Date Fields cannot be blank', 'error');
+            this.showNoficiation('Error', 'Date Fields cannot be left blank', 'error');
             return false;
         } else {
             let dueDate = new Date(duedate);
             let invoiceDate = new Date(invoicedate);
-            if (dueDate >= invoiceDate) {
-                this.showNoficiation('Error', 'Due Date should be atleast one day ahead of invoice Date', 'error');
+            if (invoiceDate <= dueDate) {
+                this.showNoficiation('Error', 'Please Enter proper date. ', 'error');
                 return false;
             } else {
                 // this.showNoficiation('Success', 'All good!', 'success');
@@ -83,7 +83,7 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             result => {
                 console.log('Created ');
                 console.log(result);
-                this.showNoficiation("Message", "Invoice is created" + result[1], "Message");
+                this.showNoficiation("Message", + result[1] + " Has been created.", "Message");
                 this.invoicerecid = result[0];
             }
         ).catch(

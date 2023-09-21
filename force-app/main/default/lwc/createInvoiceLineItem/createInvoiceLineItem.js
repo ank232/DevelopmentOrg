@@ -50,7 +50,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
 
   /* Wire Method to fetch Related LineItems */
   @wire(RelatedLineItems, { invoiceId: "$recordId" })
-  LineItemData(result) {
+  LineItemData(result) {    
     this.datatoRefresh = result;
     if (result.data) {
       if (result.data.length == 0) {
@@ -65,7 +65,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
       }
     }
     if (result.error) {
-      console.log(error);
+      console.log('Error Occured');      
     }
   }
   @wire(CurrentPageReference) currentPageReference;

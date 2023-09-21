@@ -30,13 +30,13 @@ export default class InvoiceButtons extends LightningElement {
         if (data) {
             if (!data.count) {
                 refButton.classList.add("slds-hide");
-                this.paidAmount = 0;
+                // this.paidAmount = 0;
             } else {
-                let amnt = 0;
-                data.records.map((item) => {
-                    amnt += item.fields.Amount__c.value;
-                });
-                this.paidAmount = amnt;
+                // let amnt = 0;
+                // data.records.map((item) => {
+                //     amnt += item.fields.Amount__c.value;
+                // });
+                // this.paidAmount = amnt;
             }
         }
         if (error) {
@@ -75,7 +75,7 @@ export default class InvoiceButtons extends LightningElement {
             button.classList.add('slds-hide');
         } else {
             const fireOrigin = data.fireOrigin;
-            if (fireOrigin.includes("Related")) {
+            if (fireOrigin.includes("Related")) {                
                 this.invoicedata = data;
                 const maxAmnt = data.invoicelines.reduce((total, lineitem) => total + lineitem.totalAmount, 0.0);
                 const totalTax = data.invoicelines.reduce((taxtotal, lineitem) => taxtotal + lineitem.taxAmount, 0.0);
@@ -86,6 +86,11 @@ export default class InvoiceButtons extends LightningElement {
 
     ProcessPayment = (paymentData) => {
         const AmounttoPaid = paymentData["Amount__c"];
+        
+        // if (AmounttoPaid > this.totalLinePrice || AmounttoPaid > this.totalLinePrice - this.paidAmount) {
+        //     this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Warning");
+        //     return;
+        // }        
         // if (AmounttoPaid > this.totalLinePrice || AmounttoPaid > this.totalLinePrice - this.paidAmount) {
         //     this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Warning");
         //     return;
@@ -141,12 +146,17 @@ export default class InvoiceButtons extends LightningElement {
     ProcessRefund(refundData) {
         console.log('I will create the refund!');
         console.log(refundData);
+        console.log(refundData);
+        // if (refundData.Amount__c > this.paidAmount) {
+        //     this.showNoficiation("Warning", "Refunded amount should not exceed the paid Amount");
+        //     return;
+        // } else {
+        console.log(refundData);        
         // if (refundData.Amount__c > this.paidAmount) {
         //     this.showNoficiation("Warning", "Refunded amount should not exceed the paid Amount");
         //     return;
         // } else {
         this.createRefundRecord(refundData);
-        // }
     }
 
     createRefundRecord(refundrec) {
@@ -164,6 +174,7 @@ export default class InvoiceButtons extends LightningElement {
             this.showNoficiation("Error", error.body.output.errors[0].message, "Error");
         });
     }
+    
     async fetchExchangeRates() {
         await ExchangeRateModal.open({
             size: "small"
@@ -180,6 +191,9 @@ export default class InvoiceButtons extends LightningElement {
     }
 
     async previewInvoice() {
+        console.log('Opening Modal');
+        console.log('DATA: ');
+        console.log(this.invoicedata);
         await PreviewInvoice.open({
             size: "large",
             decsciption: "invoice info",
