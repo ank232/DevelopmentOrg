@@ -57,7 +57,8 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
     @api recordId;
     columns = COLS;
     invoiceData = [];
-    // Wire method to get the list of related invoices
+    selectedRowData;
+    // Wire method to get the list of related invoices   
     @wire(ShowInvoices, { companyId: '$recordId' })
     wiredInvoices({ data, error }) {
         if (data) {
@@ -78,8 +79,8 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
                     }
                     if (invoice.Status__c === 'Pending') {
                         invoiceStatusbadge = 'slds-badge slds-theme_warning';
-                    }      
-                    console.log('Invoice Amount-> ',invoice.Total_Line_Amount__c);
+                    }
+                    console.log('Invoice Amount-> ', invoice.Total_Line_Amount__c);
                     return {
                         ...invoice,
                         InvoiceNO,
@@ -98,9 +99,30 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
     }
     Rowmenu = (event) => {
         console.log('You selected a row!!');
-        const row = event.detail.row;
+        const row = event.detail.selectedRows;
+        console.log(JSON.stringify(row));
+        this.selectedRowData = row;
+    }
+    showNoficiation(title, message, variant) {
+        const showToast = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(showToast);
+    }
+    sendAction = (event) => {
+        console.log('Action(Send)');
+        console.log('selected invoices are');
+        console.log(this.selectedRowData);
+        if (!this.selectedRowData) {
+            this.showNoficiation("Message", "Plese Select invoice(s) first", "Message");
+            return;
+        }
+        console.log();
+    }
+    rowAction = (event) => {
         const actionName = event.detail.action.name;
-
         switch (actionName) {
             case 'view':
                 this[NavigationMixin.Navigate]({
@@ -116,13 +138,5 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
                 break;
             default:
         }
-    }
-    showNoficiation(title, message, variant) {
-        const showToast = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant
-        });
-        this.dispatchEvent(showToast);
     }
 }
