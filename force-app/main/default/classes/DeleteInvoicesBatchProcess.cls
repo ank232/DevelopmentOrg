@@ -4,7 +4,7 @@ global class DeleteInvoicesBatchProcess implements Database.Batchable <SObject> 
         {
             Date OneyearAgo = Date.today().addYears(-1);
             return  Database.getQueryLocator(
-                'SELECT ID FROM INVOICE__C WHERE createdDate =:OneyearAgo'
+                'SELECT ID FROM INVOICE__C WHERE createdDate <=:OneyearAgo'
             );
         }
     public void execute(Database.BatchableContext BC, List<Invoice__c> oldInvoiceRecords)
@@ -25,6 +25,6 @@ global class DeleteInvoicesBatchProcess implements Database.Batchable <SObject> 
     }
     public void  finish(Database.BatchableContext BC)
     {
-
+               
     }
 }
