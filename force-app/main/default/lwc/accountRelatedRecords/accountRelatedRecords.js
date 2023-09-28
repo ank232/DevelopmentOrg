@@ -155,7 +155,7 @@ export default class AccountRelatedRecords extends LightningElement {
                 }
             });
             this.dispatchEvent(customEvent);
-            this.searchQuery=this.CustomerInfoMap[conid].Name;
+            this.searchQuery = this.CustomerInfoMap[conid].Name;
             this.searchResults = null;
         } else {
             this.showDetails = {};

@@ -80,7 +80,6 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
                     if (invoice.Status__c === 'Pending') {
                         invoiceStatusbadge = 'slds-badge slds-theme_warning';
                     }
-                    console.log('Invoice Amount-> ', invoice.Total_Line_Amount__c);
                     return {
                         ...invoice,
                         InvoiceNO,
@@ -122,19 +121,21 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
         console.log();
     }
     rowAction = (event) => {
+        const rowId = event.detail.row.Id;
+        const rowNumber = event.detail.row.Name;
         const actionName = event.detail.action.name;
         switch (actionName) {
             case 'view':
                 this[NavigationMixin.Navigate]({
                     type: 'standard__recordPage',
                     attributes: {
-                        recordId: row.Id,
+                        recordId: rowId,
                         actionName: 'view'
                     }
                 });
                 break;
             case 'delete':
-                this.showNoficiation("Message", "Invoice " + row.Name + " is deleted", "Message");
+                this.showNoficiation("Message", "Invoice " + rowNumber + " is deleted", "Message");
                 break;
             default:
         }
