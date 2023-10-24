@@ -373,6 +373,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
       item["totalAmount"] = 0;
       item["taxAmount"] = 0;
       this.lineItems = [...this.lineItems];
+      this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, "Null Amount",this._invoiceCurrency,this.rate);
     }
   }
 }

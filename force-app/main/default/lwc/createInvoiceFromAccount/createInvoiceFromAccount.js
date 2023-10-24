@@ -38,8 +38,8 @@ export default class CreateInvoiceFromAccount extends LightningElement {
         } else {
             let dueDate = new Date(duedate);
             let invoiceDate = new Date(invoicedate);
-            if (invoiceDate <= dueDate) {
-                this.showNoficiation('Error', 'Please Enter proper date. ', 'error');
+            if (dueDate < invoiceDate) {
+                this.showNoficiation('Error', 'Due date must be one day after invoiceDate', 'error');
                 return false;
             } else {
                 // this.showNoficiation('Success', 'All good!', 'success');
@@ -83,7 +83,9 @@ export default class CreateInvoiceFromAccount extends LightningElement {
             result => {
                 console.log('Created ');
                 console.log(result);
-                this.showNoficiation("Message", + result[1] + " Has been created.", "Message");
+                const invNo = result[1];
+                console.log('|||||||=-=-=-= ', invNo);
+                this.showNoficiation("Message", invNo + " Has been created.", "Message");
                 this.invoicerecid = result[0];
             }
         ).catch(

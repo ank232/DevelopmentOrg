@@ -1,11 +1,11 @@
 import InvoiceTotalMC from "@salesforce/messageChannel/InvoiceTotalMC__c";
 import { subscribe, MessageContext } from "lightning/messageService";
-import { LightningElement, wire } from "lwc";
+import { LightningElement, wire, api } from "lwc";
 import currencyType from "@salesforce/apex/CustomerDetailsController.currencyType";
 export default class InvoiceTotal extends LightningElement {
-  invtax;
-  invsubtotal;
-  invgrandtotal;
+  @api invtax;
+  @api invsubtotal;
+  @api invgrandtotal;
   currencytype;
   exchangerate;
   invoiceLines;
@@ -21,20 +21,22 @@ export default class InvoiceTotal extends LightningElement {
       })
       .catch(error => {
         console.log(JSON.stringify(error));
-        this.exchangerate = '$';        
+        this.exchangerate = '$';
       });
   }
   connectedCallback() {
     this.MessageReciever();
   }
   MessageReciever() {
-    subscribe(this.messageContext, InvoiceTotalMC, message => {      
+    subscribe(this.messageContext, InvoiceTotalMC, message => {
       this.currencytype = message.invoiceCurrencyCode;
       this.fetchrates(message.invoiceCurrencyCode);
+      console.log('Message');
+      console.log(message);
       this.invoiceLines = message.invoicelines;
     });
   }
-  showConvertedAmount() {    
+  showConvertedAmount() {
     const exchange = this.exchangerate;
     this.InvoiceTotal(this.invoiceLines, exchange);
   }
@@ -56,7 +58,16 @@ export default class InvoiceTotal extends LightningElement {
     this.invsubtotal = subtotal;
     this.invgrandtotal = taxTotal + subtotal;
     // this.convertedsubtotal = this.invsubtotal * clientCurrency;
-    // this.convertedtax = this.invtax * clientCurrency;ax;
+    // this.convertedtax = this.invtax * clientCurrency;ax;   
+    const fireinvoiceSummaryEvent = new CustomEvent(
+      "invoicesummary",
+      {
+        detail: {
+          grandtotal: this.invgrandtotal,
+          totaltax: this.invtax
+        }
+      });
+    this.dispatchEvent(fireinvoiceSummaryEvent);
   }
 
   desctructcurrency(value) {

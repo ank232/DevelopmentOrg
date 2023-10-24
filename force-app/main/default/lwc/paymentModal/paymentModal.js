@@ -28,4 +28,9 @@ export default class PaymentModal extends LightningModal {
         console.log('Payment Data Saved!-> going to create--');
         // this.close(this.paymentData);
     }
+    handleFlow = (event) => {
+        console.log(event.detail)
+        console.log('FLOW EVENT');
+        console.log(event.detail.status);
+    }
 }
