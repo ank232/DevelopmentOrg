@@ -16,6 +16,7 @@ public with sharing class CustomerDetailsController {
                 invoice__c
                 WHERE
                 Company__c =: companyId
+                With SECURITY_ENFORCED
             ];
             return Invoices;
         } catch (Exception e) {
@@ -164,7 +165,7 @@ public with sharing class CustomerDetailsController {
         system.debug('Converted Rate from '+fromCurrency.IsoCode+ ' to '+ toCurrency.IsoCode +' ==== '+(toCurrency.ConversionRate/fromCurrency.ConversionRate));
          rateConverted = (toCurrency.ConversionRate / fromCurrency.ConversionRate);
          system.debug('*** Conversion Rate is '+ rateConverted.setScale(4));
-        return rateConverted.setScale(3);
+        return rateConverted;
     }
     return rateConverted;
     }

@@ -27,44 +27,52 @@ public with sharing class PaymentHandler
         }
         // Cases When Payment have been made before a new payment
         if(!invoice.payments__r.isEmpty())
-        {            
+        {                       
+            System.debug('EXISTING PAYMENT');
             if(payment.CurrencyIsoCode !=invoice.payments__r[0].CurrencyIsoCode )
             {
                 payment.addError('Payment must be made in '+ invoice.payments__r[0].CurrencyIsoCode);
             }
-            Decimal existingPayments = calculateTotalAmnt(invoice.payments__r);            
-            decimal exchangeRate = CustomerDetailsController.currencyConvertor(invoice.CurrencyIsoCode, invoice.payments__r[0].CurrencyIsoCode);
-            Decimal maxPayable = exchangeRate* invoice.Grand_total__c;           
-            decimal remainingAmnt = maxPayable - existingPayments;
-            system.debug(remainingAmnt);
-            if(payment.Amount__c > remainingAmnt )
+            Decimal existingPayments = calculateTotalAmnt(invoice.payments__r);             
+            decimal exchangeRate = CustomerDetailsController.currencyConvertor(invoice.CurrencyIsoCode,payment.CurrencyIsoCode);
+            Decimal normalizedamount = exchangeRate*invoice.Grand_total__c;
+            system.debug('Normailzed Value(incoming Amnt) : '+ normalizedamount);      
+            decimal remainingAmnt = normalizedamount - existingPayments;
+            system.debug('Residual amount- '+ remainingAmnt);
+            if(remainingAmnt <=0)
             {
-                String errorMsg = 'Amount Exceeded the Invoice total amount. Please try again (max Limit=: ' + remainingAmnt + ')';
-                payment.addError(errorMsg);
+                payment.addError('Payment Already done');
             }
+            //if(paidAmountInInvoiceCurrency > remainingAmnt )
+            //{
+              //  String errorMsg = 'Amount Exceeded the Invoice total amount. Please try again (max Limit=: ' + remainingAmnt + ')';
+                //payment.addError(errorMsg);
+            //}            
         }
-        else
+        if(invoice.payments__r.isEmpty())
         {
+            System.debug('NEW PAYMENT RECIEVED');                  
             if(payment.currencyIsoCode != invoice.CurrencyIsoCode)
             {                
-                decimal exchangeRate = CustomerDetailsController.currencyConvertor(invoice.CurrencyIsoCode, payment.CurrencyIsoCode);
-                decimal payableAmount =invoice.Grand_total__c *exchangeRate;
-                system.debug('Amount To be paid in '+ payment.CurrencyIsoCode);
-                system.debug('Payable--> '+ payableAmount);
                 system.debug('Incoming amnt->' + payment.CurrencyIsoCode+ payment.Amount__c);
+                System.debug('Invoice Amount---> '+ invoice.Grand_total__c);
+                decimal exchangeRate = CustomerDetailsController.currencyConvertor(invoice.CurrencyIsoCode,payment.CurrencyIsoCode);
+                decimal payableAmount =invoice.Grand_Total__c*exchangeRate;                
+                system.debug('Amount To be paid in '+ payment.CurrencyIsoCode);              
+                system.debug('final Price --> '+ payableAmount);                    
                 if(payment.Amount__c > payableAmount)
                 {
-                    String errorMessage = 'Payment amount (' + payment.Amount__c + ' ' + payment.CurrencyIsoCode + ') exceeds the invoice total (' + invoice.Grand_Total__c + ' ' + invoice.CurrencyIsoCode + '). Please review.';
+                   String errorMessage = 'Payment amount (' + payment.Amount__c + ' ' + payment.CurrencyIsoCode + ') exceeds the invoice total (' + invoice.Grand_Total__c + ' ' + invoice.CurrencyIsoCode + '). Please review.';
                     payment.addError(errorMessage);
-                }
-            }
-            if(payment.CurrencyIsoCode == invoice.CurrencyIsoCode){
-                if(payment.Amount__c > invoice.Grand_total__c)
-                {
-                    payment.addError('Payment amount cannot exceed lineItemAmount');
-                }
-            }
+              }                
+            }        
         }
+        if(payment.CurrencyIsoCode == invoice.CurrencyIsoCode){
+            if(payment.Amount__c > invoice.Grand_total__c)
+            {
+                payment.addError('Payment amount cannot exceed lineItemAmount');
+            }
+        }        
     }
     // This method will responsible to validate the payment record before commiting to DB
     public static void checkPaymentDate(List<Payment__c> paymentsToverfied)
@@ -122,7 +130,7 @@ public with sharing class PaymentHandler
             for(Invoice__c inv: relatedInvoicesforRefund)
             {
                 inv.Paid_date__c = System.today();
-                inv.Status__c = 'Paid';
+                // inv.Status__c = 'Paid';
             }
         }
         try{

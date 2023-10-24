@@ -64,8 +64,4 @@ public with sharing class DumpClass {
         List<currencyType>  c1 = Database.query('SELECT IsoCode, ConversionRate from CurrencyType Where isoCode=:fromCurrency AND isoCode=: toCurrency');
         system.debug(c1);
     }
-    public static void runBatch()
-    {
-        list<Id> invoiceIds = [select id from invoice__c];
-    }
 }

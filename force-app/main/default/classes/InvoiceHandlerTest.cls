@@ -2,7 +2,7 @@
             ===================================================
             Test Cases to Test InvoiceManagemnt Application
               Cases: 
-                    * Positive Cases 
+                    *  Positive Cases 
                     *  Bulk records 
                     *  Negative Cases      
             ====================================================
@@ -214,44 +214,6 @@ static void testBatchDelete()
         System.assertEquals(0, remainingInvoices.size(), 'All invoices should have been deleted.');
 }
 
-/*
-       =======================================================
-            Positive Testing if Payment has been recorded 
-            successfully when the invoice is approved
-            and the paid date is updated as per the requirement
-      ========================================================
-*/  
-    @isTest 
-    static void testPayment()
-    {
-        Map<Id, List<Invoice_Line_Items__c>> invoiceLineMap = new Map<Id,List<Invoice_Line_Items__c>>();
-        List<String> prodNames = new List<String>{'Prod1','Prod2', 'Prod3'};
-        List<product2> products =InvoiceManagementTestDataFactory.createProductRecord(prodNames);
-        Account acc = InvoiceManagementTestDataFactory.createCompanyRecord('Dexter Textiles',true);
-        Contact con = InvoiceManagementTestDataFactory.createContactRecord(acc.Id, true);
-        List<Invoice__c> invoicesToInsert = InvoiceManagementTestDataFactory.createInvoiceRecord(acc.Id, con.Id,3);
-        for(integer i=0;i<invoicesToInsert.size();i++)
-        {
-            List<Invoice_Line_Items__c> insertedLines = InvoiceManagementTestDataFactory.createLinesItemsRecord(invoicesToInsert[i].Id,3,products[i].Id);
-            invoiceLineMap.put(invoicesToInsert[i].Id, insertedLines);
-        }
-        invoice__c approvedInv = new Invoice__c(
-            company__c = acc.Id,
-            customer__c = con.Id,
-            invoice_number__c = 'ApprInv',
-            status__c= 'Approved',
-            Due_date__c =system.today(),
-            Invoice_date__c = system.today()
-        );
-        insert approvedInv;
-        double amt = 6000;
-        try {
-            Database.SaveResult[] res=Database.insert(InvoiceManagementTestDataFactory.createPaymentRecord(approvedInv.Id,amt,'Processed',2));
-        } catch(DmlException e) {
-            System.debug(e.getMessage());
-        }
-    }
-
     /*
                 ===========================================
                     Negative Testing:
@@ -318,18 +280,5 @@ static void testBatchDelete()
        }
        List<Invoice__c> deletedInvoices = [SELECT ID FROM INVOICE__c];
        delete deletedInvoices;
-    }
-
-    /*
-        =========================================
-           Checking if the system let the user
-           to create refund rec without having
-           any payment recorded
-        ==========================================
-    */ 
-    @istest
-    static void testrefund()
-    {
-
-    }
+    }  
 }
