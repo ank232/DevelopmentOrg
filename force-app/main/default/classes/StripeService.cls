@@ -1,9 +1,14 @@
 global without sharing class StripeService {
-   private static final string API_key = 'sk_test_51O1Y31SHDmZoIlazRyaoVZGhVZE9aVUDCfFCdq3m3mUwksQstO25Fz2QUDtwNIhQehmGeIdeaxyZm53uQu58hamI00pK8ev0pu';
+   private static string API_KEY;
    private static final string StripeEndpoint = 'https://api.stripe.com/v1';
    private static string ProductId = 'prod_OsBxPCe5UFZ8vD';
    private static string priceId;
    
+   StripeService()
+   {    
+    API_KEY__mdt stirpe =[select stripe_test_key__c FROM API_KEY__mdt];
+    API_KEY = stirpe.stripe_test_key__c;
+   }
 public static void createStripeCustomer()
 {    
     Map<String, Object> requestBody = new Map<String, Object>();
