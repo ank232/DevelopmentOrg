@@ -1,75 +1,62 @@
 <template>
-    <lightning-card>
-        <lightning-input type="search" label="Search Customer" value={searchQuery} onchange={customername}
-            required></lightning-input>
-        <template if:true={showSpinner}>
-            <lightning-spinner size="medium" alternative-text="Loading Customers..."></lightning-spinner>
+  <lightning-card>
+    <lightning-input type="search" label="Search Customer" value={searchQuery} onchange={customername}
+      required></lightning-input>
+    <template if:true={showSpinner}>
+      <lightning-spinner size="medium" alternative-text="Loading Customers..."></lightning-spinner>
+    </template>
+    <template if:true={nocontactFound}>
+      <div class="slds-text-color_destructive">
+        No contact was found!, please search for something else
+      </div>
+    </template>
+    <template if:true={hascontacts}>
+      <ul class="slds-has-divider_top slds-has-block-links_space">
+        <template for:each={searchResults} for:item="result">
+          <li key={result.Id} data-contactid={result.Id} onclick={handleCustomerinfo} class="slds-list__item">
+            <template if:true={result.isLoading}>
+              <lightning-spinner size="small" alternative-text="Loading Contacts..."></lightning-spinner>
+            </template>
+            <template if:false={result.isLoading}>{result.Name}</template>
+          </li>
         </template>
-        <template if:true={nocontactFound}>
-            <div class="slds-text-color_destructive">
-                No contact was found!,
-                please search for something else
-            </div>
-        </template>
-        <template if:true={hascontacts}>
-            <ul class="slds-has-divider_top slds-has-block-links_space">
-                <template for:each={searchResults} for:item="result">
-                    <li key={result.Id} data-contactid={result.Id} onclick={handleCustomerinfo} class="slds-list__item">
-                        <template if:true={result.isLoading}>
-                            <lightning-spinner size="small" alternative-text="Loading Contacts..."></lightning-spinner>
-                        </template>
-                        <template if:false={result.isLoading}>{result.Name}</template>
-                    </li>
-                </template>
-            </ul>
-        </template>
-        <template if:true={selectedcontactId}>
-            <ul class="slds-has-dividers_around slds-has-block-links_space">
-                <li class="slds-item">
-                    <span>
-                        Name:
-                    </span>
-                    <a href="javascript:void(0)">{showDetails.Name}</a>
-                </li>
-                <li class="slds-item">
-                    <span>
-                        Contact:
-                    </span>
-                    <lightning-formatted-phone value={showDetails.Phone}></lightning-formatted-phone>
-                </li>
-                <li class="slds-item">
-                    <span>
-                        Email:
-                    </span>
-                    <template if:true={showDetails.Email}>
-                        <lightning-formatted-email value={showDetails.Email}>
-                        </lightning-formatted-email>
-                    </template>
-                    <template if:false={showDetails.Email}>
-                        <p>Email Not Found</p>
-                    </template>
-                </li>
-                <li class="slds-item">
-                    <span>
-                        Currency Iso Code:
-                    </span>
-                    <a href="javascript:void(0)">
-                        {showDetails.CurrencyIsoCode}
-                    </a>
-                </li>
-                <li class="slds-item">
-                    <span>
-                        To Address:
-                    </span>
-                    <template if:true={showDetails.address}>
-                        <lightning-formatted-address country={country} province={streetName} city={city}>
-                        </lightning-formatted-address>
-                    </template>
-                    <template if:false={showDetails.address}>
-                        <p>Adress cannot be found!</p>
-                    </template>
-                </li>
-            </ul>
-        </template>
-    </lightning-card>
+      </ul>
+    </template>
+    <template if:true={selectedcontactId}>
+      <ul class="slds-has-dividers_around slds-has-block-links_space">
+        <li class="slds-item">
+          <span> Name: </span>
+          <a href="javascript:void(0)">{showDetails.Name}</a>
+        </li>
+        <li class="slds-item">
+          <span> Contact: </span>
+          <lightning-formatted-phone value={showDetails.Phone}></lightning-formatted-phone>
+        </li>
+        <li class="slds-item">
+          <span> Email: </span>
+          <template if:true={showDetails.Email}>
+            <lightning-formatted-email value={showDetails.Email}>
+            </lightning-formatted-email>
+          </template>
+          <template if:false={showDetails.Email}>
+            <p>Email Not Found</p>
+          </template>
+        </li>
+        <li class="slds-item">
+          <span> Currency Iso Code: </span>
+          <a href="javascript:void(0)"> {showDetails.CurrencyIsoCode} </a>
+        </li>
+        <li class="slds-item">
+          <span> To Address: </span>
+          <template if:true={showDetails.address}>
+            <lightning-formatted-address country={country} province={streetName} city={city}>
+            </lightning-formatted-address>
+          </template>
+          <template if:false={showDetails.address}>
+            <p>Adress cannot be found!</p>
+          </template>
+        </li>
+      </ul>
+    </template>
+  </lightning-card>
 </template>

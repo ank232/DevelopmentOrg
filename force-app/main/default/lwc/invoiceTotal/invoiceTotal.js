@@ -15,23 +15,23 @@ export default class InvoiceTotal extends LightningElement {
   @wire(MessageContext) messageContext;
   fetchrates(targetCode) {
     currencyType({ currencyCode: targetCode })
-      .then(result => {
+      .then((result) => {
         this.exchangerate = result.ConversionRate;
         this.showConvertedAmount();
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(JSON.stringify(error));
-        this.exchangerate = '$';
+        this.exchangerate = "$";
       });
   }
   connectedCallback() {
     this.MessageReciever();
   }
   MessageReciever() {
-    subscribe(this.messageContext, InvoiceTotalMC, message => {
+    subscribe(this.messageContext, InvoiceTotalMC, (message) => {
       this.currencytype = message.invoiceCurrencyCode;
       this.fetchrates(message.invoiceCurrencyCode);
-      console.log('Message');
+      console.log("Message");
       console.log(message);
       this.invoiceLines = message.invoicelines;
     });
@@ -47,26 +47,26 @@ export default class InvoiceTotal extends LightningElement {
       0.0
     );
     data.forEach((lineItem) => {
-      if (typeof lineItem.totalAmount === 'string') {
+      if (typeof lineItem.totalAmount === "string") {
         lineItem.totalAmount = parseFloat(lineItem.totalAmount);
       }
     });
     // this.convertedgrandtotal = this.convertedsubtotal + this.convertedt
     const subtotal = data.reduce(
-      (total, lineItem) => total + lineItem.totalAmount, 0.00);
+      (total, lineItem) => total + lineItem.totalAmount,
+      0.0
+    );
     this.invtax = taxTotal;
     this.invsubtotal = subtotal;
     this.invgrandtotal = taxTotal + subtotal;
     // this.convertedsubtotal = this.invsubtotal * clientCurrency;
-    // this.convertedtax = this.invtax * clientCurrency;ax;   
-    const fireinvoiceSummaryEvent = new CustomEvent(
-      "invoicesummary",
-      {
-        detail: {
-          grandtotal: this.invgrandtotal,
-          totaltax: this.invtax
-        }
-      });
+    // this.convertedtax = this.invtax * clientCurrency;ax;
+    const fireinvoiceSummaryEvent = new CustomEvent("invoicesummary", {
+      detail: {
+        grandtotal: this.invgrandtotal,
+        totaltax: this.invtax
+      }
+    });
     this.dispatchEvent(fireinvoiceSummaryEvent);
   }
 
@@ -74,9 +74,9 @@ export default class InvoiceTotal extends LightningElement {
     const hasCurrencySymbol = /[^\d.,]/.test(value);
     if (hasCurrencySymbol) {
       // Remove non-numeric characters except for periods and commas
-      const numericPart = value.replace(/[^\d.,]/g, '');
+      const numericPart = value.replace(/[^\d.,]/g, "");
       // Replace commas with empty strings
-      const numericValue = numericPart.replace(/,/g, '');
+      const numericValue = numericPart.replace(/,/g, "");
       // Parse the numeric value as a floating-point number
       return parseFloat(numericValue);
     } else {

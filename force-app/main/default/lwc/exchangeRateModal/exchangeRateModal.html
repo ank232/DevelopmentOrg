@@ -1,13 +1,30 @@
 <template>
-    <lightning-modal-header label="Latest Exchange Rate"></lightning-modal-header>
-    <lightning-modal-body>
-        <div class="slds-grid">
-            <lightning-input required="true" label="From Currency ISO" onchange={fromCurrency}></lightning-input>
-            <lightning-input required="true" label="To Currency ISO" onchange={toCurrency}></lightning-input>
-        </div>
-    </lightning-modal-body>
-    <lightning-modal-footer>
-        <lightning-button type="submit" variant="brand" onclick={closeModal} label="Close"></lightning-button>
-        <lightning-button variant="brand" onclick={saveResult} label="Done"></lightning-button>
-    </lightning-modal-footer>
+  <lightning-modal-header label="Latest Exchange Rate"></lightning-modal-header>
+  <lightning-modal-body>
+    <div class="slds-grid">
+      <lightning-input
+        required="true"
+        label="From Currency ISO"
+        onchange={fromCurrency}
+      ></lightning-input>
+      <lightning-input
+        required="true"
+        label="To Currency ISO"
+        onchange={toCurrency}
+      ></lightning-input>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      type="submit"
+      variant="brand"
+      onclick={closeModal}
+      label="Close"
+    ></lightning-button>
+    <lightning-button
+      variant="brand"
+      onclick={saveResult}
+      label="Done"
+    ></lightning-button>
+  </lightning-modal-footer>
 </template>

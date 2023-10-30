@@ -1,11 +1,21 @@
 <template>
-    <lightning-input type="search" label="Search product" value={searchProductName}
-        onchange={handleProductSearch}></lightning-input>
-    <template if:true={showProd}>
-        <ul>
-            <template for:each={searchResults} for:item="product">
-                <li key={product.Name} onclick={ProductSelection} data-product={product.Id}>{product.Name}</li>
-            </template>
-        </ul>
-    </template>
+  <lightning-input
+    type="search"
+    label="Search product"
+    value={searchProductName}
+    onchange={handleProductSearch}
+  ></lightning-input>
+  <template if:true={showProd}>
+    <ul>
+      <template for:each={searchResults} for:item="product">
+        <li
+          key={product.Name}
+          onclick={ProductSelection}
+          data-product={product.Id}
+        >
+          {product.Name}
+        </li>
+      </template>
+    </ul>
+  </template>
 </template>

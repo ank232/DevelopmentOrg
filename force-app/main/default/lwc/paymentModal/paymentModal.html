@@ -1,26 +1,6 @@
 <template>
-    <lightning-modal-header label="Record Payment"></lightning-modal-header>
-    <lightning-modal-body>
-        <lightning-flow flow-api-name="User_currency_Converter" onstatuschange={handleFlow}></lightning-flow>
-        <lightning-record-edit-form object-api-name="Payment__c" onsubmit={createPaymentRecord}>
-            <div class="slds-grid slds-wrap">
-                <div class="slds-col slds-size_1-of-2">
-                    <lightning-input-field field-name="Amount__c"></lightning-input-field>
-                    <lightning-input-field field-name="CurrencyIsoCode"></lightning-input-field>
-                    <lightning-input-field field-name="Status__c"></lightning-input-field>
-                </div>
-                <div class="slds-col slds-size_1-of-2">
-                    <lightning-input-field field-name="Date__c"></lightning-input-field>
-                    <lightning-input-field field-name="Reference_Number__c"></lightning-input-field>
-                </div>
-            </div>
-            <div class="slds-grid  slds-var-m-top_medium">
-                <lightning-button type="submit" label="Save" variant="brand"
-                    class="slds-var-m-right_medium"></lightning-button>
-                <lightning-button label="Close" variant="brand" onclick={closePaymentModal}></lightning-button>
-            </div>
-            <!-- <lightning-modal-footer> -->
-        </lightning-record-edit-form>
-    </lightning-modal-body>
-    <!-- </lightning-modal-footer> -->
+  <lightning-modal-header label="Record Payment"></lightning-modal-header>
+  <lightning-modal-body>   
+      <a href={stripePayURL} class="slds-button slds-button_brand" target="_blank"> Pay with Stripe</a>    
+  </lightning-modal-body>
 </template>

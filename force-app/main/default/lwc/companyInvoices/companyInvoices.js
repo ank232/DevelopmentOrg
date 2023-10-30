@@ -81,7 +81,7 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
         this.invoiceData = null;
       } else {
         console.log(data);
-        this.invoiceData = data.map(invoice => {
+        this.invoiceData = data.map((invoice) => {
           const customerName = invoice.Customer__r
             ? `${invoice.Customer__r.FirstName} ${invoice.Customer__r.LastName}`
             : "N/A";
@@ -102,7 +102,7 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
       console.log(JSON.stringify(error));
     }
   }
-  Rowmenu = event => {
+  Rowmenu = (event) => {
     console.log("You selected a row!!");
     const row = event.detail.selectedRows;
     console.log(JSON.stringify(row));
@@ -131,7 +131,7 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
         size: "large",
         description: "invoice Summary",
         message: this.selectedRowData
-      }).catch(error => {
+      }).catch((error) => {
         console.log("Error in Invoice Modal");
         console.log(error);
       });
@@ -151,7 +151,7 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
   //     }
   //     console.log();
   // }
-  rowAction = event => {
+  rowAction = (event) => {
     const rowId = event.detail.row.Id;
     const rowNumber = event.detail.row.Name;
     const actionName = event.detail.action.name;

@@ -53,7 +53,7 @@ export default class Paymentrectable extends LightningElement {
         const temprecs = [];
         const fieldVals = data.records;
         console.log(fieldVals);
-        fieldVals.forEach(obj => {
+        fieldVals.forEach((obj) => {
           let record = {};
           record.Id = obj.fields.Id.value;
           record.Reference = obj.fields.Reference_Number__c.value;
@@ -78,7 +78,7 @@ export default class Paymentrectable extends LightningElement {
       this.paymentrecs = null;
     }
   }
-  deletePaymentRecord = event => {
+  deletePaymentRecord = (event) => {
     const rowIndex = event.target.dataset.id;
     const recTodelete = this.paymentrecs[rowIndex];
     setTimeout(() => {
@@ -94,7 +94,7 @@ export default class Paymentrectable extends LightningElement {
         this.showNoficiation("Message", "Payment has been deleted", "Message");
         this.loadingScreen = false;
       })
-      .catch(error => {
+      .catch((error) => {
         this.showNoficiation("Error", error.message, "Error");
       });
     if (this.paymentrecs.length == 0) {

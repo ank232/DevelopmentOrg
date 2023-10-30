@@ -1,54 +1,45 @@
 <template>
-    <lightning-modal-header label="Invoice Preview"></lightning-modal-header>
-    <lightning-modal-body class="custombody">
-        <!-- <lightning-card title="Invoice Details" class="custombody"> -->
-        <!-- {message} -->
-        <ul class="slds-has-dividers_around">
-            <template for:each={message} for:item="messageItem" for:index="index">
-                <!-- <p key={messageItem.Id} class="custombody">Items::: {messageItem.Id}</p> -->
-                <span key={messageItem.Id}>{messageItem.CurrencyIsoCode}</span> {messageItem.Grand_Total__c}
-                <li key={messageItem.Id} class="slds-item">
-                    <span>
-                        Invoice Total
-                    </span>
-                    {messageItem.Grand_Total__c}
-                </li>
-                <li key={messageItem.Id}>
-                    {messageItem.CurrencyIsoCode}
-                </li>
-                <li key={messageItem.Id} class="slds-item">
-                    <span>
-                        Quantity
-                    </span>
-                    {messageItem.Quantity__c}
-                </li>
-            </template>
-        </ul>
-        <lightning-layout>
-            <lightning-layout-item>
-                <template for:each={invoiceLines} for-index="item" for:item="lineItem">
-                    <li key={lineItem.Id}  class="slds-item">
-                        <span key={lineItem.Id}>
-                            Product Quantity
-                        </span>
-                        {lineItem.Quantity__c}
-                    </li>
-                    <li  key={lineItem.Id} class="slds-item">
-                        <span key={lineItem.Id}>
-                            Product Price
-                        </span>
-                        {lineItem.Total_Amount__c}
-                    </li>
-                </template>
-            </lightning-layout-item>
-        </lightning-layout>
-        <!-- <template for:each={invoiceLines} for:item="lineitem" for:index="item">
+  <lightning-modal-header label="Invoice Preview"></lightning-modal-header>
+  <lightning-modal-body class="custombody">
+    <!-- <lightning-card title="Invoice Details" class="custombody"> -->
+    <!-- {message} -->
+    <ul class="slds-has-dividers_around">
+      <template for:each={message} for:item="messageItem" for:index="index">
+        <!-- <p key={messageItem.Id} class="custombody">Items::: {messageItem.Id}</p> -->
+        <span key={messageItem.Id}>{messageItem.CurrencyIsoCode}</span>
+        {messageItem.Grand_Total__c}
+        <li key={messageItem.Id} class="slds-item">
+          <span> Invoice Total </span>
+          {messageItem.Grand_Total__c}
+        </li>
+        <li key={messageItem.Id}>{messageItem.CurrencyIsoCode}</li>
+        <li key={messageItem.Id} class="slds-item">
+          <span> Quantity </span>
+          {messageItem.Quantity__c}
+        </li>
+      </template>
+    </ul>
+    <lightning-layout>
+      <lightning-layout-item>
+        <template for:each={invoiceLines} for-index="item" for:item="lineItem">
+          <li key={lineItem.Id} class="slds-item">
+            <span key={lineItem.Id}> Product Quantity </span>
+            {lineItem.Quantity__c}
+          </li>
+          <li key={lineItem.Id} class="slds-item">
+            <span key={lineItem.Id}> Product Price </span>
+            {lineItem.Total_Amount__c}
+          </li>
+        </template>
+      </lightning-layout-item>
+    </lightning-layout>
+    <!-- <template for:each={invoiceLines} for:item="lineitem" for:index="item">
             <p key={lineitem.Id}>{lineitem.Product__r.Name}</p>
 
         </template> -->
-        <!-- </lightning-card> -->
-        <!-- <c-invoice-total invtax={invtax} invsubtotal={invsubtotal} invgrandtotal={invgrandtotal}
+    <!-- </lightning-card> -->
+    <!-- <c-invoice-total invtax={invtax} invsubtotal={invsubtotal} invgrandtotal={invgrandtotal}
             oninvoicesummary={invoiceSummary}></c-invoice-total> -->
-        <lightning-button label="Confirm" onclick={confirmInv}></lightning-button>
-    </lightning-modal-body>
+    <lightning-button label="Confirm" onclick={confirmInv}></lightning-button>
+  </lightning-modal-body>
 </template>

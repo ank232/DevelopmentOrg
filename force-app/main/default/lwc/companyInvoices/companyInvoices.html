@@ -1,14 +1,23 @@
 <!-- sldsValidatorIgnore -->
 <template>
-    <lightning-card icon-name="utility: contract_line_outcome_data">
-        <template lwc:if={invoiceData}>
-            <lightning-datatable key-field="Id" data={invoiceData} columns={columns} show-row-number-column="true"
-                onrowaction={rowAction} onrowselection={Rowmenu}>
-            </lightning-datatable>
-            <lightning-button label="Send Invoices" onclick={sendAction}></lightning-button>
-        </template>
-        <template lwc:else>
-            <div class="slds-error">No data to show.</div>
-        </template>
-    </lightning-card>
+  <lightning-card icon-name="utility: contract_line_outcome_data">
+    <template lwc:if={invoiceData}>
+      <lightning-datatable
+        key-field="Id"
+        data={invoiceData}
+        columns={columns}
+        show-row-number-column="true"
+        onrowaction={rowAction}
+        onrowselection={Rowmenu}
+      >
+      </lightning-datatable>
+      <lightning-button
+        label="Send Invoices"
+        onclick={sendAction}
+      ></lightning-button>
+    </template>
+    <template lwc:else>
+      <div class="slds-error">No data to show.</div>
+    </template>
+  </lightning-card>
 </template>

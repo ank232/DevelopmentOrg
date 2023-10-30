@@ -1,45 +1,53 @@
 <!-- sldsValidatorIgnore -->
 <template>
-    <lightning-card icon-name="utility:contract_payment" title="Payments">
-        <template if:true={loadingScreen}>
-            <lightning-spinner alternative-text="Processing payments"></lightning-spinner>
+  <lightning-card icon-name="utility:contract_payment" title="Payments">
+    <template if:true={loadingScreen}>
+      <lightning-spinner
+        alternative-text="Processing payments"
+      ></lightning-spinner>
+    </template>
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+      <thead>
+        <tr>
+          <th scope="col">Reference</th>
+          <th scope="col">Date</th>
+          <th scope="col">Amount</th>
+          <th scope="col">Status</th>
+          <th scope="col">Comments</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template for:each={paymentrecs} for:item="rec" for:index="index">
+          <tr key={rec.Name} data-row-index="index">
+            <td>{rec.Reference}</td>
+            <td>{rec.Date}</td>
+            <td>
+              <div class="slds-text-title_bold">{rec.Amount__c}</div>
+            </td>
+            <td>{rec.Status__c}</td>
+            <td>{rec.Comments}</td>
+            <td>
+              <lightning-button-icon
+                data-id={index}
+                label="Delete"
+                icon-name="standard:record_delete"
+                onclick={deletePaymentRecord}
+                title="Delete"
+              ></lightning-button-icon>
+            </td>
+          </tr>
         </template>
-        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
-            <thead>
-                <tr>
-                    <th scope="col">Reference</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Amount</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Comments</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template for:each={paymentrecs} for:item="rec" for:index="index">
-                    <tr key={rec.Name} data-row-index="index">
-                        <td>{rec.Reference}</td>
-                        <td>{rec.Date}</td>
-                        <td>
-                            <div class="slds-text-title_bold">
-                                {rec.Amount__c}
-                            </div>
-                        </td>
-                        <td>{rec.Status__c}</td>
-                        <td>{rec.Comments}</td>
-                        <td>
-                            <lightning-button-icon data-id={index} label="Delete" icon-name="standard:record_delete"
-                                onclick={deletePaymentRecord} title="Delete"></lightning-button-icon>
-                        </td>
-                    </tr>
-                </template>
-            </tbody>
-        </table>
-        <div class="slds-text-heading_medium">
-            Amount Paid:
-            <lightning-formatted-number format-style="currency" value={paymentsummary.totalPaidAmount}
-                currency-code={paymentsummary.paymentCurrency}>
-            </lightning-formatted-number>
-        </div>
-    </lightning-card>
+      </tbody>
+    </table>
+    <div class="slds-text-heading_medium">
+      Amount Paid:
+      <lightning-formatted-number
+        format-style="currency"
+        value={paymentsummary.totalPaidAmount}
+        currency-code={paymentsummary.paymentCurrency}
+      >
+      </lightning-formatted-number>
+    </div>
+  </lightning-card>
 </template>

@@ -50,7 +50,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
 
   /* Wire Method to fetch Related LineItems */
   @wire(RelatedLineItems, { invoiceId: "$recordId" })
-  LineItemData(result) {    
+  LineItemData(result) {
     this.datatoRefresh = result;
     if (result.data) {
       if (result.data.length == 0) {
@@ -65,7 +65,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
       }
     }
     if (result.error) {
-      console.log('Error Occured');      
+      console.log("Error Occured");
     }
   }
   @wire(CurrentPageReference) currentPageReference;
@@ -82,7 +82,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
 
   /*-------------   Method to Prepare the related Data and pushing it into lineItems --------------*/
   RelatedLineItemData(data) {
-    const lineData = [];
+    const lineData = [];    
     for (let item of data) {
       const reLItem = {
         Id: item.Id,
@@ -93,28 +93,38 @@ export default class CreateInvoiceLineItem extends LightningElement {
         TaxPercent: item.Tax__c,
         TaxType: item.Tax_Type__c,
         totalAmount: item.Total_Amount__c,
-        taxAmount: item.Tax_Amount__c
+        taxAmount: item.Tax_Amount__c ,
+        stipePrice:item.Product__r.Stripe_Price_Id__c
       };
       lineData.push(reLItem);
     }
     this.lineItems = lineData;
-    this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, "RelatedLineItemData", this._invoiceCurrency // this.rate
+    this.EmitInvoiceTotalMessage(
+      this.lineItems,
+      this.invoiceStatus,
+      "RelatedLineItemData",
+      this._invoiceCurrency // this.rate
     );
   }
   /* ---------- Event Handlers ------------*/
-  handleFocus = event => {
+  handleFocus = (event) => {
     const row = event.target.dataset.id;
     const normalval = destructCurrency(event.target.value);
-    this.lineItems[row]['UnitAmount'] = normalval;
+    this.lineItems[row]["UnitAmount"] = normalval;
   };
-  formatAmount = event => {
+  formatAmount = (event) => {
     const row = event.target.dataset.id;
     console.log("Focus Released!");
     console.log(event.target.value);
-    this._invoiceCurrency = this._invoiceCurrency ? this._invoiceCurrency : 'USD';
-    this.lineItems[row]['UnitAmount'] = makeCurrency(event.target.value, this._invoiceCurrency);
+    this._invoiceCurrency = this._invoiceCurrency
+      ? this._invoiceCurrency
+      : "USD";
+    this.lineItems[row]["UnitAmount"] = makeCurrency(
+      event.target.value,
+      this._invoiceCurrency
+    );
   };
-  handleProductName = event => {
+  handleProductName = (event) => {
     const rowId = event.target.dataset.id;
     if (!event.target.value) {
       this.showNoficiation("Message", "You left a field Blank!", "Message");
@@ -122,35 +132,35 @@ export default class CreateInvoiceLineItem extends LightningElement {
     this.lineItems[rowId]["ProductName"] = event.target.value;
   };
 
-  handleDescription = event => {
+  handleDescription = (event) => {
     const row = event.target.dataset.id;
     this.lineItems[row]["Description"] = event.target.value;
   };
-  handleQuantity = event => {
+  handleQuantity = (event) => {
     const row = event.target.dataset.id;
     this.lineItems[row]["Quantity"] = event.target.value;
     this.CalculateTaxAmount(row);
   };
 
-  handleunitAmount = event => {
-    console.log('Onchange Event occured!');
+  handleunitAmount = (event) => {
+    console.log("Onchange Event occured!");
     const row = event.target.dataset.id;
     const value = event.target.value;
     console.log("You entered=", value);
-    this.lineItems[row]['UnitAmount'] = event.target.value;
+    this.lineItems[row]["UnitAmount"] = event.target.value;
     this.CalculateTaxAmount(row);
   };
-  handleTaxType = event => {
+  handleTaxType = (event) => {
     const row = event.target.dataset.id;
     this.lineItems[row]["TaxType"] = event.target.value;
   };
 
-  handleTaxInput = event => {
+  handleTaxInput = (event) => {
     const row = event.target.dataset.id;
     this.lineItems[row]["TaxPercent"] = event.target.value;
     this.CalculateTaxAmount(row);
   };
-  handleDeleteLineItem = event => {
+  handleDeleteLineItem = (event) => {
     const rowIndex = event.target.dataset.id;
     let itemDeleted = this.lineItems[rowIndex];
     if (this.currentPageReference.type.includes("recordPage")) {
@@ -184,7 +194,13 @@ export default class CreateInvoiceLineItem extends LightningElement {
   }
 
   /* Emiting the message:Payload: InvoiceLineItems , Invoice Status */
-  EmitInvoiceTotalMessage(invoiceProds, invStatus, origin, invoiceCurrency, exchangeRate) {
+  EmitInvoiceTotalMessage(
+    invoiceProds,
+    invStatus,
+    origin,
+    invoiceCurrency,
+    exchangeRate
+  ) {
     const payload = {
       invoicelines: invoiceProds,
       invoiceStatus: invStatus,
@@ -197,7 +213,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
 
   /* Validating User Input Data */
   validateLineItemInput(data) {
-    const validate = data.every(item => {
+    const validate = data.every((item) => {
       item.UnitAmount = destructCurrency(item.UnitAmount);
       console.log(item.UnitAmount);
       return (
@@ -240,7 +256,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
             "DeleteEvent"
           );
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
           this.showNoficiation(
             "Error",
@@ -258,7 +274,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
    * @returns {any}
    */
   async CreateLineItems(data, invoiceId) {
-    console.log('Creating Items!');
+    console.log("Creating Items!");
     const lineItemsdata = [];
     for (let item of data) {
       const newItem = {
@@ -287,7 +303,9 @@ export default class CreateInvoiceLineItem extends LightningElement {
       this.UpdateWire();
       // }
     } catch (error) {
-      if (error.body.message.includes("Invoice is paid, you cannot edit anything")) {
+      if (
+        error.body.message.includes("Invoice is paid, you cannot edit anything")
+      ) {
         this.showNoficiation(
           "Error",
           "Invoice is paid, you cannot edit LineItems",
@@ -306,7 +324,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
       .then(() => {
         this.showNoficiation("Message", "Data has been refreshed", "Message");
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         this.showNoficiation("Warning", error, "Warning");
       });
@@ -327,7 +345,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
     }
   };
   /* ----------- Inserting the LineItems into Database ----------------*/
-  SaveLineItem = event => {
+  SaveLineItem = (event) => {
     event.preventDefault();
     const currentPageRef = this.currentPageReference;
     if (currentPageRef.type.includes("quickAction")) {
@@ -360,7 +378,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
    */
   CalculateTaxAmount(row) {
     const item = this.lineItems[row];
-    const unit = destructCurrency(item['UnitAmount']);
+    const unit = destructCurrency(item["UnitAmount"]);
     const quant = parseInt(item["Quantity"]);
     const tax = parseFloat(item["TaxPercent"]);
     if (!isNaN(unit) && !isNaN(quant) && !isNaN(tax)) {
@@ -368,12 +386,24 @@ export default class CreateInvoiceLineItem extends LightningElement {
       const taxAmount = unit * (tax / 100) * quant;
       item["taxAmount"] = taxAmount.toFixed(3);
       this.lineItems = [...this.lineItems];
-      this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, "Recalculation", this._invoiceCurrency, this.rate);
+      this.EmitInvoiceTotalMessage(
+        this.lineItems,
+        this.invoiceStatus,
+        "Recalculation",
+        this._invoiceCurrency,
+        this.rate
+      );
     } else {
       item["totalAmount"] = 0;
       item["taxAmount"] = 0;
       this.lineItems = [...this.lineItems];
-      this.EmitInvoiceTotalMessage(this.lineItems, this.invoiceStatus, "Null Amount",this._invoiceCurrency,this.rate);
+      this.EmitInvoiceTotalMessage(
+        this.lineItems,
+        this.invoiceStatus,
+        "Null Amount",
+        this._invoiceCurrency,
+        this.rate
+      );
     }
   }
 }
