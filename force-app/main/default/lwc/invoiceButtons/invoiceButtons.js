@@ -134,7 +134,8 @@ export default class InvoiceButtons extends LightningElement {
     this.trueVal = true;
     await PaymentModal.open({
       size: "Small",
-      message: this.invoicedata
+      message: this.invoicedata,
+      recordId: this.recordId
     })
       .then((result) => {
         if (result.paymentData) {
