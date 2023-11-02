@@ -136,13 +136,14 @@ global without sharing class StripeService {
     }
   }
   @auraEnabled
-  public static string createStripePayment(string priceId, integer quanity,string redirectUrl) {
+  public static string createStripePayment(string priceId, integer quanity,string redirectUrl,string invoiceId) {
     Map<String, Object> requestbody = new Map<String, Object>();
     // System.debug('VALUES:::');
     // System.debug(priceId + '||| ' + quanity);
     requestbody.put('lineItemPrice', priceId);
     requestbody.put('lineItemQuantity', quanity);
     requestbody.put('redirectUrl', redirectUrl);
+    requestbody.put('invoiceId',invoiceId);
     string encodedResponse =
       'line_items[0[price]]=' +
       EncodingUtil.urlEncode(
@@ -156,6 +157,7 @@ global without sharing class StripeService {
         'UTF-8'
       );
       encodedResponse +='&after_completion[type]=redirect' + '&after_completion[redirect][url]='+ EncodingUtil.urlEncode(String.valueOf(requestbody.get('redirectUrl')), 'UTF-8');
+      encodedResponse+= '&metadata[invoiceId]='+ EncodingUtil.urlEncode(String.valueOf(requestbody.get('invoiceId')), 'UTF-8');
     HttpRequest stripePayreq = new HttpRequest();
     stripePayreq.setEndpoint('callout:Stripe_System/payment_links');
     stripePayreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');

@@ -22,13 +22,27 @@ global without sharing class StripeWebHook {
       Map<String, Object> stripePaymentData = (Map<String, Object>) JSON.deserializeUntyped(
         responseString
       );
+      System.debug(System.LoggingLevel.DEBUG, '** ' + responseString);
       String eventType = String.valueOf(stripePaymentData.get('type'));
       switch on eventType {
+        when 'checkout.session.completed' {
+          Map<String, Object> wrapper = (Map<String,Object>) stripePaymentData.get('data');
+          Map<String, Object> checkoutData = (Map<String,Object>)wrapper.get('object');
+          string invoiceId = String.valueOf(checkoutData.get('metadata'));
+          System.debug('MetaData::');
+          System.debug(System.LoggingLevel.DEBUG , '^^^^^-> '+ invoiceId);
+          response.statusCode = 200;
+          response.responseBody = Blob.valueOf(
+            '{success: true, event: "Checkout Completed?"}'
+          );
+          Integer amount = Integer.valueOf(String.ValueOf(checkoutData.get('amount_total')))/ 100;
+          sendStripeReciept(amount, '',invoiceId);
+        }
         when 'charge.succeeded' {
+          System.debug(System.LoggingLevel.DEBUG, '****=> \n' + responseString);
           Map<String, Object> data = (Map<String, Object>) stripePaymentData.get(
             'data'
-          );
-          System.debug(System.LoggingLevel.DEBUG, '****=> \n' + responseString);
+          );         
           StripePaymentWrapper paymentData = (StripePaymentWrapper) JSON.deserialize(
             JSON.serialize(data.get('object')),
             StripePaymentWrapper.class
@@ -39,7 +53,7 @@ global without sharing class StripeWebHook {
             '{success: true, event: "Charge Recieved"}'
           );
           response.statusCode = 200;
-          sendStripeReciept(amount, reciept);
+          // sendStripeReciept(amount, reciept);
         }
         when 'product.updated' {
           System.debug('Product Update Recieved');
@@ -60,8 +74,10 @@ global without sharing class StripeWebHook {
             Stripe_Price_Id__c = wrapper.default_price
           );
           Database.upsert(stripeProduct, Product2.Stripe_Product_Id__c, false);
-          response.statusCode =200;
-          response.responseBody = Blob.valueOf('success:true,"event":"Product Upserted In Salesforce"');
+          response.statusCode = 200;
+          response.responseBody = Blob.valueOf(
+            'success:true,"event":"Product Upserted In Salesforce"'
+          );
         }
         when else {
           System.debug(eventType);
@@ -102,7 +118,7 @@ global without sharing class StripeWebHook {
     @invocableVariable(required=true)
     public integer amount;
   }
-  public static void sendStripeReciept(integer amount, string recieptUrl) {
+  public static void sendStripeReciept(integer amount, string recieptUrl,string invoiceId) {
     List<OrgWideEmailAddress> orgEmail = [
       SELECT Id
       FROM OrgWideEmailAddress
@@ -118,12 +134,11 @@ global without sharing class StripeWebHook {
     email.setOrgWideEmailAddressId(fromEmail);
     email.setSaveAsActivity(false);
     email.setTargetObjectId(UserInfo.getUserId());
-    email.setHtmlBody(
-      // 'Test Email From BillZen ' + recieptUrl
+    email.setHtmlBody(      
       'Payment of ' +
-        amount +
-        'Has been recieved \n' +
-        '<button href=+ >Get the Reciept</button>'
+        amount + 'For Invoice ' + invoiceId +
+        ' Has been recieved \n' +
+        '<button href="#" >Get the Reciept</button>'
     );
     try {
       System.debug(
