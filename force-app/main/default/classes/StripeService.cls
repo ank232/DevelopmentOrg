@@ -54,9 +54,8 @@ global without sharing class StripeService {
         'UTF-8'
       );
     HttpRequest req = new HttpRequest();
-    req.setEndpoint(StripeEndpoint + '/products');
-    req.setMethod('POST');
-    req.setHeader('Authorization', 'Bearer ' + API_key);
+    req.setEndpoint('callout:Stripe_System/products');
+    req.setMethod('POST');    
     req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
     req.setBody(urlEncodebody);
 
@@ -83,9 +82,9 @@ global without sharing class StripeService {
       Http http = new Http();
       HttpResponse stripeResponse = http.send(stripeReq);
       if (stripeResponse.getStatusCode() == 200) {
-        // System.debug('Found Acive Products');
-        // System.debug(stripeResponse.getBody());
-        parseData(stripeResponse.getBody());
+        System.debug('Found Acive Products');
+        System.debug(stripeResponse.getBody());
+        // parseData(stripeResponse.getBody());
       }
       if (stripeResponse.getStatusCode() == 404) {
         System.debug('Not FOUND');
@@ -137,12 +136,13 @@ global without sharing class StripeService {
     }
   }
   @auraEnabled
-  public static string createStripePayment(string priceId, integer quanity) {
+  public static string createStripePayment(string priceId, integer quanity,string redirectUrl) {
     Map<String, Object> requestbody = new Map<String, Object>();
-    System.debug('VALUES:::');
-    System.debug(priceId + '||| ' + quanity);
+    // System.debug('VALUES:::');
+    // System.debug(priceId + '||| ' + quanity);
     requestbody.put('lineItemPrice', priceId);
     requestbody.put('lineItemQuantity', quanity);
+    requestbody.put('redirectUrl', redirectUrl);
     string encodedResponse =
       'line_items[0[price]]=' +
       EncodingUtil.urlEncode(
@@ -155,6 +155,7 @@ global without sharing class StripeService {
         String.valueOf(requestbody.get('lineItemQuantity')),
         'UTF-8'
       );
+      encodedResponse +='&after_completion[type]=redirect' + '&after_completion[redirect][url]='+ EncodingUtil.urlEncode(String.valueOf(requestbody.get('redirectUrl')), 'UTF-8');
     HttpRequest stripePayreq = new HttpRequest();
     stripePayreq.setEndpoint('callout:Stripe_System/payment_links');
     stripePayreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -216,5 +217,5 @@ global without sharing class StripeService {
       System.debug(response.getStatusCode());
       System.debug(response.getBody());
     }
-  }
+  }  
 }

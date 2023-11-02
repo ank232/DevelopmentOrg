@@ -5,8 +5,8 @@ public class StripePaymentWrapper {
   public string balance_transaction;  
   public billing_details billing_details;
   public boolean captured;
-  public string paid;
-  public string receipt_url;
+  public string paid;  
+  public string receipt_url;  
   public class billing_details {
     public address address;
     public string email;
