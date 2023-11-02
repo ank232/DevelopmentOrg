@@ -5,7 +5,6 @@ global without sharing class StripeWebHook {
   @HttpPost
   global static void doPost() {
     RestResponse response = RestContext.response;
-    // sendEmail(78, 'reciept');
     response.addHeader('Content-Type', 'application/json');
     String responseString = RestContext.request.requestBody.toString();
     String validResponse = validateStripeSign(
@@ -24,20 +23,50 @@ global without sharing class StripeWebHook {
         responseString
       );
       String eventType = String.valueOf(stripePaymentData.get('type'));
-      if (eventType == 'charge.succeeded') {
-        Map<String, Object> data = (Map<String, Object>) stripePaymentData.get(
-          'data'
-        );
-        System.debug(System.LoggingLevel.DEBUG, '****=> \n' + responseString);
-        StripePaymentWrapper paymentData = (StripePaymentWrapper) JSON.deserialize(
-          JSON.serialize(data.get('object')),
-          StripePaymentWrapper.class
-        );
-        Integer amount = paymentData.amount;
-        String reciept = paymentData.receipt_url;
+      switch on eventType {
+        when 'charge.succeeded' {
+          Map<String, Object> data = (Map<String, Object>) stripePaymentData.get(
+            'data'
+          );
+          System.debug(System.LoggingLevel.DEBUG, '****=> \n' + responseString);
+          StripePaymentWrapper paymentData = (StripePaymentWrapper) JSON.deserialize(
+            JSON.serialize(data.get('object')),
+            StripePaymentWrapper.class
+          );
+          Integer amount = paymentData.amount;
+          String reciept = paymentData.receipt_url;
+          response.responseBody = Blob.valueOf(
+            '{success: true, event: "Charge Recieved"}'
+          );
+          response.statusCode = 200;
+          sendStripeReciept(amount, reciept);
+        }
+        when 'product.updated' {
+          System.debug('Product Update Recieved');
+          System.debug(LoggingLevel.DEBUG, responseString);
+          Map<String, Object> data = (Map<String, Object>) stripePaymentData.get(
+            'data'
+          );
+          StripeProductWrapper wrapper = (StripeProductWrapper) JSON.deserialize(
+            JSON.serialize(data.get('object')),
+            StripeProductWrapper.class
+          );
+          Product2 stripeProduct = new Product2(
+            name = wrapper.name,
+            Description = 'Added From Stripe',
+            Stripe_Product_Id__c = wrapper.id,
+            currencyIsoCode = 'USD',
+            IsActive = true,
+            Stripe_Price_Id__c = wrapper.default_price
+          );
+          Database.upsert(stripeProduct, Product2.Stripe_Product_Id__c, false);
+          response.statusCode =200;
+          response.responseBody = Blob.valueOf('success:true,"event":"Product Upserted In Salesforce"');
+        }
+        when else {
+          System.debug(eventType);
+        }
       }
-      response.responseBody = Blob.valueOf('{success: true, event: "Unknown"}');
-      response.statusCode = 200;
     }
   }
   private static String validateStripeSign(
@@ -72,5 +101,52 @@ global without sharing class StripeWebHook {
     public string recieptUrl;
     @invocableVariable(required=true)
     public integer amount;
+  }
+  public static void sendStripeReciept(integer amount, string recieptUrl) {
+    List<OrgWideEmailAddress> orgEmail = [
+      SELECT Id
+      FROM OrgWideEmailAddress
+      WHERE DisplayName = 'Org EMAIL'
+      LIMIT 1
+    ];
+    string fromEmail = orgEmail[0].Id;
+    Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+    email.setSubject('Payment Successful');
+    string userEmail = UserInfo.getUserEmail();
+    string[] to = new List<string>{ 'ankurtrivediakku@gmail.com' };
+    email.setToAddresses(to);
+    email.setOrgWideEmailAddressId(fromEmail);
+    email.setSaveAsActivity(false);
+    email.setTargetObjectId(UserInfo.getUserId());
+    email.setHtmlBody(
+      // 'Test Email From BillZen ' + recieptUrl
+      'Payment of ' +
+        amount +
+        'Has been recieved \n' +
+        '<button href=+ >Get the Reciept</button>'
+    );
+    try {
+      System.debug(
+        System.LoggingLevel.DEBUG,
+        'USED LIMIT? ' + Limits.getEmailInvocations()
+      );
+      Messaging.SendEmailResult[] res = Messaging.sendEmail(
+        new List<Messaging.SingleEmailMessage>{ email }
+      );
+      for (Messaging.SendEmailResult result : res) {
+        if (!result.isSuccess()) {
+          System.debug('Not DONE: ' + result.getErrors());
+        } else {
+          System.debug('SENT!');
+          System.debug(result);
+        }
+      }
+    } catch (Exception e) {
+      System.debug(System.LoggingLevel.ERROR, e.getMessage());
+      System.debug(
+        System.LoggingLevel.WARN,
+        'USED LIMIT(DEAD) ? ' + Limits.getEmailInvocations()
+      );
+    }
   }
 }
