@@ -18,7 +18,8 @@ export default class PaymentModal extends LightningModal {
     this.invoiceQuantity = this.message.invoicelines[0].Quantity;    
     this.priceId=this.message.invoicelines[0].stipePrice;
     console.log(this.priceId);
-    this.generateStripePayout(this.priceId, this.invoiceQuantity);
+    console.log('Location: ',window.location.href);
+    this.generateStripePayout(this.priceId, this.invoiceQuantity, window.location.href);
   }
   closePaymentModal = () => {
     console.log("Close event orrcured");
@@ -39,9 +40,9 @@ export default class PaymentModal extends LightningModal {
     //     paymentData: null
     //   });
     // }
-generateStripePayout(stripe_product_id, productQuantity)
+generateStripePayout(stripe_product_id, productQuantity,redirect_url)
 {
-  createStripePayment({priceId: stripe_product_id, quanity: productQuantity})
+  createStripePayment({priceId: stripe_product_id, quanity: productQuantity, redirectUrl: redirect_url})
   .then(
 (result)=>{
   const paymentlink = result;
