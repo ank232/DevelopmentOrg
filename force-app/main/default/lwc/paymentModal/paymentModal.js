@@ -37,11 +37,6 @@ export default class PaymentModal extends LightningModal {
         paymentData: this.paymentData
       });
     } 
-    // else {
-    //   this.close({
-    //     paymentData: null
-    //   });
-    // }
 generateStripePayout(stripe_product_id, productQuantity,redirect_url,invoiceId)
 {
   createStripePayment({priceId: stripe_product_id, quanity: productQuantity, redirectUrl: redirect_url, invoiceId: invoiceId})

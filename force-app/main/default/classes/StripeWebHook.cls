@@ -26,23 +26,30 @@ global without sharing class StripeWebHook {
       String eventType = String.valueOf(stripePaymentData.get('type'));
       switch on eventType {
         when 'checkout.session.completed' {
-          Map<String, Object> wrapper = (Map<String,Object>) stripePaymentData.get('data');
-          Map<String, Object> checkoutData = (Map<String,Object>)wrapper.get('object');
-          string invoiceId = String.valueOf(checkoutData.get('metadata'));
-          System.debug('MetaData::');
-          System.debug(System.LoggingLevel.DEBUG , '^^^^^-> '+ invoiceId);
+          Map<String, Object> wrapper = (Map<String, Object>) stripePaymentData.get(
+            'data'
+          );
+          Map<String, Object> checkoutData = (Map<String, Object>) wrapper.get(
+            'object'
+          );
+          string metadata = String.valueOf(checkoutData.get('metadata'));
+          List<String> res = metadata.split('=');
+          string invoiceId = res[1].remove('}');
           response.statusCode = 200;
           response.responseBody = Blob.valueOf(
             '{success: true, event: "Checkout Completed?"}'
           );
-          Integer amount = Integer.valueOf(String.ValueOf(checkoutData.get('amount_total')))/ 100;
-          sendStripeReciept(amount, '',invoiceId);
+          String amountVal = String.valueOf(checkoutData.get('amount_total'));
+          Decimal amount = Decimal.valueOf(amountVal);
+          amount = amount / 100;
+          // sendStripeReciept(amount, '', invoiceId);
+          sendSuccsessMail(amount,invoiceId);
         }
         when 'charge.succeeded' {
           System.debug(System.LoggingLevel.DEBUG, '****=> \n' + responseString);
           Map<String, Object> data = (Map<String, Object>) stripePaymentData.get(
             'data'
-          );         
+          );
           StripePaymentWrapper paymentData = (StripePaymentWrapper) JSON.deserialize(
             JSON.serialize(data.get('object')),
             StripePaymentWrapper.class
@@ -53,7 +60,7 @@ global without sharing class StripeWebHook {
             '{success: true, event: "Charge Recieved"}'
           );
           response.statusCode = 200;
-          // sendStripeReciept(amount, reciept);
+          sendStripeReciept(amount, reciept);
         }
         when 'product.updated' {
           System.debug('Product Update Recieved');
@@ -118,7 +125,62 @@ global without sharing class StripeWebHook {
     @invocableVariable(required=true)
     public integer amount;
   }
-  public static void sendStripeReciept(integer amount, string recieptUrl,string invoiceId) {
+  public static void sendSuccsessMail(decimal amount, string invoiceId)
+  {
+    Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+    email.setSubject('Payment Successful');
+    string userEmail = UserInfo.getUserEmail();
+        List<OrgWideEmailAddress> orgEmail = [
+      SELECT Id
+      FROM OrgWideEmailAddress
+      WHERE DisplayName = 'Org EMAIL'
+      LIMIT 1
+    ];
+    string fromEmail = orgEmail[0].Id;
+    string[] to = new List<string>{ 'ankurtrivediakku@gmail.com' };
+    email.setToAddresses(to);
+    email.setOrgWideEmailAddressId(fromEmail);
+    email.setSaveAsActivity(false);
+    email.setTargetObjectId(UserInfo.getUserId());
+    String emailBody = '<html><body>';
+    emailBody +=
+      '<p>Payment of ' +
+      amount +
+      ' has been received against InvoiceNo. ' +
+      invoiceId +
+      ' Please get your purchase reciept.</p>';          
+    emailBody += '<p>Thank you for your payment!</p>';
+    emailBody += '<p> BillZen</p>';
+    emailBody += '</body></html>';
+    email.setHtmlBody(emailBody);
+    try {
+      System.debug(
+        System.LoggingLevel.DEBUG,
+        'USED LIMIT? ' + Limits.getEmailInvocations()
+      );
+      Messaging.SendEmailResult[] res = Messaging.sendEmail(
+        new List<Messaging.SingleEmailMessage>{ email }
+      );
+      for (Messaging.SendEmailResult result : res) {
+        if (!result.isSuccess()) {
+          System.debug('Not DONE: ' + result.getErrors());
+        } else {
+          System.debug('SENT!');
+          System.debug(result);
+        }
+      }
+    } catch (Exception e) {
+      System.debug(System.LoggingLevel.ERROR, e.getMessage());
+      System.debug(
+        System.LoggingLevel.WARN,
+        'USED LIMIT(DEAD) ? ' + Limits.getEmailInvocations()
+      );
+    }
+  }
+  public static void sendStripeReciept(
+    decimal amount,
+    string recieptUrl
+  ) {
     List<OrgWideEmailAddress> orgEmail = [
       SELECT Id
       FROM OrgWideEmailAddress
@@ -134,12 +196,19 @@ global without sharing class StripeWebHook {
     email.setOrgWideEmailAddressId(fromEmail);
     email.setSaveAsActivity(false);
     email.setTargetObjectId(UserInfo.getUserId());
-    email.setHtmlBody(      
-      'Payment of ' +
-        amount + 'For Invoice ' + invoiceId +
-        ' Has been recieved \n' +
-        '<button href="#" >Get the Reciept</button>'
-    );
+    String emailBody = '<html><body>';
+    emailBody +=
+      '<p>Payment of ' +
+      amount +
+      ' has been received. '+ 
+      ' Please get your purchase reciept.</p>';
+    emailBody +=
+      '<a href="' +
+      recieptUrl +
+      '" style="display: inline-block; background-color: #007BFF; color: #fff; padding: 10px 20px; text-decoration: none;">View Receipt</a>';
+    emailBody += '<p>Thank you for your payment!</p>';
+    emailBody += '</body></html>';
+    email.setHtmlBody(emailBody);
     try {
       System.debug(
         System.LoggingLevel.DEBUG,
