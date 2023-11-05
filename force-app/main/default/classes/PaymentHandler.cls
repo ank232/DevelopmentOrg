@@ -6,7 +6,17 @@ public with sharing class PaymentHandler {
     }
     return totalamnt;
   }
-
+private static void validatePayment(List<Payment__c> payments){
+Set<Id> invoiceIds = new Set<Id>();
+for(Payment__c paymentrecord: payments)
+{
+  if(paymentrecord.Invoice__c != null)
+  {
+invoiceIds.add(paymentrecord.Invoice__c);
+  }
+}
+List<Invoice__c> relatedInvoice = [Select Id, Status__c from Invoice__c  where Id In: invoiceIds];
+}
   private static void validatePaymentrecord(
     Payment__c payment,
     Invoice__c invoice
@@ -16,6 +26,7 @@ public with sharing class PaymentHandler {
       return;
     }
     if (invoice.status__c != 'Approved') {
+      System.debug(System.LoggingLevel.WARN, 'Not Approved?');
       payment.addError('Please get your invoice approved');
     }
     if (payment.Date__c < invoice.Invoice_date__c) {
