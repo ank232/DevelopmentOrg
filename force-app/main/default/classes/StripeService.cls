@@ -135,67 +135,63 @@ global without sharing class StripeService {
       }
     }
   }
-  @auraEnabled
-  public static string createStripePayment(
-    string priceId,
-    integer quanity,
-    string redirectUrl,
-    string invoiceId
-  ) {
-    Map<String, Object> requestbody = new Map<String, Object>();
-    requestbody.put('lineItemPrice', priceId);
-    requestbody.put('lineItemQuantity', quanity);
-    requestbody.put('redirectUrl', redirectUrl);
-    requestbody.put('invoiceId', invoiceId);
-    string encodedResponse =
-      'line_items[0[price]]=' +
-      EncodingUtil.urlEncode(
-        String.valueOf(requestbody.get('lineItemPrice')),
-        'UTF-8'
-      );
-    encodedResponse +=
-      '&line_items[0][quantity]=' +
-      EncodingUtil.urlEncode(
-        String.valueOf(requestbody.get('lineItemQuantity')),
-        'UTF-8'
-      );
-    encodedResponse +=
-      '&after_completion[type]=redirect' +
-      '&after_completion[redirect][url]=' +
-      EncodingUtil.urlEncode(
-        String.valueOf(requestbody.get('redirectUrl')),
-        'UTF-8'
-      );
+  // Accepts JSON Data to create Stripe Payment link: content: invoiceLineItems,callbackURL
+  @AuraEnabled
+  public static string createStripePayment(String data) {
+    PaymentModalWrapper paymentWrapper = (PaymentModalWrapper) JSON.deserialize(
+      data,
+      PaymentModalWrapper.class
+    );
+    String url;
+    List<paymentModalWrapper.Data> invoiceLines = paymentWrapper.Data;
+    string encodedResponse = '';
+    for (integer i = 0; i < invoiceLines.size(); i++) {
+      Integer quantity = invoiceLines[i].Quantity;
+      String stripePriceId = invoiceLines[i].stripePrice;
+      encodedResponse +=
+        'line_items[' +
+        i +
+        '][price]=' +
+        EncodingUtil.urlEncode(stripePriceId, 'UTF-8');
+      encodedResponse +=
+        '&line_items[' +
+        i +
+        '][quantity]=' +
+        EncodingUtil.urlEncode(String.valueOf(quantity), 'UTF-8') +
+        '&';
+    }
     encodedResponse +=
       '&metadata[invoiceId]=' +
-      EncodingUtil.urlEncode(
-        String.valueOf(requestbody.get('invoiceId')),
-        'UTF-8'
-      );
+      EncodingUtil.urlEncode(paymentWrapper.invoiceId, 'UTF-8');
+    encodedResponse += '&after_completion[type]=redirect';
+    encodedResponse +=
+      '&after_completion[redirect][url]=' +
+      EncodingUtil.urlEncode(paymentWrapper.redirectUrl, 'UTF-8');
     HttpRequest stripePayreq = new HttpRequest();
     stripePayreq.setEndpoint('callout:Stripe_System/payment_links');
     stripePayreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
     stripePayreq.setMethod('POST');
     stripePayreq.setBody(encodedResponse);
-    Http http = new Http();
-    HttpResponse response = http.send(stripePayreq);
-    if (response.getStatusCode() == 200) {
-      Map<String, Object> responsebody = (Map<String, Object>) (JSON.deserializeUntyped(
-        response.getBody()
-      ));
-      string link = String.valueOf(responsebody.get('url'));
-      System.debug(link);
-      return link;
+    try {
+      Http http = new Http();
+      HttpResponse response = http.send(stripePayreq);
+      if (response.getStatusCode() == 200) {
+        Map<String, Object> responsebody = (Map<String, Object>) (JSON.deserializeUntyped(
+          response.getBody()
+        ));
+        url = String.valueOf(responsebody.get('url'));
+        System.debug(url);
+      }
+      if (response.getStatusCode() == 400) {
+        url = '404 Bad Request';
+        System.debug('Bad Request??');
+        throw new AuraHandledException('Bad Request');
+      }
+    } catch (Exception e) {
+      System.debug(e.getMessage());
+      url = e.getMessage();
     }
-    if (response.getStatusCode() == 400) {
-      string error = 'Bad Request, Try again';
-      return error;
-    } else {
-      System.debug('FAILED>????');
-      System.debug(response.getStatusCode());
-      System.debug(response.getBody());
-      return null;
-    }
+    return url;
   }
   public static void createProductsinStripe() {
     List<Product2> products = [
