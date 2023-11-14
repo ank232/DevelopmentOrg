@@ -1,4 +1,4 @@
-# Invoice Management Project Checklist
+# BillZen: an invoice management application
 
 ## Setup and Configuration
 
@@ -6,28 +6,35 @@
   - [x] Invoice
   - [x] Payment
   - [x] Line Item
-- [ ] Create Lightning Web Components:
-
+- [x] Create Lightning Web Components:
   - [x] Create LWC for Invoice Creation.
   - [x] Create LWC for Payment Recording.
   - [x] Create LWC for Line Item Creation.
   - [x] Create LWC for Refund Recording.
-  - [ ] Utility Buttons on Invoice to Delete or void any invoice
+  - [x] Utility Buttons on Invoice to Delete or void any invoice
   - [x] Overriding Invoice Record Page with LWC (Related Lists)
 
 - [x] Implement Apex Classes:
   - [x] Create Apex Controller for LWCs.
   - [x] Implement Apex methods for CRUD operations.
 
-- [x] Triggers: 
+- [x] Triggers:
     -[x] Trigger to prevent Deletion of any account that has draft Invoices.
-    -[x] Trigger to prevent deletion of any invoice which is pending or paid. 
+    -[x] Trigger to prevent deletion of any invoice which is pending or paid.
     -[x] Trigger to restrict update on any invoice and on related LineItems when its paid.
     -[x] When a Payment is Recorded Update the Payment Date on the Invoice Object with the Current Date.
 
+## Trigger Framework
+
+- Used a handler-dispatcher method for triggers to make it logic-less and to maintain code redability.
+- The Dispatcher class contains a method dispatch() that contains System.TriggerOperation.
+- This Dispatcher class is called inside the trigger passing the trigger operation type (after insert, before insert, etc).
+- Based on trigger operationType the dispatcher is calling the respective handler class method.
+- Using this framework, the trigger is separate from any logic and only contains the dispatch().
+
 ## User Interface
 
-### Web Components
+## Web Components
 
 | Component name           | Usage                                                             | Component Location                       |
 | ------------------------ | ----------------------------------------------------------------- | ---------------------------------------- |
@@ -36,8 +43,11 @@
 | createInvoiceFromAccount | create invoice record                                             | Account Record page                      |
 | createInvoiceLineItem    | create invoiceLineItems                                           | Account Record page ,Invoice Record page |
 | invoiceByStatus          | display invoice-total in three categories                         | Account Record page                      |
-| invoiceTota              | display the related lineItems total(total-tax,grand-total ,total) | Invoice Record page                      |
+| invoiceTotal             | display the related lineItems total(total-tax,grand-total ,total) | Invoice Record page                      |
 | paymentModal             | display the payment link and redirect it to stripe payment        | Invoice Record page                      |
+| paymentrectable          | shows the related payment record on invoice record page           | Invoice Record page                      |
+| invoiceButtons           | shows the invoice button group(includes:                          | Invoice Record page                      |
+                           |   payment, refund, exchangerates, preview invoice buttons)        |                                          |
 
 - [x] Customize Page Components:
   - [x] Add Lightning Components to display invoices, payments, and line items.
@@ -54,6 +64,7 @@
 - [x] Line Item Management:
   - [x] Allow adding, editing, and deleting line items.
   - [x] Calculate line item totals and taxes dynamically.
+
 - [x] Payment Recording:
   - [x] Create payment records associated with invoices.
   - [x] Calculate total payments and outstanding amounts.
@@ -90,9 +101,10 @@
 
 ## Documentation
 
-- [ ] User Guide:
-
-  - [ ] Prepare a user guide explaining how to use the application.
-
 - [ ] Technical Documentation:
   - [x] Document the data model, component structure, and customization details.
+
+sequenceDiagram
+    Alice->>John: Hello John, how are you?
+    John-->>Alice: Great!
+    Alice-)John: See you later!
