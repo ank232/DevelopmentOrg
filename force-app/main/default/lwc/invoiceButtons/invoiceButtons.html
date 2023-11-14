@@ -1,24 +1,9 @@
 <template>
   <lightning-button-group>
-    <lightning-button
-      label="Record Payment"
-      onclick={RecordPayment}
-      class="paymentButton"
-    ></lightning-button>
-    <lightning-button
-      label="Record Refund"
-      onclick={RecordRefund}
-      class="refundButton"
-    ></lightning-button>
-    <lightning-button
-      label="Exchange Rates"
-      onclick={fetchExchangeRates}
-      class="exchangeRate"
-    ></lightning-button>
-    <lightning-button
-      label="Preview Invoice"
-      onclick={previewInvoice}
-      class="invoiceInpreview"
-    ></lightning-button>
+    <lightning-button label="Record Payment" onclick={RecordPayment} class="paymentButton">
+    </lightning-button>
+    <lightning-button label="Record Refund" onclick={RecordRefund} class="refundButton"></lightning-button>
+    <lightning-button label="Exchange Rates" onclick={fetchExchangeRates} class="exchangeRate"></lightning-button>
+    <lightning-button label="Preview Invoice" onclick={previewInvoice} class="invoiceInpreview"></lightning-button>
   </lightning-button-group>
 </template>

@@ -16,6 +16,16 @@ export default class InvoiceButtons extends LightningElement {
   totalLinePrice;
   paidAmount;
   @api invoicedata;
+  runOnce = true;
+  // isDisabled = true;
+  renderedCallback() {
+    if (this.runOnce) {
+      console.log("I will disable the buttons(invoiceBtns)");
+      console.log("InvoiceButton???");
+      console.log(this.invoicedata);
+      this.runOnce = false;
+    }
+  }
   @wire(getRelatedListRecords, {
     parentRecordId: "$recordId",
     relatedListId: "Payments__r",
@@ -33,9 +43,12 @@ export default class InvoiceButtons extends LightningElement {
     const refButton = this.template.querySelector(".refundButton");
     if (data) {
       if (!data.count) {
-        refButton.classList.add("slds-hide");
-        // this.paidAmount = 0;
+        // refButton.classList.add('disabled-button');
+        // refButton.setAttribute('disabled', true);
+        // refButton.classList.add("slds-hide");
+        this.paidAmount = 0;
       } else {
+        // refButton.classList.remove('disabled-button');
         // let amnt = 0;
         // data.records.map((item) => {
         //     amnt += item.fields.Amount__c.value;
@@ -75,9 +88,13 @@ export default class InvoiceButtons extends LightningElement {
      */
   InvoiceButtonVisibility = (data) => {
     const button = this.template.querySelector(".paymentButton");
-    if (data.invoicelines.length == 0) {
-      button.classList.add("slds-hide");
+    if (data.invoicelines.length === 0) {
+      // button.classList.add("slds-hide");
+      // button.setAttribute('disabled',true);
+      // button.setAttribute = true;
+      // button.classList.add('disabled-button');
     } else {
+      // button.removeAttribute('disabled');
       const fireOrigin = data.fireOrigin;
       if (fireOrigin.includes("Related")) {
         this.invoicedata = data;
@@ -95,7 +112,7 @@ export default class InvoiceButtons extends LightningElement {
   };
 
   ProcessPayment = (paymentData) => {
-    const AmounttoPaid = paymentData["Amount__c"];
+    // const AmounttoPaid = paymentData["Amount__c"];
 
     // if (AmounttoPaid > this.totalLinePrice || AmounttoPaid > this.totalLinePrice - this.paidAmount) {
     //     this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Warning");
@@ -132,6 +149,10 @@ export default class InvoiceButtons extends LightningElement {
 
   async RecordPayment() {
     this.trueVal = true;
+    if(!this.invoicedata)
+    {
+      return;
+    }
     await PaymentModal.open({
       size: "Small",
       message: this.invoicedata,
@@ -145,6 +166,7 @@ export default class InvoiceButtons extends LightningElement {
       })
       .catch((error) => {
         console.log("Error in Modal!!");
+        console.log(error);
       });
   }
 
@@ -232,7 +254,7 @@ export default class InvoiceButtons extends LightningElement {
     console.log("Opening Modal");
     console.log("DATA: ");
     console.log(this.invoicedata);
-    await PreviewInvoice.open({      
+    await PreviewInvoice.open({
       size: "large",
       decsciption: "invoice info",
       message: this.invoicedata
