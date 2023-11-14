@@ -94,7 +94,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
         TaxType: item.Tax_Type__c,
         totalAmount: item.Total_Amount__c,
         taxAmount: item.Tax_Amount__c ,
-        stipePrice:item.Product__r.Stripe_Price_Id__c
+        stripePrice:item.Product__r.Stripe_Price_Id__c
       };
       lineData.push(reLItem);
     }
