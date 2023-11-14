@@ -18,6 +18,7 @@ public with sharing class CustomerDetailsController {
       ];
       return Invoices;
     } catch (Exception e) {
+      System.debug(e.getMessage());
       throw new AuraHandledException(e.getMessage());
     }
   }
@@ -177,4 +178,28 @@ public with sharing class CustomerDetailsController {
     }
     return rateConverted;
   }
-}
+  /*    
+  Method to send Email when a payment been made against the invoice  
+  */ 
+  public static void sendStripePaymail(string customerEmail, string emailContent, string emailSubject)
+  {   
+    OrgWideEmailAddress orgEmail = [SELECT ID FROM OrgWideEmailAddress WHERE DisplayName = 'Org EMAIL' LIMIT 1];
+    string fromEmail =orgEmail.Id;
+    string[] to = new List<String>{customerEmail};
+    Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+    email.setSubject(emailSubject);
+    email.setHtmlBody(emailContent);
+    email.setOrgWideEmailAddressId(fromEmail);
+    email.setToAddresses(to);
+    email.setSaveAsActivity(true);    
+    Messaging.SendEmailResult[] emailDeliverabily = Messaging.sendEmail(new List<Messaging.SingleEmailMessage> {email});
+    for (Messaging.SendEmailResult result : emailDeliverabily) {
+        if (!result.isSuccess()) {
+          System.debug('Not DONE: ' + result.getErrors());
+        } else {
+          System.debug('SENT!');
+          System.debug(result);
+        }
+      }
+  }
+  }
