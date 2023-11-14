@@ -3,7 +3,7 @@ public class CustomPaymentDispatcher {
     {
         switch on operationType {
             when BEFORE_INSERT {
-                PaymentHandler.checkPaymentDate((List<Payment__c>) Trigger.new);                
+                PaymentHandler.checkPaymentEligibility((List<Payment__c>) Trigger.new);                
             }
             when else {
                 System.debug('Other Event called? '+ operationType);

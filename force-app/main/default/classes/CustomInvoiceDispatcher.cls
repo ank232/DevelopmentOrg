@@ -28,6 +28,7 @@ public class CustomInvoiceDispatcher {
       }
       when else {
         System.debug('OTHER OPERATION RUNNING');
+        System.debug(operationType);
       }
     }
   }
