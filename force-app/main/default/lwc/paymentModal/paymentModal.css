@@ -1,0 +1,7 @@
+.disabled-button{
+    background-color: #ddd;
+    color: #888;
+    border: none;
+    cursor: not-allowed;
+    text-decoration: none;
+}

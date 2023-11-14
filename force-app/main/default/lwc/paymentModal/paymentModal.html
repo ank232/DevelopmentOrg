@@ -1,6 +1,6 @@
 <template>
   <lightning-modal-header label="Record Payment"></lightning-modal-header>
-  <lightning-modal-body>   
-      <a href={stripePayURL} class="slds-button slds-button_brand" target="_blank"> Pay with Stripe</a>    
+  <lightning-modal-body>       
+      <a href={stripePayURL} class="slds-button slds-button_brand payBtn" target="_blank" disabled={isDisabled}> Pay with Stripe</a>    
   </lightning-modal-body>
 </template>

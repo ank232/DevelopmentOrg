@@ -3,25 +3,53 @@ import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import createStripePayment from "@salesforce/apex/StripeService.createStripePayment";
 import { api } from "lwc";
 export default class PaymentModal extends LightningModal {
-  paymentData;
-  invoiceQuantity;
   @api recordId;
-  @api message;
-  priceId;
+  @api message;  
   stripePayURL;
-
-  connectedCallback(){
-    console.log('Payment Modal CC running');
-    console.log(JSON.stringify(this.message));    
-    console.log('VALS;');
-    // console.log(this.recordId);
-    // console.log(typeof this.message.invoicelines[0].Quantity);
-    // console.log(typeof this.message.invoicelines[0].stipePrice);
-    this.invoiceQuantity = this.message.invoicelines[0].Quantity;    
-    this.priceId=this.message.invoicelines[0].stipePrice;
-    console.log(this.priceId);
-    console.log('Location: ',window.location.href);
-    this.generateStripePayout(this.priceId, this.invoiceQuantity, window.location.href,this.recordId);
+  runOne = true;
+  isDisabled= false;
+renderedCallback(){
+if(this.runOne)
+{
+  let btn = this.template.querySelector(".payBtn");
+  if(this.message.invoicelines &&this.message.invoiceStatus!== 'Approved')
+  {
+    console.log('RC running');
+    console.log('Not Approved??(RC)');
+    console.log(btn);
+    btn.setAttribute('disabled',true);
+    btn.classList.add('disabled-button');
+    btn.setAttribute =true;  
+  }
+  else{  
+    console.log('Approved ??(RC)');
+    btn.removeAttribute('disabled');
+    btn.classList.remove('disabled-button');
+    console.log(btn);
+  }
+  // btn.disabled = true;
+  this.runOne = false;
+}
+}
+  connectedCallback(){               
+    let inputParam = {};
+    inputParam.data = this.message.invoicelines;
+    inputParam.redirectUrl =window.location.href;
+    inputParam.invoiceId = this.recordId; 
+    const isApproved =this.checkEligibility(this.message.invoiceStatus);   
+    if(!isApproved)
+    {     
+      return;
+    }
+    this.generateStripePayout(inputParam);
+  }
+  checkEligibility(invoiceStatus)
+  {
+    if(invoiceStatus!=='Approved')
+    {
+      return false;
+    }
+    return true;
   }
   closePaymentModal = () => {
     console.log("Close event orrcured");
@@ -37,20 +65,16 @@ export default class PaymentModal extends LightningModal {
         paymentData: this.paymentData
       });
     } 
-generateStripePayout(stripe_product_id, productQuantity,redirect_url,invoiceId)
-{
-  createStripePayment({priceId: stripe_product_id, quanity: productQuantity, redirectUrl: redirect_url, invoiceId: invoiceId})
-  .then(
-(result)=>{
-  const paymentlink = result;
-  console.log(paymentlink);
-  this.stripePayURL= paymentlink;
-})
-  .catch(
-(error=>{
-  console.log('Error Occured in generating payment link ',error);  
-})
-  );
+generateStripePayout(invoiceLineItems)
+{  
+  let jsonData = JSON.stringify(invoiceLineItems);
+  console.log("-=> ",jsonData);  
+  createStripePayment({data:jsonData}).then((result)=>{
+    console.log('Res ',result);
+    this.stripePayURL = result;
+  }).catch((error)=>{
+    console.log('Err: ', error);
+  });
 }
   createPaymentRecord = (event) => {
     this.paymentData = event.detail.fields;
@@ -61,5 +85,14 @@ generateStripePayout(stripe_product_id, productQuantity,redirect_url,invoiceId)
     console.log(event.detail);
     console.log("FLOW EVENT");
     console.log(event.detail.status);
+  }
+    showNoficiation(title, message, variant,sticky) {
+    const showToast = new ShowToastEvent({
+      title: title,
+      message: message,
+      variant: variant,
+      mode: sticky
+    });
+    this.dispatchEvent(showToast);
   }
 }
