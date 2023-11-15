@@ -3,16 +3,19 @@
 ## Setup and Configuration
 
 - [ ] Create Salesforce Custom Objects:
-  - [x] Invoice
-  - [x] Payment
-  - [x] Line Item
-- [x] Create Lightning Web Components:
+  - [x] Invoices
+  - [x] Payments
+  - [x] Refunds
+  - [x] Line Items
+
+- [ ] Create Lightning Web Components:
   - [x] Create LWC for Invoice Creation.
   - [x] Create LWC for Payment Recording.
   - [x] Create LWC for Line Item Creation.
   - [x] Create LWC for Refund Recording.
   - [x] Utility Buttons on Invoice to Delete or void any invoice
   - [x] Overriding Invoice Record Page with LWC (Related Lists)
+  - [X] Stripe payment modal  
 
 - [x] Implement Apex Classes:
   - [x] Create Apex Controller for LWCs.
@@ -30,7 +33,7 @@
 - The Dispatcher class contains a method dispatch() that contains System.TriggerOperation.
 - This Dispatcher class is called inside the trigger passing the trigger operation type (after insert, before insert, etc).
 - Based on trigger operationType the dispatcher is calling the respective handler class method.
-- Using this framework, the trigger is separate from any logic and only contains the dispatch().
+- Using this framework, the trigger is separated from any logic and only contains the dispatch().
 
 ## User Interface
 
@@ -78,33 +81,13 @@
   - [x] Create and edit invoices.
   - [x] Add, edit, and delete line items.
   - [x] Record payments and calculate outstanding amounts.
-
-- [ ] Test Lightning Components:
-
-  - [ ] Verify component behavior, data retrieval, and rendering.
-
-- [ ] Test Apex Methods:
-  - [ ] Ensure CRUD operations work correctly.
+  - [x] Testing CRUD operation with different profiles.
 
 ## Deployment
 
-- [ ] Deploy to Development Environment:
-
-  - [ ] Test the application in a development environment.
-
-- [ ] Deploy to Production Environment:
-
-  - [ ] Migrate the application to the production environment.
-
-- [ ] User Training:
-  - [ ] Provide training to end users on using the invoice management system.
+ -[x] Using Github Actions defined in sfdx-ci.yml file, which contains commands to automate apex tests as part of Continuous Integration.
 
 ## Documentation
 
 - [ ] Technical Documentation:
   - [x] Document the data model, component structure, and customization details.
-
-sequenceDiagram
-    Alice->>John: Hello John, how are you?
-    John-->>Alice: Great!
-    Alice-)John: See you later!
