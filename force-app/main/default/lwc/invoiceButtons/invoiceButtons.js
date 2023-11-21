@@ -4,7 +4,7 @@ import { createRecord } from "lightning/uiRecordApi";
 import InvoiceTotalMC from "@salesforce/messageChannel/InvoiceTotalMC__c";
 import PaymentModal from "c/paymentModal";
 import RefundModal from "c/refundModal";
-import PreviewInvoice from "c/previewInvoice";
+// import PreviewInvoice from "c/previewInvoice";
 import ExchangeRateModal from "c/exchangeRateModal";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { getRelatedListRecords } from "lightning/uiRelatedListApi";
@@ -17,12 +17,10 @@ export default class InvoiceButtons extends LightningElement {
   paidAmount;
   @api invoicedata;
   runOnce = true;
-  // isDisabled = true;
+  isDisabled = false;  
   renderedCallback() {
     if (this.runOnce) {
-      console.log("I will disable the buttons(invoiceBtns)");
-      console.log("InvoiceButton???");
-      console.log(this.invoicedata);
+      console.log("I will disable the buttons(invoiceBtns)");            
       this.runOnce = false;
     }
   }
@@ -40,20 +38,18 @@ export default class InvoiceButtons extends LightningElement {
     ]
   })
   PaymentRecords({ data, error }) {
-    const refButton = this.template.querySelector(".refundButton");
+    // const refButton = this.template.querySelector(".refundButton");
     if (data) {
       if (!data.count) {
         // refButton.classList.add('disabled-button');
         // refButton.setAttribute('disabled', true);
-        // refButton.classList.add("slds-hide");
-        this.paidAmount = 0;
+        // refButton.classList.add("slds-hide");        
       } else {
         // refButton.classList.remove('disabled-button');
         // let amnt = 0;
         // data.records.map((item) => {
         //     amnt += item.fields.Amount__c.value;
-        // });
-        // this.paidAmount = amnt;
+        // });        
       }
     }
     if (error) {
@@ -89,15 +85,17 @@ export default class InvoiceButtons extends LightningElement {
   InvoiceButtonVisibility = (data) => {
     const button = this.template.querySelector(".paymentButton");
     if (data.invoicelines.length === 0) {
-      // button.classList.add("slds-hide");
-      // button.setAttribute('disabled',true);
+      button.classList.add("slds-hide");
+      // button.classList.add("slds-hidden");
       // button.setAttribute = true;
-      // button.classList.add('disabled-button');
+      button.setAttribute('disabled',true);
+      button.classList.add('disabled-button');
     } else {
-      // button.removeAttribute('disabled');
+      button.removeAttribute('disabled');
       const fireOrigin = data.fireOrigin;
       if (fireOrigin.includes("Related")) {
         this.invoicedata = data;
+        console.log(this.invoicedata);
         const maxAmnt = data.invoicelines.reduce(
           (total, lineitem) => total + lineitem.totalAmount,
           0.0
@@ -111,17 +109,7 @@ export default class InvoiceButtons extends LightningElement {
     }
   };
 
-  ProcessPayment = (paymentData) => {
-    // const AmounttoPaid = paymentData["Amount__c"];
-
-    // if (AmounttoPaid > this.totalLinePrice || AmounttoPaid > this.totalLinePrice - this.paidAmount) {
-    //     this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Warning");
-    //     return;
-    // }
-    // if (AmounttoPaid > this.totalLinePrice || AmounttoPaid > this.totalLinePrice - this.paidAmount) {
-    //     this.showNoficiation("Warning", "Payment must be greater than the total LineItem", "Warning");
-    //     return;
-    // }
+  ProcessPayment = (paymentData) => {  
     this.createpaymentRecord(paymentData);
   };
 
@@ -146,13 +134,15 @@ export default class InvoiceButtons extends LightningElement {
         console.log(error);
       });
   }
-
+check(stripeId){
+if(!stripeId)
+{
+  return false;
+}
+return true;
+}
+/* Modal to make payment through stripe system, it should only open only when we have invoicelines and stripeProductIds attached to it*/ 
   async RecordPayment() {
-    this.trueVal = true;
-    if(!this.invoicedata)
-    {
-      return;
-    }
     await PaymentModal.open({
       size: "Small",
       message: this.invoicedata,
@@ -248,19 +238,5 @@ export default class InvoiceButtons extends LightningElement {
         this.showNoficiation("Message", "Problem in Modal!", "Message");
         console.error(error);
       });
-  }
-
-  async previewInvoice() {
-    console.log("Opening Modal");
-    console.log("DATA: ");
-    console.log(this.invoicedata);
-    await PreviewInvoice.open({
-      size: "large",
-      decsciption: "invoice info",
-      message: this.invoicedata
-    }).catch((error) => {
-      console.log(error);
-      this.showNoficiation("Message", "modal closed", "Mesage");
-    });
-  }
+  } 
 }
