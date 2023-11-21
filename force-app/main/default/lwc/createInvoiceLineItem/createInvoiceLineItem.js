@@ -84,6 +84,7 @@ export default class CreateInvoiceLineItem extends LightningElement {
   RelatedLineItemData(data) {
     const lineData = [];    
     for (let item of data) {
+      let stripePriceId = item.Product__r.Stripe_Price_Id__c ? item.Product__r.Stripe_Price_Id__c:''; 
       const reLItem = {
         Id: item.Id,
         ProductName: item.Product__c,
@@ -94,7 +95,8 @@ export default class CreateInvoiceLineItem extends LightningElement {
         TaxType: item.Tax_Type__c,
         totalAmount: item.Total_Amount__c,
         taxAmount: item.Tax_Amount__c ,
-        stripePrice:item.Product__r.Stripe_Price_Id__c
+        stripePrice : stripePriceId
+        // stripePrice:item.Product__r.Stripe_Price_Id__c? s:s
       };
       lineData.push(reLItem);
     }
