@@ -5,6 +5,9 @@ public class CustomPaymentDispatcher {
             when BEFORE_INSERT {
                 PaymentHandler.checkPaymentEligibility((List<Payment__c>) Trigger.new);                
             }
+            when AFTER_INSERT{
+                PaymentHandler.afterInsert((List<Payment__c>) Trigger.new);
+            }
             when else {
                 System.debug('Other Event called? '+ operationType);
             }

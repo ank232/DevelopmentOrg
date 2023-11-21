@@ -37,4 +37,33 @@ public with sharing class PaymentHandler {
       }
     }
   }
+  /* This method will update the related invoice status to Paid */ 
+  public static void afterInsert(List<Payment__c> payments)
+  {
+    Set<Id> invoiceIds = new Set<Id>();
+    for(Payment__c  pay: payments)
+    {
+      invoiceIds.add(pay.Invoice__c);
+    }
+    if(! invoiceIds.isEmpty())
+    {
+      Map<Id, Invoice__c> relatedInvoices =new Map<Id, Invoice__c> ([Select Id, Status__c FROM Invoice__c WHERE Id IN: invoiceIds]);
+      if(!relatedInvoices.isEmpty())
+      {      for(Payment__c pay: payments)        
+        {
+          if(relatedInvoices.containskey(pay.Invoice__c))
+          {
+             relatedInvoices.get(pay.Invoice__c).Status__c = 'Paid';
+          }
+        }
+      }
+      try{
+        update relatedInvoices.values();
+      }catch(DmlException dmlEx)
+      {
+        System.debug('Not Done??');
+        System.debug(dmlEx.getStackTraceString());
+      }
+    }
+  }
 }
