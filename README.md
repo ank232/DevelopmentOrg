@@ -1,6 +1,6 @@
 # BillZen: an invoice management application
 
-## Data Model 
+## Data Model
 
 ![!Screenshot](assets/data_model/data_model.png)
 
