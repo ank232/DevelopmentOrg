@@ -1,6 +1,8 @@
 # BillZen: an invoice management application
-# Demo
-<iframe width="560" height="315" src="https://www.canva.com/design/DAFwGPMAUik/2wK6YuOaCr9CGW8YZRcc3g/watch" frameborder="4" allowfullscreen></iframe>
+
+## Data Model 
+
+![!Screenshot](assets/data_model/data_model.png)
 
 ## Setup and Configuration
 
