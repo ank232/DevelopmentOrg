@@ -2,10 +2,7 @@ public class CustomInvoiceDispatcher {
   public static void dispatch(System.TriggerOperation operationType) {
     switch on operationType {
       when AFTER_UPDATE {
-        InvoiceHandler.UpdateInvoice(
-          (List<Invoice__c>) Trigger.new,
-          (Map<Id, Invoice__c>) Trigger.oldmap
-        );
+        // InvoiceHandler.UpdateInvoice((List<Invoice__c>) Trigger.new,(Map<Id, Invoice__c>) Trigger.oldmap);
       }
       when BEFORE_INSERT {
         InvoiceHandler.verifyInvoiceData((List<Invoice__c>) Trigger.new);
