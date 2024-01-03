@@ -1,4 +1,4 @@
-public with sharing class PaymentHandler {
+public without sharing class PaymentHandler {
   public static void checkPaymentEligibility(List<Payment__c> payments) {
     System.debug('Trigger Runnin in Before for Payment(custom)');
     System.debug('USER RUNNING Trigger::: ' + UserInfo.getProfileId());
@@ -16,22 +16,13 @@ public with sharing class PaymentHandler {
           FROM Invoice__c
           WHERE Id IN :invoiceIds
         ]
-      );
-      system.debug('RelatedINV: ' + relatedInvs);
-      for (payment__c paymentRec : payments) {
-        System.debug('Inside Loop?');
-        System.debug(paymentRec);
-        if (
-          relatedInvs.containsKey(paymentRec.Invoice__c) &&
-          relatedInvs.get(paymentRec.Invoice__c).Status__c != 'Approved'
-        ) {
+      );      
+      for (payment__c paymentRec : payments) {        
+        if (relatedInvs.containsKey(paymentRec.Invoice__c) && relatedInvs.get(paymentRec.Invoice__c).Status__c != 'Approved') {
           System.debug('Condition Satisfied?');
           paymentRec.addError('Payment must be made on Approved invoices');
         }
-        if (
-          relatedInvs.containsKey(paymentRec.Invoice__c) &&
-          relatedInvs.get(paymentRec.Invoice__c).Total_Line_Amount__c == 0.0
-        ) {
+        if (relatedInvs.containsKey(paymentRec.Invoice__c) && relatedInvs.get(paymentRec.Invoice__c).Total_Line_Amount__c == 0.0) {
           paymentRec.addError('No LineItem found');
         }
       }
@@ -62,7 +53,9 @@ public with sharing class PaymentHandler {
       }catch(DmlException dmlEx)
       {
         System.debug('Not Done??');
-        System.debug(dmlEx.getStackTraceString());
+        System.debug(dmlEx.getStackTraceString());                
+        Error_Log__c errorLogger  = new Error_Log__c(Class_name__c = 'PaymentHandler',Stack_trace__c = dmlEx.getStackTraceString(),Error_message__c =dmlEx.getDmlMessage(0));
+        insert errorLogger;
       }
     }
   }
