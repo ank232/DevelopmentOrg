@@ -11,7 +11,8 @@ public with sharing class CustomerDetailsController {
           Due_Date__c,
           Invoice_Date__c,
           Status__c,
-          Total_Line_Amount__c
+          Total_Line_Amount__c,
+          CurrencyIsoCode
         FROM invoice__c
         WHERE Company__c = :companyId
         WITH SECURITY_ENFORCED
@@ -192,14 +193,14 @@ public with sharing class CustomerDetailsController {
     email.setOrgWideEmailAddressId(fromEmail);
     email.setToAddresses(to);
     email.setSaveAsActivity(true);    
-    Messaging.SendEmailResult[] emailDeliverabily = Messaging.sendEmail(new List<Messaging.SingleEmailMessage> {email});
-    for (Messaging.SendEmailResult result : emailDeliverabily) {
-        if (!result.isSuccess()) {
-          System.debug('Not DONE: ' + result.getErrors());
-        } else {
-          System.debug('SENT!');
-          System.debug(result);
-        }
-      }
+    // Messaging.SendEmailResult[] emailDeliverabily = Messaging.sendEmail(new List<Messaging.SingleEmailMessage> {email});
+    // for (Messaging.SendEmailResult result : emailDeliverabily) {
+    //     if (!result.isSuccess()) {
+    //       System.debug('Not DONE: ' + result.getErrors());
+    //     } else {
+    //       System.debug('SENT!');
+    //       System.debug(result);
+    //     }
+    //   }
   }
   }
