@@ -77,7 +77,7 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
   @wire(ShowInvoices, { companyId: "$recordId" })
   wiredInvoices({ data, error }) {
     if (data) {
-      if (data.length == 0) {
+      if (data.length === 0) {
         this.invoiceData = null;
       } else {
         console.log(data);
@@ -116,41 +116,6 @@ export default class CompanyInvoices extends NavigationMixin(LightningElement) {
     });
     this.dispatchEvent(showToast);
   }
-  async sendAction() {
-    // console.log("Sending Action;;;;");
-    // console.log(this.selectedRowData);
-    if (
-      this.selectedRowData.length == 0 ||
-      typeof this.selectedRowData == "undefined"
-    ) {
-      console.log("Modal WIll Not open");
-    } else {
-      console.log("OPENING MODAL");
-      await PreviewInvoice.open({
-        label: "Test Modal",
-        size: "large",
-        description: "invoice Summary",
-        message: this.selectedRowData
-      }).catch((error) => {
-        console.log("Error in Invoice Modal");
-        console.log(error);
-      });
-    }
-  }
-  // else{
-  //     console.log('ELSE');
-  //     console.log(this.selectedRowData);
-  // }
-  // sendAction = (event) => {
-  //     console.log('Action(Send)');
-  //     console.log('selected invoices are');
-  //     console.log(this.selectedRowData);
-  //     if (!this.selectedRowData) {
-  //         this.showNoficiation("Message", "Plese Select invoice(s) first", "Message");
-  //         return;
-  //     }
-  //     console.log();
-  // }
   rowAction = (event) => {
     const rowId = event.detail.row.Id;
     const rowNumber = event.detail.row.Name;
