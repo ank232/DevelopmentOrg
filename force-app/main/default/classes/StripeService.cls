@@ -14,8 +14,7 @@ global without sharing class StripeService {
 
     HttpRequest req = new HttpRequest();
     req.setEndpoint('callout:Stripe_System/customers');
-    req.setMethod('POST');
-    // req.setHeader('Authorization', 'Bearer '+ API_key);
+    req.setMethod('POST');    
     req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
     req.setBody(payload);
 
@@ -65,9 +64,7 @@ global without sharing class StripeService {
     if (response.getStatusCode() == 200 || response.getStatusCode() == 201) {
       System.debug('Product Created IN Stripe');
       System.debug(response.getBody());
-    } else {
-      System.debug('FAILED>????');
-      System.debug(response.getStatusCode());
+    } else {          
       System.debug(response.getBody());
     }
   }
@@ -82,9 +79,7 @@ global without sharing class StripeService {
       Http http = new Http();
       HttpResponse stripeResponse = http.send(stripeReq);
       if (stripeResponse.getStatusCode() == 200) {
-        System.debug('Found Acive Products');
-        System.debug(stripeResponse.getBody());
-        // parseData(stripeResponse.getBody());
+        System.debug('Found Acive Products');        
       }
       if (stripeResponse.getStatusCode() == 404) {
         System.debug('Not FOUND');
@@ -138,35 +133,34 @@ global without sharing class StripeService {
   // Accepts JSON Data to create Stripe Payment link: content: invoiceLineItems,callbackURL
   @AuraEnabled
   public static string createStripePayment(String data) {
-    PaymentModalWrapper paymentWrapper = (PaymentModalWrapper) JSON.deserialize(
-      data,
-      PaymentModalWrapper.class
-    );
+    PaymentModalWrapper paymentWrapper = (PaymentModalWrapper) JSON.deserialize(data,PaymentModalWrapper.class);
+    if(paymentWrapper.invoiceStatus!='Approved')
+    {
+      throw new AuraHandledException('Invoice is not approved, cannot make payment');
+    }
     String url;
-    List<paymentModalWrapper.Data> invoiceLines = paymentWrapper.Data;
     string encodedResponse = '';
+    List<paymentModalWrapper.Data> invoiceLines = paymentWrapper.Data;
+    if(invoiceLines.isEmpty())
+    {
+      throw new AuraHandledException('Invoice has no products');
+    }
     for (integer i = 0; i < invoiceLines.size(); i++) {
       Integer quantity = invoiceLines[i].Quantity;
       String stripePriceId = invoiceLines[i].stripePrice;
-      encodedResponse +=
-        'line_items[' +
-        i +
-        '][price]=' +
-        EncodingUtil.urlEncode(stripePriceId, 'UTF-8');
-      encodedResponse +=
-        '&line_items[' +
-        i +
-        '][quantity]=' +
-        EncodingUtil.urlEncode(String.valueOf(quantity), 'UTF-8') +
-        '&';
+      if(String.isBlank(stripePriceId))
+      {
+        throw new AuraHandledException('No Stripe products found');
+      }
+      encodedResponse +='line_items[' +i +'][price]=' +EncodingUtil.urlEncode(stripePriceId, 'UTF-8');
+      encodedResponse +='&line_items[' +i +'][quantity]=' +
+      encodingUtil.urlEncode(String.valueOf(quantity), 'UTF-8') +
+      '&';
     }
-    encodedResponse +=
-      '&metadata[invoiceId]=' +
-      EncodingUtil.urlEncode(paymentWrapper.invoiceId, 'UTF-8');
+    encodedResponse +='&metadata[invoiceId]=' +encodingUtil.urlEncode(paymentWrapper.invoiceId, 'UTF-8');
     encodedResponse += '&after_completion[type]=redirect';
-    encodedResponse +=
-      '&after_completion[redirect][url]=' +
-      EncodingUtil.urlEncode(paymentWrapper.redirectUrl, 'UTF-8');
+    encodedResponse +='&after_completion[redirect][url]=' +
+    encodingUtil.urlEncode(paymentWrapper.redirectUrl, 'UTF-8');
     HttpRequest stripePayreq = new HttpRequest();
     stripePayreq.setEndpoint('callout:Stripe_System/payment_links');
     stripePayreq.setHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -176,19 +170,14 @@ global without sharing class StripeService {
       Http http = new Http();
       HttpResponse response = http.send(stripePayreq);
       if (response.getStatusCode() == 200) {
-        Map<String, Object> responsebody = (Map<String, Object>) (JSON.deserializeUntyped(
-          response.getBody()
-        ));
-        url = String.valueOf(responsebody.get('url'));
-        System.debug(url);
+        Map<String, Object> responsebody = (Map<String, Object>) (JSON.deserializeUntyped(response.getBody()));
+        url = String.valueOf(responsebody.get('url'));        
       }
       if (response.getStatusCode() == 400) {
-        url = '404 Bad Request';
-        System.debug('Bad Request??');
+        url = '404 Bad Request';        
         throw new AuraHandledException('Bad Request');
       }
-    } catch (Exception e) {
-      System.debug(e.getMessage());
+    } catch (Exception e) {      
       url = e.getMessage();
     }
     return url;
