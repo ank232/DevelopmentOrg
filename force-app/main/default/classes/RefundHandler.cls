@@ -48,17 +48,17 @@ public with sharing class RefundHandler {
     if (refundRec.Date__c < invoiceRec.Paid_date__c) {
       refundRec.addError('Refund Date must be after the paid Date');
     }
-    double maxRefundableAmnt = calculateRefundAmount(existingRefunds);
-    double payableAmnt = PaymentHandler.calculateTotalAmnt(paymentsRecorded);
-    // checking if user gave amnt greater than the payments amnt
-    if (refundRec.Amount__c > payableAmnt) {
-      refundRec.addError('Refund cannot be greater than paid amount');
-      return;
-    }
-    if (refundRec.Amount__c + maxRefundableAmnt > payableAmnt) {
-      refundRec.addError('Refund amount exceeded');
-      return;
-    }
+    // double maxRefundableAmnt = calculateRefundAmount(existingRefunds);
+    // double payableAmnt = PaymentHandler.calculateTotalAmnt(paymentsRecorded);
+    // // checking if user gave amnt greater than the payments amnt
+    // if (refundRec.Amount__c > payableAmnt) {
+    //   refundRec.addError('Refund cannot be greater than paid amount');
+    //   return;
+    // }
+    // if (refundRec.Amount__c + maxRefundableAmnt > payableAmnt) {
+    //   refundRec.addError('Refund amount exceeded');
+    //   return;
+    // }
     // if refunds been made already
     if (!existingRefunds.isEmpty()) {
       Date latestrefundedDate = invoiceRec.Refunds__r[0].Date__c;

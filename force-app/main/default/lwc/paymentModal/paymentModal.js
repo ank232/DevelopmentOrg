@@ -19,42 +19,6 @@ if(this.runOne)
 }
 }
   connectedCallback(){
-    console.log('Connected Callback (Buttons) running');
-  const isStripeIdpresent = this.message.invoicelines.every((element)=>{
-    console.log(element.stripePrice);
-    return (element.stripePrice);    
-  });
-  if(this.message.invoicelines.length === 0)
-  {
-    this.errorMessage = 'No Items';
-    this.showpayBtn = false;
-    return;
-  }
-  if(!isStripeIdpresent)
-  {
-    this.errorMessage  = 'No Stripe Products found';
-    this.showpayBtn = false; 
-    return;
-  }
-  if(this.message.invoiceStatus === 'Paid')
-  {
-    this.errorMessage = 'Already paid';
-    this.showpayBtn = false;
-    return;
-  }
-    if(this.message.invoiceStatus !== 'Approved') 
-  {
-    this.errorMessage = 'Invoice was not approved';
-    this.showpayBtn = false; 
-    this.isDisabled = true;
-    return;
-  }
-  // if(this.message.invoiceStatus !=='Approved' || this.message.invoicelines.length!==0 || !isStripeIdpresent){    
-  //     console.log('!No Done!'); 
-  // }
-  // else{  
-    console.log('Approved ??(RC):(');
-    this.isDisabled=false;
     let inputParam = {};
     inputParam.data = this.message.invoicelines;
     inputParam.redirectUrl =window.location.href;
@@ -63,9 +27,7 @@ if(this.runOne)
     this.generateStripePayout(inputParam);
   }
   closePaymentModal = () => {
-    console.log("Close event orrcured");
-    // console.log(this.paymentData);
-    // if (typeof this.paymentData !== "undefined") {
+    console.log("Close event orrcured");   
       const modalCloseEvent = new ShowToastEvent({
         title: "Success",
         message: "Payment Saved Successfully",
@@ -80,8 +42,7 @@ generateStripePayout(invoiceLineItems)
 {  
   let jsonData = JSON.stringify(invoiceLineItems);
   console.log("-=> ",jsonData);  
-  createStripePayment({data:jsonData}).then((result)=>{
-    // console.log('Res ',result);
+  createStripePayment({data:jsonData}).then((result)=>{    
     this.isDisabled = false;
     this.stripePayURL = result;
     this.errorMessage = undefined;
