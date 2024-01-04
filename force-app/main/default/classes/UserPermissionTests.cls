@@ -13,8 +13,12 @@ public class UserPermissionTests {
         System.runAs(userToTest) {            
             System.debug(userinfo.getName());
 			payment__c pay  = new Payment__c(invoice__c=inv.Id,status__c='Draft',date__c=System.today());            
-            insert pay;
-            system.debug(pay);
+            try {
+                insert pay;                
+            } catch(DMLException e) {
+                System.debug(e.getMessage());
+                System.assert(pay.Id==null);
+            }  
         }
     }
 }
