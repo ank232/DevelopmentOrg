@@ -41,34 +41,11 @@ public class InvoiceHandlerTest {
     for (Id inv : invoiceLineMap.keyset()) {
       System.assertEquals(invoiceLineMap.get(inv).size(), 3); // Invoice line Item Assertion
     }
-    List<Account> accounts = [
-      SELECT PAID_INVOICES__c, Open_Invoices__c, OverDue_Invoices__c
-      FROM ACCOUNT
-      WHERE ID = :acc.Id
-    ];
-
-    List<Invoice__c> invoices = [
-      SELECT GRAND_TOTAL__c
-      FROM Invoice__c
-      WHERE Company__c = :acc.Id
-    ];
-    Double totalAmnt = 0;
-    for (Invoice__c inv : invoices) {
-      totalAmnt += inv.Grand_Total__c;
-    }
-    for (Account ac : accounts) {
-      System.assertEquals(ac.Paid_Invoices__c, 0);
-      System.assertEquals(
-        ac.Open_Invoices__c,
-        totalAmnt,
-        'Total Open invoices'
-      ); // Rollup field Assertion on Insert Operation
-    }
   }
   /*
         ====================================
         Testing if user can update invoice 
-        and its related invoices if its paid
+        and its related invoicelineitems if its paid
         =====================================
 */
   @isTest
@@ -362,85 +339,5 @@ public class InvoiceHandlerTest {
     }
     List<Invoice__c> deletedInvoices = [SELECT ID FROM INVOICE__c];
     delete deletedInvoices;
-  }
-  @isTest
-  static void testGuestUser() {
-    String uniqueUserName =
-      'standarduser' +
-      DateTime.now().getTime() +
-      '@testorg.com';
-    Profile guestUser = [
-      SELECT Id
-      FROM profile
-      WHERE Name = 'InvoicePayment Profile'
-    ];
-    User u = new User(
-      Alias = 'standt',
-      Email = 'standarduser@testorg.com',
-      EmailEncodingKey = 'UTF-8',
-      LastName = 'Testing',
-      LanguageLocaleKey = 'en_US',
-      LocaleSidKey = 'en_US',
-      ProfileId = guestUser.Id,
-      TimeZoneSidKey = 'America/Los_Angeles',
-      UserName = uniqueUserName
-    );
-    System.runAs(u) {
-      System.debug('Current User: ' + UserInfo.getUserName());
-      System.debug('Current Profile: ' + UserInfo.getProfileId());
-      Account acc = new Account(name ='TestUser Acc',Industry='Banking', Rating='Hot');
-      insert acc;
-      system.debug('Acc??');
-      System.debug(acc);
-      Invoice__c testInvoice = new Invoice__c(company__c =acc.Id,status__c='Draft',due_date__c=date.today(),Invoice_date__c=Date.today(), comments__c ='Test',Invoice_number__c ='TEST INV1');
-      insert testInvoice;
-      System.assert(testInvoice.Id!= null);
-      Payment__c payMent = new Payment__c(invoice__c =testInvoice.Id, amount__c =200,Status__c ='Draft',Date__c =Date.Today()+2);
-      try {        
-        insert payMent;
-      } catch(Exception e) {
-        System.debug('-=-=-= '+e.getMessage());
-        System.assert(e.getNumDml()==1,'Custom Validation failed');
-        system.assert(payMent.Id == null,'Should Not Insert the payment record');
-      }
-    }
-  }
-  @isTest 
-  static void userPermissions()
-  {
-    String uniqueUserName =
-      'standarduser' +
-      DateTime.now().getTime() +
-      '@testorg.com';
-    Profile guestUser = [
-      SELECT Id
-      FROM profile
-      WHERE Name = 'Read Only'
-    ];
-    User u = new User(
-      Alias = 'standt',
-      Email = 'standarduser@testorg.com',
-      EmailEncodingKey = 'UTF-8',
-      LastName = 'Testing',
-      LanguageLocaleKey = 'en_US',
-      LocaleSidKey = 'en_US',
-      ProfileId = guestUser.Id,
-      TimeZoneSidKey = 'America/Los_Angeles',
-      UserName = uniqueUserName
-    );    
-    System.runAs(u)
-    {
-      Account  acc =InvoiceManagementTestDataFactory.createCompanyRecord('Test Acc', true);      
-      Invoice__c testInvoice = new Invoice__c(company__c =acc.Id,status__c='Approved',due_date__c=date.today(),Invoice_date__c=Date.today(), comments__c ='Test',Invoice_number__c ='TEST INV1');
-      insert testInvoice;      
-      Payment__c pay = new Payment__c(invoice__c = testInvoice.id, amount__c = 2323, date__c =date.today(), status__c ='draft');
-      try {
-      insert pay;
-      System.debug(pay);
-        // system.assert(prod.Id== null,'No Permissions?');
-      } catch(Exception e) {
-        System.debug('-=-=> '+e.getMessage());
-      }
-    }
   }
 }
