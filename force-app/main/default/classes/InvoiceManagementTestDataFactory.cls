@@ -94,4 +94,28 @@ public class InvoiceManagementTestDataFactory {
     insert newPayment;
     return newPayment;
   }
+  public static User createTestUser(string userProfile)
+  {
+     String uniqueUserName =
+      'standarduser' +
+      DateTime.now().getTime() +
+      '@testorg.com';
+    Profile guestUser = [
+      SELECT Id
+      FROM profile
+      WHERE Name = 'InvoicePayment Profile'
+    ];
+    User testUser = new User(
+      Alias = 'standt',
+      Email = 'standarduser@testorg.com',
+      EmailEncodingKey = 'UTF-8',
+      LastName = 'Testing',
+      LanguageLocaleKey = 'en_US',
+      LocaleSidKey = 'en_US',
+      ProfileId = guestUser.Id,
+      TimeZoneSidKey = 'America/Los_Angeles',
+      UserName = uniqueUserName
+    );
+    return testUser;
+  }
 }
